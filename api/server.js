@@ -13,7 +13,7 @@ const connection_string = process.env.CONNECTION_STRING;
 const port = process.env.PORT || 5000
 
 app.listen(port, () => {
-  console.log('server running on port ${port}');
+  console.log(`server running on port ${port}`);
 });
 
 mongoose
