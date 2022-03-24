@@ -51,5 +51,14 @@ router.post("/check", verifyToken ,(req,res) =>{
     })
 })
 
+router.get("/" ,(req,res)=>{
+    res.send("dentro de user route")
+})
+
+router.post("/prueba" ,(req,res)=>{
+
+    res.send(req.body)
+})
+
 
 module.exports = router
