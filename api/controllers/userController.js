@@ -4,7 +4,7 @@ const generateToken = require("../config/generateToken");
 
 exports.register = (req, res) => {
   const { name, surname, email, password, age } = req.body;
-  
+  console.log(`req body es`, req.body)
   User.findOne({ email })
   .then((user) => {
     if (user) {
@@ -13,6 +13,7 @@ exports.register = (req, res) => {
     } else {
       User.create({ name, surname, email, password, age })
       .then((user) => {
+        console.log('entre')
             res.sendStatus(201);
           })
           .catch((error) => {
