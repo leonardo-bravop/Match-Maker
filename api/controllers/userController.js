@@ -4,21 +4,16 @@ const generateToken = require("../config/generateToken");
 
 exports.register = (req, res) => {
   const { name, surname, email, password, age } = req.body;
-
+  
   User.findOne({ email })
-    .then((user) => {
-      if (user) {
-        res.status(400);
-        throw new Error("User Already Exists");
-      } else {
-        User.create({ name, surname, email, password, age })
-          .then((user) => {
-            res.json({
-              _id: user._id,
-              name: user.name,
-              surname: user.surname,
-              email: user.email,
-            });
+  .then((user) => {
+    if (user) {
+      res.status(400);
+      throw new Error("User Already Exists");
+    } else {
+      User.create({ name, surname, email, password, age })
+      .then((user) => {
+            res.sendStatus(201);
           })
           .catch((error) => {
             res.json({ message: error });
