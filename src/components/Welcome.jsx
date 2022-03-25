@@ -13,7 +13,7 @@ import Login from "./Login";
 function Welcome({ navigation }) {
     return (
       <View style={styles.fondo}>
-        <Text>Bienvenido, registrate o chupala</Text>
+        <Text>Bienvenido, registrate o logeate</Text>
             <Button
             title="Register"
             onPress={() => navigation.navigate('Register')}
