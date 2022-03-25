@@ -1,20 +1,22 @@
 const express = require("express");
-const app = express();
-const bodyParser = require("body-parser");
-const mongoose = require("mongoose");
-const router = require("./routes")
-
+const cors = require("cors")
+const volleyball = require("volleyball")
 require("dotenv").config();
+const connectDB = require("./config/db");
+const router = require("./routes");
 
-app.get("/", (req, res) => {
-  res.send("welcome to node js");
-});
+const app = express();
+connectDB()
 
+app.use(cors())
+app.use(volleyball)
 app.use(express.json())
+
 app.use("/api", router)
 
-const connection_string = process.env.CONNECTION_STRING;
 const port = process.env.PORT || 5000
+// const hostname = "127.0.0.1"
+
 
 app.listen(port, () => {
   console.log(`server running on port ${port}`);
@@ -29,7 +31,8 @@ mongoose
     console.error("MongoDB connection failed", error);
   });
 
+
 app.listen(port, () => {
-  console.log(`server running on port ${port}`);
+  console.log(`server running on port:${port}`);
 });
 
