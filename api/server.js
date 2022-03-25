@@ -17,9 +17,20 @@ app.use("/api", router)
 const port = process.env.PORT || 5000
 // const hostname = "127.0.0.1"
 
-app.get("/", (req, res) => {
-  res.send("welcome to the server with mongo db atlas");
+
+app.listen(port, () => {
+  console.log(`server running on port ${port}`);
 });
+
+mongoose
+  .connect(connection_string)
+  .then(() => {
+    console.log("MongoDB connection established...");
+  })
+  .catch((error) => {
+    console.error("MongoDB connection failed", error);
+  });
+
 
 app.listen(port, () => {
   console.log(`server running on port:${port}`);
