@@ -3,6 +3,8 @@ import {
   Button,
   View,
   Text,
+  StyleSheet,
+  TouchableOpacity
 } from "react-native";
 
 import { styles } from "../styles/Styles";
@@ -11,18 +13,25 @@ import Register from "./Register";
 import Login from "./Login";
 
 function Welcome({ navigation }) {
+
     return (
       <View style={styles.fondo}>
-        <Text>Bienvenido, registrate o logeate</Text>
-            <Button
-            title="Register"
-            onPress={() => navigation.navigate('Register')}
-            />
-          <Button
-          title="Login"
+        
+        <Text style={styles.info} >Bienvenido, registrate o logeate</Text>
+        
+        <TouchableOpacity
+          style={styles.colorBtn}
           onPress={() => navigation.navigate('Login')}
-          />
-        </View>
+        >
+          <Text style={styles.colorTxtBtn}>Iniciar Sesion</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.colorBtn}
+          onPress={() => navigation.navigate('Register')}
+        >
+          <Text style={styles.colorTxtBtn}>Registrarse</Text>
+        </TouchableOpacity>
+      </View>
     );
   }
 
