@@ -10,23 +10,35 @@ import {
 } from "react-native";
 
 import { useEffect, useState } from "react";
+import axios from "axios";
+
+import Constants from "expo-constants";
+
+const { manifest } = Constants;
+
+const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
 
 function Register({ navigation }) {
+  
 
     const [form, setForm] = useState({
-        user: "",
+        name: "",
+        surname: "",
         email: "",
         password: "",
       });
-    
-      const handleChange = (e) => {
-        e.preventDefault();
-        setForm({ ...form, [e.target.name]: e.target.value });
-      };
-    
+
+      onChangeText = (key, val) => {
+        setForm({...form, [key]: val })
+      }
+
       const handleSubmit = (e) => {
-        e.preventDefault();
-        navigation.navigate('Login')
+        e.preventDefault()
+        axios.post(`${uri}/api/user/register`, form)
+        .then(res => {
+          res.status == 201 ?  navigation.navigate('Login') : null
+        })
+        
       };
 
     return (
@@ -38,25 +50,34 @@ function Register({ navigation }) {
           <SafeAreaView>
             <View>
               <TextInput
-                onChange={handleChange}
+                 onChangeText={val => onChangeText('name', val)}
                 type="text"
-                placeholder="Usuario"
-                name="user"
+                placeholder="name"
+                name="name"
               />
             </View>
     
             <View>
               <TextInput
-                onChange={handleChange}
+               onChangeText={val => onChangeText('surname', val)}
+                type="text"
+                placeholder="surname"
+                name="surname"
+              />
+            </View>
+    
+            <View>
+              <TextInput
+               onChangeText={val => onChangeText('email', val)}
                 type="email"
                 placeholder="Email"
                 name="email"
               />
             </View>
-    
+
             <View>
               <TextInput
-                onChange={handleChange}
+                onChangeText={val => onChangeText('password', val)}
                 type="password"
                 placeholder="Password"
                 name="password"

@@ -1,4 +1,5 @@
 import React from "react";
+
 import {
   Button,
   View,
@@ -6,9 +7,17 @@ import {
   SafeAreaView,
   TextInput,
   StyleSheet,
+
 } from "react-native";
 
 import { useEffect, useState } from "react";
+import axios from "axios";
+
+import Constants from "expo-constants";
+
+const { manifest } = Constants;
+
+const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
 
 import Home from "./Home"
 
@@ -18,21 +27,26 @@ function Login({ navigation }) {
     password: "",
   });
 
-  const handleChange = (e) => {
-    e.preventDefault();
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  onChangeText = (key, val) => {
+    setForm({...form, [key]: val })
+  }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    navigation.navigate('Home')
-  };
+    try {
+    const user = await axios.post(`${uri}/api/user/login`, form)
+
+      user.status == 201 ?  navigation.navigate('Home') : null
+  } catch (err) {
+    console.log(err)
+  }
+}
 
   return (
     <SafeAreaView>
       <View>
         <TextInput
-          onChange={handleChange}
+          onChangeText={val => onChangeText('email', val)}
           type="text"
           placeholder="Email"
           name="email"
@@ -41,7 +55,7 @@ function Login({ navigation }) {
 
       <View className="field">
         <TextInput
-          onChange={handleChange}
+           onChangeText={val => onChangeText('password', val)}
           type="password"
           placeholder="Password"
           name="password"
