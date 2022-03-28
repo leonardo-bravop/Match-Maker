@@ -5,7 +5,8 @@ export const styles = StyleSheet.create({
   fondo: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    paddingTop: 30
   },
 
   info: {
