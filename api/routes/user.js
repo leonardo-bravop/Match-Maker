@@ -11,6 +11,9 @@ router.put("/edit/:_id", userController.edit);
 
 router.get("getGroups", userController.getGroups)
 
+router.post("/logout", userController.logOut)
+
+
 function verifyToken(req, res, next) {
   const bearerHeader = req.headers["authorization"];
   if (typeof bearerHeader !== "undefined") {
