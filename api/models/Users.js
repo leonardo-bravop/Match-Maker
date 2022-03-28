@@ -33,6 +33,7 @@ const userSchema = new Schema({
     type: String,
     required: [true, 'Please enter your age'],
   },
+
 });
 
 userSchema.pre("save", async function () {

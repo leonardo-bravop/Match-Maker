@@ -1,12 +1,9 @@
 const User = require("../models/Users");
 const generateToken = require("../config/generateToken");
 
-
 exports.register = (req, res) => {
   const { name, surname, nickname, email, password, age } = req.body;
   console.log(`req body es`, req.body)
-
-
   User.findOne({ email })
     .then((user) => {
       if (user) {
@@ -107,6 +104,8 @@ exports.edit = (req, res) => {
   })
 }
 
-exports.getGroups = (req, res) => {
+exports.getGroups = (req, res) => {};
 
-}
+exports.logOut = (req, res) => {
+  res.send({});
+};
