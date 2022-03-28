@@ -18,6 +18,8 @@ import * as yup from "yup";
 import { styles } from "../styles/Styles";
 import Constants from "expo-constants";
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 const { manifest } = Constants;
 
 const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
@@ -25,9 +27,12 @@ const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 function Login({ navigation }) {
   const handleLogin = async (values) => {
     try {
-      const user = await axios.post(`${uri}/api/user/login`, values);
-
-      user.status == 201 ? navigation.navigate("Home") : null;
+      const result = await axios.post(`${uri}/api/user/login`, values);
+      const userStored = JSON.stringify(result.data)
+      await AsyncStorage.setItem("userInfo", userStored)
+      const returnedUser = await AsyncStorage.getItem('userInfo')
+      console.log(`STORED USER ES`, returnedUser)
+      result.status == 201 ? navigation.navigate("Home") : null;
     } catch (err) {
       console.log(err);
     }
@@ -46,8 +51,8 @@ function Login({ navigation }) {
   });
 
   return (
-    <SafeAreaView>
-      <View style={styles.form}>
+    <SafeAreaView style={styles.fondo} >
+      <View >
         <Formik
           validateOnMount={true}
           validationSchema={validationSchema}
