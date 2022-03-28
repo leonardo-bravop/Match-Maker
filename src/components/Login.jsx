@@ -51,8 +51,8 @@ function Login({ navigation }) {
   });
 
   return (
-    <SafeAreaView>
-      <View style={styles.form}>
+    <SafeAreaView style={styles.fondo} >
+      <View >
         <Formik
           validateOnMount={true}
           validationSchema={validationSchema}
