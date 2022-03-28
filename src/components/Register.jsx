@@ -46,7 +46,7 @@ function Register({ navigation }) {
   });
 
   return (
-    <View>
+    <View style={styles.form}>
       <Text style={styles.info}>
         Llene el siguente formulario para registrarse
       </Text>
