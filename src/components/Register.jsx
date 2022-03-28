@@ -51,7 +51,7 @@ function Register({ navigation }) {
         Llene el siguente formulario para registrarse
       </Text>
 
-      <SafeAreaView>
+      <SafeAreaView style={styles.fondo}>
         <View>
           <Formik
             validateOnMount={true}
