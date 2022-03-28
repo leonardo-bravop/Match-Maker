@@ -6,13 +6,13 @@ import Constants from "expo-constants";
 import { View, Text, SafeAreaView } from 'react-native'
 import * as React from 'react';
 import WelcomeNavigation from './src/navigations/WelcomeNavigation';
+import RootNavigation from "./src/navigation/rootNavigation";
 
 
 function App() {
   return (
     <SafeAreaView style={{flex : 1}}>
-      <WelcomeNavigation/>
-      
+      <RootNavigation/>
     </SafeAreaView>
   );
 }

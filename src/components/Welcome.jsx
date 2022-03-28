@@ -17,18 +17,17 @@ function Welcome({ navigation }) {
     return (
       <View style={styles.fondo}>
         
-        <Text style={styles.info} >Bienvenido</Text>
-        <Text> registrate o logueate</Text>
+        <Text style={styles.info} >Bienvenido, registrate o logeate</Text>
         
         <TouchableOpacity
           style={styles.colorBtn}
-          onPress={() => navigation.navigate('Register')}
+          onPress={() => navigation.navigate('Login')}
         >
           <Text style={styles.colorTxtBtn}>Iniciar Sesion</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.colorBtn}
-          onPress={() => navigation.navigate('Login')}
+          onPress={() => navigation.navigate('Register')}
         >
           <Text style={styles.colorTxtBtn}>Registrarse</Text>
         </TouchableOpacity>

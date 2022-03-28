@@ -28,7 +28,9 @@ export const styles = StyleSheet.create({
     borderRadius: 7,
     paddingRight: 12,
   },
- 
+  form: {
+    marginTop: 100,
+  },
   colorBtn: {
     borderWidth: 1,
     borderColor: '#007BFF',
@@ -39,7 +41,6 @@ export const styles = StyleSheet.create({
     marginRight: 20,
     borderRadius: 7,
   },
- 
   colorTxtBtn: {
     color: '#FFFFFF',
     fontSize: 20,
