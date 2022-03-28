@@ -9,10 +9,12 @@ const userSchema = new Schema({
   email: String,
   password: String,
   age: Number,
-  groups: {
-    type: Array,
-    default: [],
-  },
+  leagues: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "League"
+    }
+  ]
 });
 
 userSchema.pre("save", async function () {
