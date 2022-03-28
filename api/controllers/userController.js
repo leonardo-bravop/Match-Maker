@@ -1,19 +1,18 @@
 const User = require("../models/Users");
 const generateToken = require("../config/generateToken");
 
-
 exports.register = (req, res) => {
   const { name, surname, email, password, age } = req.body;
-  console.log(`req body es`, req.body)
+  console.log(`req body es`, req.body);
   User.findOne({ email })
-  .then((user) => {
-    if (user) {
-      res.status(400);
-      throw new Error("User Already Exists");
-    } else {
-      User.create({ name, surname, email, password, age })
-      .then((user) => {
-        console.log('entre')
+    .then((user) => {
+      if (user) {
+        res.status(400);
+        throw new Error("User Already Exists");
+      } else {
+        User.create({ name, surname, email, password, age })
+          .then((user) => {
+            console.log("entre");
             res.sendStatus(201);
           })
           .catch((error) => {
@@ -58,14 +57,16 @@ exports.login = (req, res) => {
 };
 
 exports.edit = (req, res) => {
-    const {_id} = req.params
-    const {name, surname,  age} = req.body
+  const { _id } = req.params;
+  const { name, surname, age } = req.body;
 
-    User.updateOne({_id}, {name, surname, age}).then(result=>{
-        res.send(result)
-    })
-}
+  User.updateOne({ _id }, { name, surname, age }).then((result) => {
+    res.send(result);
+  });
+};
 
-exports.getGroups = (req, res) => {
+exports.getGroups = (req, res) => {};
 
-}
+exports.logOut = (req, res) => {
+  res.send({});
+};
