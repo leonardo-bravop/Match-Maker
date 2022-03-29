@@ -28,10 +28,11 @@ function Login({ navigation }) {
   const handleLogin = async (values) => {
     try {
       const result = await axios.post(`${uri}/api/user/login`, values);
-      const userStored = JSON.stringify(result.data)
+      const userStored = (result.data.token)
+      console.log(`userstored es`, userStored)
       await AsyncStorage.setItem("userInfo", userStored)
-      const returnedUser = await AsyncStorage.getItem('userInfo')
-      console.log(`STORED USER ES`, returnedUser)
+      // const returnedUser = await AsyncStorage.getItem('userInfo')
+      // console.log(`STORED USER ES`, returnedUser)
       result.status == 201 ? navigation.navigate("Home") : null;
     } catch (err) {
       console.log(err);
