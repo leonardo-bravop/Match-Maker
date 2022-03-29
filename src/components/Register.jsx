@@ -46,17 +46,24 @@ function Register({ navigation }) {
   });
 
   return (
-    <View style={styles.form}>
+    <View style={styles.fondo}>
       <Text style={styles.info}>
         Llene el siguente formulario para registrarse
       </Text>
 
-      <SafeAreaView style={styles.fondo}>
+      <SafeAreaView>
         <View>
           <Formik
             validateOnMount={true}
             validationSchema={validationSchema}
-            initialValues={{ name: "", surname: "", email: "", password: "" }}
+            initialValues={{
+              name: "",
+              surname: "",
+              email: "",
+              password: "",
+              nickname: "nick",
+              age: "26",
+            }}
             onSubmit={(values) => handleRegister(values)}
           >
             {({
