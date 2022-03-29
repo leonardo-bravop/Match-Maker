@@ -25,6 +25,12 @@ const AppNavigator = createBottomTabNavigator(
         tabBarIcon: <Icon name="ios-people" type="ionicon" color="white" />,
       },
     },
+    Jugar: {
+      screen: Users,
+      navigationOptions: {
+        tabBarIcon: <Icon name="ios-add-circle-outline" type="ionicon" color="white" />,
+      },
+    },
     Historial: {
       screen: Users,
       navigationOptions: {
