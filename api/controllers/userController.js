@@ -1,5 +1,6 @@
 const User = require("../models/Users");
 const generateToken = require("../config/generateToken");
+const jwt = require("jsonwebtoken")
 
 exports.register = (req, res) => {
   const { name, surname, nickname, email, password, age } = req.body;
@@ -68,7 +69,7 @@ exports.login = (req, res) => {
             .matchPassword(password)
             .then((result) => {
               if (result) {
-                res.status(201).json({
+                res.status(200).json({
                   _id: user._id,
                   name: user.name,
                   surname: user.surname,
@@ -109,3 +110,23 @@ exports.getGroups = (req, res) => {};
 exports.logOut = (req, res) => {
   res.send({});
 };
+
+exports.me = (req, res) => {
+  console.log(`entre en me`)
+  jwt.verify(req.token, process.env.JWT_SECRET, (err, authData) => {
+    if (err) {
+      console.log(`req token es`, req.token)
+      res.sendStatus(403);
+    } else {
+      console.log(`req token cuando funciona es`, req.token)
+      User.findById(authData.id).then((user) =>
+        res.json({
+          _id: user._id,
+          name: user.name,
+          surname: user.surname,
+          nickname: user.nickname,
+        })
+      );
+    }
+  });
+}
