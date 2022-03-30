@@ -23,10 +23,9 @@ const { manifest } = Constants;
 const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 
 function Register({ navigation }) {
-  const handleRegister = (values, resetForm) => {
+  const handleRegister = (values) => {
     axios.post(`${uri}/api/user/register`, values).then((res) => {
       res.status == 201 ? navigation.navigate("Login") : null;
-      resetForm();
     });
   };
 
@@ -47,7 +46,7 @@ function Register({ navigation }) {
 
     password: yup
       .string("Ingresa tu eontraseña")
-      .min(6, "La contraseña debe tener al menos 6 caracteres")
+      .min(8, "La contraseña debe tener al menos 8 caracteres")
       .required("*Campo requerido"),
   });
 
@@ -56,6 +55,7 @@ function Register({ navigation }) {
       <Text style={styles.info}>
         Llene el siguente formulario para registrarse
       </Text>
+
 
       <SafeAreaView>
         <View>
@@ -70,7 +70,7 @@ function Register({ navigation }) {
               nickname: "",
               age: "26",
             }}
-            onSubmit={(values, {resetForm}) => handleRegister(values, resetForm)}
+            onSubmit={(values) => handleRegister(values)}
           >
             {({
               handleChange,
@@ -104,10 +104,6 @@ function Register({ navigation }) {
                   name="surname"
                 />
 
-                {errors.surname && touched.surname && (
-                  <Text>{errors.surname}</Text>
-                )}
-
                 <TextInput
                   style={styles.inputs}
                   onChangeText={handleChange("nickname")}
@@ -118,8 +114,8 @@ function Register({ navigation }) {
                   name="nickname"
                 />
 
-                {errors.nickname && touched.nickname && (
-                  <Text>{errors.nickname}</Text>
+                {errors.surname && touched.surname && (
+                  <Text>{errors.surname}</Text>
                 )}
 
                 <TextInput

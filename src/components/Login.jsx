@@ -13,12 +13,12 @@ import {
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Home from "./Home";
+import Welcome from "./Welcome";
 import { Formik } from "formik";
 import * as yup from "yup";
 import { styles } from "../styles/Styles";
 import Constants from "expo-constants";
-
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import AsyncStorage from "@react-native-async-storage/async-storage"
 
 const { manifest } = Constants;
 
@@ -28,12 +28,11 @@ function Login({ navigation }) {
   const handleLogin = async (values) => {
     try {
       const result = await axios.post(`${uri}/api/user/login`, values);
-      const userStored = result.data.token;
-      console.log(`userstored es`, userStored);
-      await AsyncStorage.setItem("userInfo", userStored);
+      const userStored = (result.data.token)
+      await AsyncStorage.setItem("userInfo", userStored)
       // const returnedUser = await AsyncStorage.getItem('userInfo')
       // console.log(`STORED USER ES`, returnedUser)
-      result.status == 201 ? navigation.navigate("Home") : null;
+      result.status == 200 ? navigation.navigate("Home") : null;
     } catch (err) {
       console.log(err);
     }
@@ -51,7 +50,7 @@ function Login({ navigation }) {
   });
 
   return (
-    <SafeAreaView style={styles.fondo}>
+<SafeAreaView style={styles.fondo}>
       <View>
         <Formik
           validateOnMount={true}
@@ -101,12 +100,12 @@ function Login({ navigation }) {
           )}
         </Formik>
 
-          <Text style={styles.colorTxtBtn} onPress={navigation.navigate("Register")}>registro</Text>
-          <Text style={styles.colorTxtBtn} onPress={navigation.navigate("Welcome")}>home</Text>
+          <Text style={styles.colorTxtBtn} onPress={() => navigation.navigate("Register")}>registro</Text>
+          <Text style={styles.colorTxtBtn} onPress={() => navigation.navigate("Welcome")}>welcome</Text>
 
       </View>
     </SafeAreaView>
-  );
+  )
 }
 
 export default Login;

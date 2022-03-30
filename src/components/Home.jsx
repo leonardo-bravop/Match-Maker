@@ -1,12 +1,17 @@
 import React from "react";
 import { useEffect, useState } from "react";
-import { View, Text, Dimensions, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  Dimensions,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FlatGrid } from "react-native-super-grid";
 import axios from "axios";
 import Constants from "expo-constants";
 const screen = Dimensions.get("screen");
-
 
 const home = StyleSheet.create({
   container: {
@@ -25,7 +30,7 @@ const home = StyleSheet.create({
   },
   containerDos: {
     marginTop: 50,
-    flex:1,
+    flex: 1,
     alignItems: "center",
   },
   lastTittle: {
@@ -49,20 +54,19 @@ const home = StyleSheet.create({
     width: "33%",
   },
   lastText: {
-
     textAlign: "center",
     fontSize: 14,
     fontWeight: "bold",
     color: "#34495e",
   },
   ligaTittle: {
-    alignSelf: "flex-start", 
+    alignSelf: "flex-start",
     fontStyle: "italic",
     fontWeight: "bold",
     fontSize: 25,
     marginTop: 40,
     color: "white",
-    marginLeft: 20
+    marginLeft: 20,
   },
   gridView: {
     marginTop: -90,
@@ -87,36 +91,13 @@ const home = StyleSheet.create({
 });
 
 function Home({ navigation }) {
-  const [items, setItems] = React.useState([
-    { name: "TURQUOISE", code: "#1abc9c" },
-    { name: "EMERALD", code: "#2ecc71" },
-    { name: "PETER RIVER", code: "#3498db" },
-    { name: "AMETHYST", code: "#9b59b6" },
-    { name: "WET ASPHALT", code: "#34495e" },
-    { name: "GREEN SEA", code: "#16a085" },
-    { name: "NEPHRITIS", code: "#27ae60" },
-    { name: "BELIZE HOLE", code: "#2980b9" },
-    { name: "WISTERIA", code: "#8e44ad" },
-    { name: "MIDNIGHT BLUE", code: "#2c3e50" },
-    { name: "SUN FLOWER", code: "#f1c40f" },
-    { name: "CARROT", code: "#e67e22" },
-    { name: "ALIZARIN", code: "#e74c3c" },
-    { name: "CLOUDS", code: "#ecf0f1" },
-    { name: "CONCRETE", code: "#95a5a6" },
-    { name: "ORANGE", code: "#f39c12" },
-    { name: "PUMPKIN", code: "#d35400" },
-    { name: "POMEGRANATE", code: "#c0392b" },
-    { name: "SILVER", code: "#bdc3c7" },
-    { name: "ASBESTOS", code: "#7f8c8d" },
-  ]);
+  const { manifest } = Constants;
 
-
-
-const { manifest } = Constants;
-
-const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
-
+  const [league, setLeague] = React.useState([]);
   const [user, setUser] = useState({});
+
+  const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
+
   useEffect(async () => {
     try {
       const userString = await AsyncStorage.getItem("userInfo");
@@ -126,12 +107,14 @@ const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
           {},
           {
             headers: {
-              'Authorization': `Bearer ${userString}`,
+              Authorization: `Bearer ${userString}`,
             },
           }
         );
-        setUser(result.data)
+        setUser(result.data);
       }
+      const { data } = await axios.get(`${uri}/api/league/getAll`);
+      setLeague(data);
     } catch (err) {
       console.log(err);
     }
@@ -149,7 +132,14 @@ const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
             <Text style={home.lastText}>TENGO 10 CAR</Text>
           </View>
           <View style={home.lastItem}>
-            <Text style={[home.lastText,{fontSize: 30, color: "#3498db", fontWeight: "normal",}]}>21-3</Text>
+            <Text
+              style={[
+                home.lastText,
+                { fontSize: 30, color: "#3498db", fontWeight: "normal" },
+              ]}
+            >
+              21-3
+            </Text>
           </View>
           <View style={home.lastItem}>
             <Text style={home.lastText}>TENGO 10 CAR</Text>
@@ -158,15 +148,17 @@ const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
         <Text style={home.ligaTittle}>LIGAS</Text>
       </View>
 
-        <FlatGrid
+      <FlatGrid
         style={home.gridView}
         itemDimension={110}
-        data={items}
+        data={league}
         // staticDimension={300}
         // fixed
         spacing={10}
         renderItem={({ item }) => (
-          <TouchableOpacity style={[home.itemContainer, { backgroundColor: item.code }]}>
+          <TouchableOpacity
+            style={[home.itemContainer, { backgroundColor: "red" }]}
+          >
             <Text style={home.itemName}>{item.name}</Text>
             <Text style={home.itemCode}>{item.code}</Text>
           </TouchableOpacity>

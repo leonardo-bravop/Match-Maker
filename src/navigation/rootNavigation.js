@@ -12,7 +12,7 @@ import Users from "../components/Users";
 import Profile from "../components/Profile";
 import Ligas from "../components/Ligas";
 import Match from "../components/Match";
-import Record from '../components/Record'
+import Record from "../components/Record";
 import { Platform } from "react-native";
 
 const AppNavigator = createBottomTabNavigator(
@@ -66,6 +66,12 @@ const AppNavigator = createBottomTabNavigator(
 );
 
 const AuthNavigator = createStackNavigator({
+  Welcome: {
+    screen: Welcome,
+    navigationOptions: () => ({
+      headerShown: false
+    }),
+  },
   Login: {
     screen: Login,
     navigationOptions: () => ({
@@ -92,9 +98,9 @@ export default createAppContainer(
       App: AppNavigator,
     },
     {
-      initialRouteName:  "AuthLoading",
+/*       initialRouteName:  "AuthLoading", */
       /* initialRouteName: 'Auth', */
-      /* initialRouteName: 'App',  */
+      initialRouteName: 'App', 
     },
     {
       defaultNavigationOptions: {
