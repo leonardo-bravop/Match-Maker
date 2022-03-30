@@ -1,6 +1,7 @@
 const User = require("../models/Users");
 const generateToken = require("../config/generateToken");
 const jwt = require("jsonwebtoken");
+const League = require("../models/League");
 
 exports.register = (req, res) => {
   const { name, surname, nickname, email, password, age } = req.body;
@@ -128,3 +129,23 @@ exports.me = (req, res) => {
     }
   });
 };
+
+exports.getLeaguesByUserId = (req, res) => {
+  const { userId } = req.params;
+  User.findById(userId).then((user) => {
+    League.find()
+      .where("_id")
+      .in(user.leagues)
+      .exec()
+      .then((leagues) => {
+        res.send(leagues);
+      });
+  });
+};
+
+// exports.getMatchesByUserId = (req, res) => {
+//   const {userId} = req.params
+//   User.findById(userId).then(
+//     res.send(user.matches)
+//   )
+// };

@@ -16,8 +16,6 @@ router.get("/showLeague/:id", leagueController.findShowLeague);
 
 router.put("/changeLeague/:id", leagueController.changeLeague);
 
-router.post("/prueba", (req, res) => {
-  res.send(req.body);
-});
+router.get("/getAll", leagueController.getAll)
 
 module.exports = router;

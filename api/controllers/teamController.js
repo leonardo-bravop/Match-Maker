@@ -13,6 +13,7 @@ exports.newTeam = (req, res) => {
       res.send(data)
     })
   };
+  
   exports.deleteTeam = (req, res) => {
     const { id } = req.params;
     Team.deleteOne({ where: id}

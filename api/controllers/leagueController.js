@@ -2,7 +2,7 @@ const League = require("../models/League");
 const User = require("../models/Users");
 
 exports.new = (req, res) => {
-  const { name, description } = req.body;
+  const { name, description, sport } = req.body;
   console.log(`req body es`, req.body);
   League.findOne({ name })
     .then((league) => {
@@ -11,7 +11,7 @@ exports.new = (req, res) => {
         throw new Error("League Already Exists");
       } else {
         console.log(`name es`, name);
-        League.create({ name, description })
+        League.create({ name, description, sport })
           .then((league) => {
             console.log("entre");
             res.sendStatus(201);
@@ -72,6 +72,13 @@ exports.findShowLeague = (req, res) => {
   })
 };
 
+exports.getAll = (req, res) => {
+  League.find({}
+  ).then((data) => {
+    res.send(data)
+  })
+};
+
 exports.changeLeague = (req, res) => {
   const { id } = req.params;
   const {name, description, matches, users } = req.body
@@ -97,3 +104,4 @@ exports.showHistoryLeague = (req, res) => {
 
 }
 
+// ruta para buscar por nombre
