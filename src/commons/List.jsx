@@ -4,25 +4,13 @@ import { ScrollView } from "react-native-gesture-handler";
 
 import { ligaStyles } from "../styles/ligaStyle";
 
-const List = ({itemList}) => {
+const List = ({list, Element}) => {
    return (
       <ScrollView >
          <View style={ligaStyles.listContainer}>
-            { itemList.map( (item, i) => {
+            { list.map( (item, i) => {
                return (
-                  <View style={ligaStyles.item} key = {i} >
-                     <View style={ligaStyles.rank}>
-                        <Text>{i+1}</Text>
-                     </View>
-                     <View style={ligaStyles.img}>
-                     </View>
-                     <View style={ligaStyles.nick}>
-                        <Text>{item}</Text>
-                     </View>
-                     <View style={ligaStyles.elo}>
-                        <Text>101011</Text>
-                     </View>
-                  </View> 
+                  <Element item={item} i={i}/>
                )}
             )}
          </View>
