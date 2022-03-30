@@ -43,3 +43,50 @@ exports.addUser = (req, res) => {
     ).then(()=>res.sendStatus(200))
   });
 };
+
+exports.newLeague = (req, res) => {
+  const { name, description, matches, users } = req.body;
+  League.create({
+    name: name,
+    description: description,
+    matches: matches, 
+    users: users
+  }
+  ).then((data) => {
+    res.send(data)
+  })
+};
+exports.deleteLeague = (req, res) => {
+  const { id } = req.params;
+  League.deleteOne({ where: id}
+  ).then((data) => {
+    res.send(data)
+  })
+};
+
+exports.findShowLeague = (req, res) => {
+  const { id } = req.params;
+  League.findById({ where: id}
+  ).then((data) => {
+    res.send(data)
+  })
+};
+
+exports.changeLeague = (req, res) => {
+  const { id } = req.params;
+  const {name, description, matches, users } = req.body
+  League.updateOne(
+    { name: name,
+      description: description,
+      matches: matches, 
+      users: users},
+    { where: id})
+    .then((data) => {
+      res.send(data)
+    })
+}
+
+exports.showHistoryLeague = (req, res) => {
+
+}
+
