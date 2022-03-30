@@ -10,6 +10,9 @@ import Login from "../components/Login";
 import Home from "../components/Home";
 import Users from "../components/Users";
 import Profile from "../components/Profile";
+import Match from "../components/Match";
+import Record from '../components/Record'
+import { Platform } from "react-native";
 
 const AppNavigator = createBottomTabNavigator(
   {
@@ -25,8 +28,16 @@ const AppNavigator = createBottomTabNavigator(
         tabBarIcon: <Icon name="ios-people" type="ionicon" color="white" />,
       },
     },
+    Jugar: {
+      screen: Match,
+      navigationOptions: {
+        tabBarIcon: (
+          <Icon name="ios-add-circle-outline" type="ionicon" color="white" />
+        ),
+      },
+    },
     Historial: {
-      screen: Users,
+      screen: Record,
       navigationOptions: {
         tabBarIcon: <Icon name="history" color="white" />,
       },
@@ -40,11 +51,17 @@ const AppNavigator = createBottomTabNavigator(
   },
   {
     tabBarOptions: {
+      //tabKeyToHideLabel: "Jugar",
       style: {
         backgroundColor: "#090717",
+        ...Platform.select({
+          ios: {
+            height: 50,
+            marginBottom: -30,
+          },
+        }),
       },
     },
-    // here will be some styling
   }
 );
 
@@ -71,8 +88,10 @@ export default createAppContainer(
       App: AppNavigator,
     },
     {
-      initialRouteName: "AuthLoading" /* "App" */,
-/*       initialRouteName: 'Auth',
+
+      initialRouteName: /*"AuthLoading"*/ "App",
+      /*       initialRouteName: 'Auth',
+
       initialRouteName: 'App', */
     },
     {
