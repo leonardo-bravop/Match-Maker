@@ -9,15 +9,15 @@ export const ligaStyles = StyleSheet.create({
 
    head: {
       flex: 4,
-      backgroundColor: "yellow"
+      backgroundColor: "#9b59b6"
    },
    body: {
       flex: 8,
-      backgroundColor: "red"
+      backgroundColor: "#090717",
    },
    foot: {
       height: 58,
-      backgroundColor: "white"
+      backgroundColor: "#090717",
    },
 
    menu: {
@@ -30,7 +30,6 @@ export const ligaStyles = StyleSheet.create({
       marginLeft:16,
       marginRight:16,
       flex: 1,
-      backgroundColor: "pink"
    },
 
    listHead:{
@@ -51,7 +50,7 @@ export const ligaStyles = StyleSheet.create({
       height: 50,
       marginBottom: 3,
       borderRadius: 10,
-      backgroundColor: "violet",
+      backgroundColor: "rgba(255, 255, 255, 0.3)",
       // borderWidth: 3
    },
 
@@ -63,7 +62,7 @@ export const ligaStyles = StyleSheet.create({
       marginBottom:"auto",
       marginTop: "auto",
       borderRadius: 10,
-      backgroundColor: "green"
+      backgroundColor: "#090717",
    },
    rank: {
       aspectRatio:1,
@@ -71,6 +70,8 @@ export const ligaStyles = StyleSheet.create({
       alignItems: "center"
    },
    img: {
+      height: 46,
+      margin:2,
       aspectRatio:1,
       justifyContent: "center",
       alignItems: "center",
@@ -87,5 +88,21 @@ export const ligaStyles = StyleSheet.create({
       width: 100,
       justifyContent: "center",
       alignItems: "center"
-   }
+   },
+   join: {
+      height: 50,
+      marginLeft:"auto",
+      marginRight: "auto",
+      marginBottom:"auto",
+      marginTop: "auto",
+      borderRadius: 10,
+      justifyContent: "center",
+      alignItems: "center"
+   },
+   joinTxt: {
+      color: '#FFFFFF',
+      fontSize: 20,
+      marginLeft:16,
+      marginRight: 16,
+    }
 })
