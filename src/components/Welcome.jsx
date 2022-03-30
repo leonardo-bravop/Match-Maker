@@ -18,18 +18,18 @@ const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 function Welcome({ navigation }) {
   const [user, setUser] = useState({});
 
-  useEffect(async () => {
-    try {
-      const userString = await AsyncStorage.getItem("userInfo");
-      if (userString) {
-        console.log(`user string es`, userString);
-        const userObject = JSON.parse(userString);
-        setUser(userObject);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  }, []);
+  // useEffect(async () => {
+  //   try {
+  //     const userString = await AsyncStorage.getItem("userInfo");
+  //     if (userString) {
+  //       console.log(`user string es`, userString);
+  //       const userObject = JSON.parse(userString);
+  //       setUser(userObject);
+  //     }
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // }, []);
 
   const handleLogOut = async () => {
     try {

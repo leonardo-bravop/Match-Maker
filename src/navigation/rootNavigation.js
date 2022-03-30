@@ -88,8 +88,10 @@ export default createAppContainer(
       App: AppNavigator,
     },
     {
+
       initialRouteName: /*"AuthLoading"*/ "App",
       /*       initialRouteName: 'Auth',
+
       initialRouteName: 'App', */
     },
     {

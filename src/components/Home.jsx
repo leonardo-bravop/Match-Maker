@@ -3,8 +3,10 @@ import { useEffect, useState } from "react";
 import { View, Text, Dimensions, StyleSheet, TouchableOpacity } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FlatGrid } from "react-native-super-grid";
-
+import axios from "axios";
+import Constants from "expo-constants";
 const screen = Dimensions.get("screen");
+
 
 const home = StyleSheet.create({
   container: {
@@ -108,14 +110,27 @@ function Home({ navigation }) {
     { name: "ASBESTOS", code: "#7f8c8d" },
   ]);
 
+
+
+const { manifest } = Constants;
+
+const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
+
   const [user, setUser] = useState({});
   useEffect(async () => {
     try {
       const userString = await AsyncStorage.getItem("userInfo");
       if (userString) {
-        /* console.log(`user string es`, userString); */
-        const userObject = JSON.parse(userString);
-        setUser(userObject);
+        const result = await axios.post(
+          `${uri}/api/user/me`,
+          {},
+          {
+            headers: {
+              'Authorization': `Bearer ${userString}`,
+            },
+          }
+        );
+        setUser(result.data)
       }
     } catch (err) {
       console.log(err);
