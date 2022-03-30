@@ -120,6 +120,8 @@ function Home({ navigation }) {
     }
   }, []);
 
+  // console.log(`leagues es`, league[0].color)
+
   return (
     <View style={home.container}>
       <View style={home.tittle}>
@@ -155,14 +157,16 @@ function Home({ navigation }) {
         // staticDimension={300}
         // fixed
         spacing={10}
-        renderItem={({ item }) => (
+        renderItem={({ item }) => {
+          console.log(`item es`, item.color)
+          return(
           <TouchableOpacity
-            style={[home.itemContainer, { backgroundColor: "red" }]}
+            style={[home.itemContainer, { backgroundColor: item.color }]}
           >
             <Text style={home.itemName}>{item.name}</Text>
             <Text style={home.itemCode}>{item.code}</Text>
-          </TouchableOpacity>
-        )}
+          </TouchableOpacity>)
+        }}
       />
     </View>
   );

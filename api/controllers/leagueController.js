@@ -2,7 +2,7 @@ const League = require("../models/League");
 const User = require("../models/Users");
 
 exports.new = (req, res) => {
-  const { name, description, sport } = req.body;
+  const { name, description, sport, color } = req.body;
   console.log(`req body es`, req.body);
   League.findOne({ name })
     .then((league) => {
@@ -11,7 +11,7 @@ exports.new = (req, res) => {
         throw new Error("League Already Exists");
       } else {
         console.log(`name es`, name);
-        League.create({ name, description, sport })
+        League.create({ name, description, sport, color })
           .then((league) => {
             console.log("entre");
             res.sendStatus(201);
@@ -66,8 +66,7 @@ exports.deleteLeague = (req, res) => {
 
 exports.findShowLeague = (req, res) => {
   const { id } = req.params;
-  League.findById({ where: id}
-  ).then((data) => {
+  League.findById(id).then((data) => {
     res.send(data)
   })
 };
