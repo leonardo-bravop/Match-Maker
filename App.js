@@ -11,7 +11,7 @@ import RootNavigation from "./src/navigation/rootNavigation";
 
 function App() {
   return (
-    <SafeAreaView style={{flex : 1}}>
+    <SafeAreaView style={{flex : 1, backgroundColor: "#0e0b29"}}>
       <RootNavigation/>
     </SafeAreaView>
   );
