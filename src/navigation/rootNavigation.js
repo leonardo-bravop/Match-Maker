@@ -52,7 +52,6 @@ const AppNavigator = createBottomTabNavigator(
   },
   {
     tabBarOptions: {
-      //tabKeyToHideLabel: "Jugar",
       style: {
         backgroundColor: "#090717",
         ...Platform.select({
@@ -70,14 +69,18 @@ const AuthNavigator = createStackNavigator({
   Login: {
     screen: Login,
     navigationOptions: () => ({
-      headerShown: false,
+      headerTitle: 'INICIA SESIÓN',
+      headerTransparent: true,
+      headerTintColor: "white"
     }),
   },
   Register: {
     screen: Register,
     navigationOptions: () => ({
-      headerShown: false,
-    }),
+      headerTitle: 'REGISTRATE',
+      headerTransparent: true,
+      headerTintColor: "white"
+    })
   },
 });
 
@@ -89,9 +92,9 @@ export default createAppContainer(
       App: AppNavigator,
     },
     {
-      //initialRouteName:  "AuthLoading",
-      //initialRouteName: 'Auth',
-      initialRouteName: 'App', 
+      initialRouteName:  "AuthLoading",
+      /* initialRouteName: 'Auth', */
+      /* initialRouteName: 'App',  */
     },
     {
       defaultNavigationOptions: {

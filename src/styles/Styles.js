@@ -4,7 +4,9 @@ import { StyleSheet } from "react-native";
 export const styles = StyleSheet.create({
   fondo: {
     flex: 1,
-    paddingTop: 30
+    paddingTop: 100,
+    backgroundColor: "#0e0b29",
+    color: "white"
   },
 
   info: {
@@ -14,6 +16,7 @@ export const styles = StyleSheet.create({
     padding: 4,
     paddingRight: 12,
     textAlign: 'center',
+    color: 'white'
   },
   inputs: {
     fontSize: 18,
@@ -26,6 +29,7 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 7,
     paddingRight: 12,
+    color: "white"
   },
   form: {
     marginTop: 100,

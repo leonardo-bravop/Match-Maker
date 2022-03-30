@@ -23,9 +23,10 @@ const { manifest } = Constants;
 const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 
 function Register({ navigation }) {
-  const handleRegister = (values) => {
+  const handleRegister = (values, resetForm) => {
     axios.post(`${uri}/api/user/register`, values).then((res) => {
       res.status == 201 ? navigation.navigate("Login") : null;
+      resetForm();
     });
   };
 
@@ -36,6 +37,8 @@ function Register({ navigation }) {
       .max(10, "La contraseña debe tener un maximo de 10 caracteres"),
 
     surname: yup.string("Ingresa tu apellido").required("*Campo requerido"),
+
+    nickname: yup.string("Ingresa tu nickname").required("*Campo requerido"),
 
     email: yup
       .string("Ingresa tu email")
@@ -54,7 +57,6 @@ function Register({ navigation }) {
         Llene el siguente formulario para registrarse
       </Text>
 
-
       <SafeAreaView>
         <View>
           <Formik
@@ -65,10 +67,10 @@ function Register({ navigation }) {
               surname: "",
               email: "",
               password: "",
-              nickname: "nick",
+              nickname: "",
               age: "26",
             }}
-            onSubmit={(values) => handleRegister(values)}
+            onSubmit={(values, {resetForm}) => handleRegister(values, resetForm)}
           >
             {({
               handleChange,
@@ -104,6 +106,20 @@ function Register({ navigation }) {
 
                 {errors.surname && touched.surname && (
                   <Text>{errors.surname}</Text>
+                )}
+
+                <TextInput
+                  style={styles.inputs}
+                  onChangeText={handleChange("nickname")}
+                  onBlur={handleBlur("nickname")}
+                  value={values.nickname}
+                  keyboardType="default"
+                  placeholder="Nickname"
+                  name="nickname"
+                />
+
+                {errors.nickname && touched.nickname && (
+                  <Text>{errors.nickname}</Text>
                 )}
 
                 <TextInput
