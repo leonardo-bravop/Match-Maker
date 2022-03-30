@@ -8,10 +8,13 @@ router.post("/login", userController.login);
 
 router.put("/edit/:_id", userController.edit);
 
-router.get("getGroups", userController.getGroups)
+// router.get("getGroups", userController.getGroups)
 
 router.post("/logout", userController.logOut)
 
+router.get("/getLeagues/:userId", userController.getLeaguesByUserId)
+
+// router.get("/getMatches/:userId", userController.getMatchesByUserId)
 
 function verifyToken(req, res, next) {
   console.log(`dentro de verify`)

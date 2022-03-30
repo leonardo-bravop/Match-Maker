@@ -8,6 +8,13 @@ const leagueSchema = new Schema({
     required: true,
   },
   description: String,
+  color: {
+    type: String,
+    default: '#5bc11c'
+  },
+  img: {
+    type: String,
+  },
   matches: [
     {
       type: mongoose.Schema.Types.ObjectId,
