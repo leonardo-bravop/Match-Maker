@@ -11,6 +11,7 @@ import Home from "../components/Home";
 import Users from "../components/Users";
 import Profile from "../components/Profile";
 import Match from "../components/Match";
+import Record from '../components/Record'
 import { Platform } from "react-native";
 
 const AppNavigator = createBottomTabNavigator(
@@ -36,7 +37,7 @@ const AppNavigator = createBottomTabNavigator(
       },
     },
     Historial: {
-      screen: Users,
+      screen: Record,
       navigationOptions: {
         tabBarIcon: <Icon name="history" color="white" />,
       },
