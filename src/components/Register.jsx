@@ -65,7 +65,7 @@ function Register({ navigation }) {
               surname: "",
               email: "",
               password: "",
-              nickname: "nick",
+              nickname: "AleR",
               age: "26",
             }}
             onSubmit={(values) => handleRegister(values)}
