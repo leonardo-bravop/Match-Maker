@@ -42,7 +42,7 @@ exports.login = (req, res) => {
         .matchPassword(password)
         .then((result) => {
           if (result) {
-            res.status(201).json({
+            res.status(200).json({
               _id: user._id,
               name: user.name,
               surname: user.surname,

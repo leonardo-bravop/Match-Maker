@@ -37,6 +37,8 @@ function Register({ navigation }) {
 
     surname: yup.string("Ingresa tu apellido").required("*Campo requerido"),
 
+    nickname: yup.string("Ingresa tu nickname").required("*Campo requerido"),
+
     email: yup
       .string("Ingresa tu email")
       .required("*Campo requerido")
@@ -44,7 +46,7 @@ function Register({ navigation }) {
 
     password: yup
       .string("Ingresa tu eontraseña")
-      .min(6, "La contraseña debe tener al menos 6 caracteres")
+      .min(8, "La contraseña debe tener al menos 8 caracteres")
       .required("*Campo requerido"),
   });
 
@@ -65,7 +67,7 @@ function Register({ navigation }) {
               surname: "",
               email: "",
               password: "",
-              nickname: "nick",
+              nickname: "",
               age: "26",
             }}
             onSubmit={(values) => handleRegister(values)}
@@ -100,6 +102,16 @@ function Register({ navigation }) {
                   keyboardType="default"
                   placeholder="Apellido"
                   name="surname"
+                />
+
+                <TextInput
+                  style={styles.inputs}
+                  onChangeText={handleChange("nickname")}
+                  onBlur={handleBlur("nickname")}
+                  value={values.nickname}
+                  keyboardType="default"
+                  placeholder="Nickname"
+                  name="nickname"
                 />
 
                 {errors.surname && touched.surname && (

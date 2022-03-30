@@ -86,6 +86,13 @@ exports.changeLeague = (req, res) => {
     })
 }
 
+exports.getAll = (req, res) => {
+  League.find({}
+  ).then((data) => {
+    res.send(data)
+  })
+};
+
 exports.showHistoryLeague = (req, res) => {
 
 }

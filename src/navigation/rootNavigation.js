@@ -12,7 +12,7 @@ import Users from "../components/Users";
 import Profile from "../components/Profile";
 import Ligas from "../components/Ligas";
 import Match from "../components/Match";
-import Record from '../components/Record'
+import Record from "../components/Record";
 import { Platform } from "react-native";
 
 const AppNavigator = createBottomTabNavigator(
@@ -52,7 +52,6 @@ const AppNavigator = createBottomTabNavigator(
   },
   {
     tabBarOptions: {
-      //tabKeyToHideLabel: "Jugar",
       style: {
         backgroundColor: "#090717",
         ...Platform.select({
@@ -67,17 +66,27 @@ const AppNavigator = createBottomTabNavigator(
 );
 
 const AuthNavigator = createStackNavigator({
+  Welcome: {
+    screen: Welcome,
+    navigationOptions: () => ({
+      headerShown: false
+    }),
+  },
   Login: {
     screen: Login,
     navigationOptions: () => ({
-      headerShown: false,
+      headerTitle: 'INICIA SESIÓN',
+      headerTransparent: true,
+      headerTintColor: "white"
     }),
   },
   Register: {
     screen: Register,
     navigationOptions: () => ({
-      headerShown: false,
-    }),
+      headerTitle: 'REGISTRATE',
+      headerTransparent: true,
+      headerTintColor: "white"
+    })
   },
 });
 
@@ -89,8 +98,8 @@ export default createAppContainer(
       App: AppNavigator,
     },
     {
-      //initialRouteName:  "AuthLoading",
-      //initialRouteName: 'Auth',
+/*       initialRouteName:  "AuthLoading", */
+      /* initialRouteName: 'Auth', */
       initialRouteName: 'App', 
     },
     {

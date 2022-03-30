@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const leagueController = require("../controllers/leagueController")
 
+router.get("/getAll", leagueController.getAll)
+
 router.post("/new", leagueController.new);
 
 router.put("/addUser/:id", leagueController.addUser);
