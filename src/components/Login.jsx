@@ -41,13 +41,12 @@ function Login({ navigation }) {
 
   const validationSchema = yup.object().shape({
     email: yup
-      .string("Ingresa tu Email")
-      .required("*Campo requerido")
-      .email("Ingresa un Email válido"),
+      .string("Ingresa tu email o nombre de usuario")
+      .required("*Campo requerido"),
 
     password: yup
       .string("Ingresa tu Contraseña")
-      .min(3, "La contraseña debe tener al menos 3 caracteres")
+      .min(6, "La contraseña debe tener al menos 6 caracteres")
       .required("*Campo requerido"),
   });
 
