@@ -10,6 +10,8 @@ import Login from "../components/Login";
 import Home from "../components/Home";
 import Users from "../components/Users";
 import Profile from "../components/Profile";
+import Ligas from "../components/Ligas";
+import AnimateBox from "../components/prueba";
 
 const AppNavigator = createBottomTabNavigator(
   {
@@ -20,13 +22,13 @@ const AppNavigator = createBottomTabNavigator(
       },
     },
     Ligas: {
-      screen: Users,
+      screen: Ligas,
       navigationOptions: {
         tabBarIcon: <Icon name="ios-people" type="ionicon" color="white" />,
       },
     },
     Historial: {
-      screen: Users,
+      screen: AnimateBox,
       navigationOptions: {
         tabBarIcon: <Icon name="history" color="white" />,
       },
@@ -71,9 +73,9 @@ export default createAppContainer(
       App: AppNavigator,
     },
     {
-      initialRouteName: /* "AuthLoading" */ "App",
-/*       initialRouteName: 'Auth',
-      initialRouteName: 'App', */
+      //initialRouteName:  "AuthLoading",
+      //initialRouteName: 'Auth',
+      initialRouteName: 'App', 
     },
     {
       defaultNavigationOptions: {

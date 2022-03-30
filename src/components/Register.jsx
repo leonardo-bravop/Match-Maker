@@ -30,7 +30,10 @@ function Register({ navigation }) {
   };
 
   const validationSchema = yup.object().shape({
-    name: yup.string("Ingresa tu nombre").required("*Campo requerido"),
+    name: yup
+      .string("Ingresa tu nombre")
+      .required("*Campo requerido")
+      .max(10, "La contraseña debe tener un maximo de 10 caracteres"),
 
     surname: yup.string("Ingresa tu apellido").required("*Campo requerido"),
 
@@ -41,17 +44,17 @@ function Register({ navigation }) {
 
     password: yup
       .string("Ingresa tu eontraseña")
-      .min(3, "La contraseña debe tener al menos 3 caracteres")
+      .min(6, "La contraseña debe tener al menos 6 caracteres")
       .required("*Campo requerido"),
   });
 
   return (
-    <View style={styles.form}>
+    <View style={styles.fondo}>
       <Text style={styles.info}>
         Llene el siguente formulario para registrarse
       </Text>
 
-      <SafeAreaView style={styles.fondo}>
+      <SafeAreaView >
         <View>
           <Formik
             validateOnMount={true}
