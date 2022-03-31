@@ -93,7 +93,7 @@ exports.getUserByLeagueId = (req, res) => {
   League.findById(leagueId).then((league) => {
     User.find(
       { _id: { $in: league.users } },
-      { _id: 1, name: 1, surname: 1, nickname: 1, img: 1 }
+      { _id: 1, nickname: 1, img: 1 }
     ).then((users) => {
       res.send(users);
     });

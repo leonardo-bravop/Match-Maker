@@ -11,13 +11,13 @@ const matchSchema = new Schema({
   ],
   equipo_1: [
     {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Array,
       ref: "Team",
     },
   ],
   equipo_2: [
     {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Array,
       ref: "Team",
     },
   ],
