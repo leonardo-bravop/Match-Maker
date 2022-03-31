@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { Formik } from "formik";
 import * as yup from "yup";
-import { styles } from "../styles/Styles";
+import { form } from "../styles/form";
 
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -51,112 +51,116 @@ function Register({ navigation }) {
   });
 
   return (
-    <View style={styles.fondo}>
-      <Text style={styles.info}>
-        Llene el siguente formulario para registrarse
+    <SafeAreaView style={form.container}>
+      <Formik
+        validateOnMount={true}
+        validationSchema={validationSchema}
+        initialValues={{
+          name: "",
+          surname: "",
+          email: "",
+          password: "",
+          nickname: "",
+          age: "26",
+        }}
+        onSubmit={(values) => handleRegister(values)}
+      >
+        {({
+          handleChange,
+          handleBlur,
+          handleSubmit,
+          values,
+          errors,
+          touched,
+          isValid,
+        }) => (
+          <>
+            <Text style={form.formTittle}>Inicia Sesión</Text>
+
+            <View style={form.inputContainer}>
+              <TextInput
+                style={form.inputs}
+                onChangeText={handleChange("name")}
+                onBlur={handleBlur("name")}
+                value={values.name}
+                keyboardType="default"
+                placeholder="Nombre"
+                name="name"
+              />
+
+              {errors.name && touched.name && <Text>{errors.name}</Text>}
+
+              <TextInput
+                style={form.inputs}
+                onChangeText={handleChange("surname")}
+                onBlur={handleBlur("surname")}
+                value={values.surname}
+                keyboardType="default"
+                placeholder="Apellido"
+                name="surname"
+              />
+
+              <TextInput
+                style={form.inputs}
+                onChangeText={handleChange("nickname")}
+                onBlur={handleBlur("nickname")}
+                value={values.nickname}
+                keyboardType="default"
+                placeholder="Nickname"
+                name="nickname"
+              />
+
+              {errors.surname && touched.surname && (
+                <Text>{errors.surname}</Text>
+              )}
+
+              <TextInput
+                style={form.inputs}
+                placeholder="Email"
+                name="email"
+                onChangeText={handleChange("email")}
+                onBlur={handleBlur("email")}
+                value={values.email}
+                keyboardType="email-address"
+              />
+
+              {errors.email && touched.email && <Text>{errors.email}</Text>}
+
+              <TextInput
+                style={form.inputs}
+                onChangeText={handleChange("password")}
+                onBlur={handleBlur("password")}
+                value={values.password}
+                keyboardType="default"
+                secureTextEntry={true}
+                placeholder="Password"
+                name="password"
+              />
+
+              {errors.password && touched.password && (
+                <Text>{errors.password}</Text>
+              )}
+            </View>
+
+            <TouchableOpacity style={form.colorBtn} onPress={handleSubmit}>
+              <Text style={form.colorTxtBtn}>Registrarse</Text>
+            </TouchableOpacity>
+          </>
+        )}
+      </Formik>
+      <Text
+        style={form.colorTxtBtn}
+        onPress={() => navigation.navigate("Login")}
+      >
+        Login
       </Text>
-
-
-      <SafeAreaView>
-        <View>
-          <Formik
-            validateOnMount={true}
-            validationSchema={validationSchema}
-            initialValues={{
-              name: "",
-              surname: "",
-              email: "",
-              password: "",
-              nickname: "",
-              age: "26",
-            }}
-            onSubmit={(values) => handleRegister(values)}
-          >
-            {({
-              handleChange,
-              handleBlur,
-              handleSubmit,
-              values,
-              errors,
-              touched,
-              isValid,
-            }) => (
-              <>
-                <TextInput
-                  style={styles.inputs}
-                  onChangeText={handleChange("name")}
-                  onBlur={handleBlur("name")}
-                  value={values.name}
-                  keyboardType="default"
-                  placeholder="Nombre"
-                  name="name"
-                />
-
-                {errors.name && touched.name && <Text>{errors.name}</Text>}
-
-                <TextInput
-                  style={styles.inputs}
-                  onChangeText={handleChange("surname")}
-                  onBlur={handleBlur("surname")}
-                  value={values.surname}
-                  keyboardType="default"
-                  placeholder="Apellido"
-                  name="surname"
-                />
-
-                <TextInput
-                  style={styles.inputs}
-                  onChangeText={handleChange("nickname")}
-                  onBlur={handleBlur("nickname")}
-                  value={values.nickname}
-                  keyboardType="default"
-                  placeholder="Nickname"
-                  name="nickname"
-                />
-
-                {errors.surname && touched.surname && (
-                  <Text>{errors.surname}</Text>
-                )}
-
-                <TextInput
-                  style={styles.inputs}
-                  placeholder="Email"
-                  name="email"
-                  onChangeText={handleChange("email")}
-                  onBlur={handleBlur("email")}
-                  value={values.email}
-                  keyboardType="email-address"
-                />
-
-                {errors.email && touched.email && <Text>{errors.email}</Text>}
-
-                <TextInput
-                  style={styles.inputs}
-                  onChangeText={handleChange("password")}
-                  onBlur={handleBlur("password")}
-                  value={values.password}
-                  keyboardType="default"
-                  secureTextEntry={true}
-                  placeholder="Password"
-                  name="password"
-                />
-
-                {errors.password && touched.password && (
-                  <Text>{errors.password}</Text>
-                )}
-
-                <TouchableOpacity
-                  style={styles.colorBtn}
-                  onPress={handleSubmit}
-                >
-                  <Text style={styles.colorTxtBtn}>Registrarse</Text>
-                </TouchableOpacity>
-              </>
-            )}
-          </Formik>
-        </View>
-      </SafeAreaView>
-    </View>
+      <Text
+        style={form.colorTxtBtn}
+        onPress={() => navigation.navigate("Welcome")}
+      >
+        welcome
+      </Text>
+    </SafeAreaView>
   );
 }
 

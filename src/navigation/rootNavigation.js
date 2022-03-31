@@ -75,17 +75,13 @@ const AuthNavigator = createStackNavigator({
   Login: {
     screen: Login,
     navigationOptions: () => ({
-      headerTitle: 'INICIA SESIÓN',
-      headerTransparent: true,
-      headerTintColor: "white"
+      headerShown: false
     }),
   },
   Register: {
     screen: Register,
     navigationOptions: () => ({
-      headerTitle: 'REGISTRATE',
-      headerTransparent: true,
-      headerTintColor: "white"
+      headerShown: false
     })
   },
 });
@@ -98,9 +94,9 @@ export default createAppContainer(
       App: AppNavigator,
     },
     {
-/*       initialRouteName:  "AuthLoading", */
+      initialRouteName:  "AuthLoading",
       /* initialRouteName: 'Auth', */
-      initialRouteName: 'App', 
+/*       initialRouteName: 'App',  */
     },
     {
       defaultNavigationOptions: {

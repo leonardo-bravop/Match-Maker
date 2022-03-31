@@ -4,7 +4,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import List from "../commons/List";
 
 import { ligaStyles } from "../styles/ligaStyle";
-import { styles } from "../styles/Styles";
+import { styles } from "../styles/form";
 import FootLigue from "./FootLigue";
 import ItemLiga from "./ItemLiga";
 
