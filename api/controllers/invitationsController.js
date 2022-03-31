@@ -5,3 +5,17 @@ const Invitation = require("../models/Invitation")
       res.send(data)
     })
   };
+
+  exports.invitationAcepted = (req, res) => {
+    Invitation.updateOne({ status: accepted })
+    .then((data) => {
+      res.send(data)
+    })
+  };
+
+  exports.invitationRejected = (req, res) => {
+    Invitation.updateOne({ status: rejected })
+    .then((data) => {
+      res.send(data)
+    })
+  };

@@ -1,5 +1,4 @@
 const Match = require('../models/Match')
-const User = require("../models/Users");
 const Invitation = require("../models/Invitation")
 
 exports.newMatch = (req, res) => {
