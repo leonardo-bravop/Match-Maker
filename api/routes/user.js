@@ -42,6 +42,8 @@ function verifyToken(req, res, next) {
 //   });
 // });
 
+router.get("/getMatches", userController.getMatchesByUserId)
+
 router.post("/me", verifyToken, userController.me);
 
 module.exports = router;
