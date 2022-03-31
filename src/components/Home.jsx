@@ -157,16 +157,14 @@ function Home({ navigation }) {
         // staticDimension={300}
         // fixed
         spacing={10}
-        renderItem={({ item }) => {
-          console.log(`item es`, item.color)
-          return(
+        renderItem={({ item }) => (
           <TouchableOpacity
             style={[home.itemContainer, { backgroundColor: item.color }]}
           >
             <Text style={home.itemName}>{item.name}</Text>
             <Text style={home.itemCode}>{item.code}</Text>
           </TouchableOpacity>)
-        }}
+        }
       />
     </View>
   );

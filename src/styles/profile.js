@@ -36,8 +36,16 @@ export const profile = StyleSheet.create({
     settingsIcon: {
       alignSelf: "flex-end",
       marginTop: -30,
-      height: 48,
+      height: 60,
       width: 48,
+    },
+    settingsMenu: {
+      height: 100,
+      marginBottom: 20,
+    },
+    menu: {
+      height: 30,
+      paddingTop: -30
     },
     containerList: {
       flex: 4,
@@ -77,8 +85,8 @@ export const profile = StyleSheet.create({
       alignItems: "center",
     },
     cardImage: {
-      height: 40,
-      width: 40,
+      height: 25,
+      width: 25,
     },
     title: {
       flex: 1,

@@ -14,93 +14,22 @@ import {
   TouchableOpacity,
   FlatList,
   Dimensions,
+  ScrollView,
 } from "react-native";
+import {
+  Menu,
+  MenuProvider,
+  MenuOptions,
+  MenuOption,
+  MenuTrigger,
+} from "react-native-popup-menu";
 import { ligaStyles } from "../styles/ligaStyle";
+import List from "../commons/List";
+import UserLeagues from "./UserLeagues";
 
 const Profile = ({ navigation }) => {
   const [user, setUser] = useState({});
-  const [items, setItems] = useState([
-    {
-      id: 1,
-      title: "Liga 1",
-      color: "#FF4500",
-      image: "https://img.icons8.com/pastel-glyph/344/football-net.png",
-      rank: 7,
-      elo: 960,
-    },
-    {
-      id: 2,
-      title: "Liga 2",
-      color: "#87CEEB",
-      image: "https://img.icons8.com/ios/344/ping-pong.png",
-      rank: 2,
-      elo: 2600,
-    },
-    {
-      id: 3,
-      title: "Liga 3",
-      color: "#4682B4",
-      image: "https://img.icons8.com/ios/344/ping-pong.png",
-      rank: 13,
-      elo: 500,
-    },
-    {
-      id: 4,
-      title: "Liga 4",
-      color: "#6A5ACD",
-      image: "https://img.icons8.com/pastel-glyph/344/football-goal.png",
-      rank: 7,
-      elo: 500,
-    },
-    {
-      id: 5,
-      title: "Liga 5",
-      color: "#FF69B4",
-      image: "https://img.icons8.com/ios-glyphs/344/netball.png",
-      rank: 7,
-      elo: 500,
-    },
-    {
-      id: 6,
-      title: "Liga 6",
-      color: "#00BFFF",
-      image: "https://img.icons8.com/pastel-glyph/344/football-net.png",
-      rank: 7,
-      elo: 500,
-    },
-    {
-      id: 7,
-      title: "Liga 7",
-      color: "#00FFFF",
-      image: "https://img.icons8.com/ios-glyphs/344/netball.png",
-      rank: 7,
-      elo: 500,
-    },
-    {
-      id: 8,
-      title: "Liga 8",
-      color: "#20B2AA",
-      image: "https://img.icons8.com/ios/344/ping-pong.png",
-      rank: 7,
-      elo: 500,
-    },
-    {
-      id: 9,
-      title: "Liga 9",
-      color: "#191970",
-      image: "https://img.icons8.com/ios/344/ping-pong.png",
-      rank: 7,
-      elo: 500,
-    },
-    {
-      id: 10,
-      title: "Liga 10",
-      color: "#008080",
-      image: "https://img.icons8.com/ios-glyphs/344/netball.png",
-      rank: 7,
-      elo: 500,
-    },
-  ]);
+  const [leagues, setLeagues] = useState({});
 
   const { manifest } = Constants;
   const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
@@ -114,6 +43,10 @@ const Profile = ({ navigation }) => {
         { headers: { Authorization: `Bearer ${userToken}` } }
       );
       setUser(user.data);
+      const leagues = await axios.get(
+        `${uri}/api/user/getLeagues/${user.data._id}`
+      );
+      setLeagues(leagues.data);
     } catch (err) {
       console.log(err);
     }
@@ -128,16 +61,27 @@ const Profile = ({ navigation }) => {
       const result = await axios.post(`${uri}/api/user/logout`);
       const emptyUser = result.data;
       setUser(emptyUser);
-      console.log("empty user es", emptyUser);
       navigation.navigate("Welcome");
     } catch (err) {
       console.log(err);
     }
   };
+
   return (
     <View style={profile.container}>
-      <TouchableOpacity style={profile.settingsIcon} onPress={handleLogout}>
-        <Icon name="ios-settings" type="ionicon" color="white" />
+      <TouchableOpacity style={profile.settingsIcon}>
+        <MenuProvider style={profile.settingsMenu}>
+          <Menu>
+            <MenuTrigger customStyles={profile.menu}>
+              <Icon name="ios-settings" type="ionicon" color="white" />
+            </MenuTrigger>
+            <MenuOptions>
+              <MenuOption onSelect={handleLogout}>
+                <Text style={{ color: "red" }}>Salir</Text>
+              </MenuOption>
+            </MenuOptions>
+          </Menu>
+        </MenuProvider>
       </TouchableOpacity>
       <Image
         style={profile.userImage}
@@ -147,36 +91,66 @@ const Profile = ({ navigation }) => {
       />
       <Text style={profile.userNameText}>{`${user.name} ${user.surname}`}</Text>
       <Text style={profile.userNameText}>{`${user.nickname}`}</Text>
-      <View style={profile.containerList}>
-        <View style={profile.header}>
-          <Text style={profile.headerList}>
-            Foto
-          </Text>
-          <Text style={profile.headerList}>Nombre</Text>
-          <Text style={profile.headerList}>Rank</Text>
-          <Text style={profile.headerList}>Elo</Text>
+
+      <View style={[ligaStyles.body, { width: "95%" }]}>
+        <View style={ligaStyles.listHead}>
+          <View style={ligaStyles.enum}>
+            <View style={{ width: 50, alignItems: "center" }}>
+              <Text style={{ color: "#FFFFFF" }}>Rank</Text>
+            </View>
+            <View style={{ width: 50, alignItems: "center" }}>
+              <Text style={{ color: "#FFFFFF" }}>Foto</Text>
+            </View>
+            <View style={{ flex: 1, width: "auto", alignItems: "center" }}>
+              <Text style={{ color: "#FFFFFF" }}>Nick</Text>
+            </View>
+            <View style={{ width: 100, alignItems: "center" }}>
+              <Text style={{ color: "#FFFFFF" }}>ELO</Text>
+            </View>
+          </View>
         </View>
-        <FlatList
-          data={items}
-          //horizontal={false}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => {
-            return (
-                <TouchableOpacity
-                  style={[profile.card, { backgroundColor: item.color }]}
-                  onPress={onPress}
-                >
-                  <Image
-                    style={profile.cardImage}
-                    source={{ uri: item.image }}
-                  />
-                  <Text style={profile.title}>{item.title}</Text>
-                  <Text style={profile.rank}>{item.rank}</Text>
-                  <Text style={profile.elo}>{item.elo}</Text>
-                </TouchableOpacity>
-            );
-          }}
-        />
+        {leagues[0] ? (
+          <ScrollView style={ligaStyles.listContainer}>
+            {leagues.map((item, i) => {
+              return (
+                <View key={i}>
+                  <TouchableOpacity
+                    onPress={() => navigation.navigate("Ligas", item)}
+                  >
+                    <View
+                      style={[
+                        ligaStyles.item,
+                        { backgroundColor: `${item.color}` },
+                      ]}
+                    >
+                      <View style={ligaStyles.rank}>
+                        <Text style={{ color: "#FFFFFF" }}>
+                          {parseInt(Math.random() * (1 - 20 + 1) + 20)}
+                        </Text>
+                      </View>
+                      <View
+                        style={[ligaStyles.img, { backgroundColor: item.code }]}
+                      >
+                        <Image
+                          style={profile.cardImage}
+                          source={{ uri: item.img }}
+                        />
+                      </View>
+                      <View style={ligaStyles.nick}>
+                        <Text style={{ color: "#FFFFFF" }}>{item.name}</Text>
+                      </View>
+                      <View style={ligaStyles.elo}>
+                        <Text style={{ color: "#FFFFFF" }}>
+                          {parseInt(Math.random() * (400 - 3000 + 1) + 3000)}
+                        </Text>
+                      </View>
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              );
+            })}
+          </ScrollView>
+        ) : null}
       </View>
     </View>
   );
