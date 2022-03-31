@@ -10,7 +10,7 @@ const List = ({list, Element}) => {
          <View style={ligaStyles.listContainer}>
             { list.map( (item, i) => {
                return (
-                  <Element item={item} i={i}/>
+                  <Element item={item} key={i}/>
                )}
             )}
          </View>

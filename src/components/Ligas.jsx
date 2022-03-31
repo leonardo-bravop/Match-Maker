@@ -8,7 +8,8 @@ import { styles } from "../styles/Styles";
 import FootLigue from "./FootLigue";
 import ItemLiga from "./ItemLiga";
 
-const Ligas = () => {
+const Ligas = ({navigation : {state : {params}}}) => {
+   console.log("ligas desde home", params);
    let [memberList, setMemberList] = useState([])
    let [userData, setUserData] = useState(null)
 
