@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { Formik } from "formik";
 import * as yup from "yup";
-import { form } from "../styles/form";
+import { formR } from "../styles/form";
 
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -51,7 +51,7 @@ function Register({ navigation }) {
   });
 
   return (
-    <SafeAreaView style={form.container}>
+    <SafeAreaView style={formR.container}>
       <Formik
         validateOnMount={true}
         validationSchema={validationSchema}
@@ -75,11 +75,11 @@ function Register({ navigation }) {
           isValid,
         }) => (
           <>
-            <Text style={form.formTittle}>Inicia Sesión</Text>
+            <Text style={formR.formTittle}>Inicia Sesión</Text>
 
-            <View style={form.inputContainer}>
+            <View style={formR.inputContainer}>
               <TextInput
-                style={form.inputs}
+                style={formR.inputs}
                 onChangeText={handleChange("name")}
                 onBlur={handleBlur("name")}
                 value={values.name}
@@ -91,7 +91,7 @@ function Register({ navigation }) {
               {errors.name && touched.name && <Text>{errors.name}</Text>}
 
               <TextInput
-                style={form.inputs}
+                style={formR.inputs}
                 onChangeText={handleChange("surname")}
                 onBlur={handleBlur("surname")}
                 value={values.surname}
@@ -101,7 +101,7 @@ function Register({ navigation }) {
               />
 
               <TextInput
-                style={form.inputs}
+                style={formR.inputs}
                 onChangeText={handleChange("nickname")}
                 onBlur={handleBlur("nickname")}
                 value={values.nickname}
@@ -115,7 +115,7 @@ function Register({ navigation }) {
               )}
 
               <TextInput
-                style={form.inputs}
+                style={formR.inputs}
                 placeholder="Email"
                 name="email"
                 onChangeText={handleChange("email")}
@@ -127,7 +127,7 @@ function Register({ navigation }) {
               {errors.email && touched.email && <Text>{errors.email}</Text>}
 
               <TextInput
-                style={form.inputs}
+                style={formR.inputs}
                 onChangeText={handleChange("password")}
                 onBlur={handleBlur("password")}
                 value={values.password}
@@ -142,20 +142,20 @@ function Register({ navigation }) {
               )}
             </View>
 
-            <TouchableOpacity style={form.colorBtn} onPress={handleSubmit}>
-              <Text style={form.colorTxtBtn}>Registrarse</Text>
+            <TouchableOpacity style={formR.colorBtn} onPress={handleSubmit}>
+              <Text style={formR.colorTxtBtn}>Registrarse</Text>
             </TouchableOpacity>
           </>
         )}
       </Formik>
       <Text
-        style={form.colorTxtBtn}
+        style={formR.colorTxtBtn}
         onPress={() => navigation.navigate("Login")}
       >
         Login
       </Text>
       <Text
-        style={form.colorTxtBtn}
+        style={formR.colorTxtBtn}
         onPress={() => navigation.navigate("Welcome")}
       >
         welcome
