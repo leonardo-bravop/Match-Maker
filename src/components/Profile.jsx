@@ -15,7 +15,6 @@ import {
   FlatList,
   Dimensions,
 } from "react-native";
-import { ligaStyles } from "../styles/ligaStyle";
 
 const Profile = ({ navigation }) => {
   const [user, setUser] = useState({});

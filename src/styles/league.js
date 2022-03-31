@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 
 
-export const ligaStyles = StyleSheet.create({
+export const leagueStyles = StyleSheet.create({
    back: {
       flex: 1,
       paddingTop: 30
@@ -31,6 +31,9 @@ export const ligaStyles = StyleSheet.create({
       marginRight:16,
       flex: 1,
    },
+   title:{
+      fontSize: 70
+   },
 
    listHead:{
       marginLeft:16,
@@ -39,10 +42,6 @@ export const ligaStyles = StyleSheet.create({
    enum:{
       flexDirection: "row",
       marginBottom: 3
-   },
-   listContainer: {
-      marginLeft:16,
-      marginRight:16
    },
    item: {
       flex: 1,
@@ -104,5 +103,12 @@ export const ligaStyles = StyleSheet.create({
       fontSize: 20,
       marginLeft:16,
       marginRight: 16,
+    },
+
+    checkContainer: {
+      width: 50, 
+      height: 50,
+      justifyContent: "center",
+      alignItems: "center"
     }
 })

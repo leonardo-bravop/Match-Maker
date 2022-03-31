@@ -10,7 +10,7 @@ import Login from "../components/Login";
 import Home from "../components/Home";
 import Users from "../components/Users";
 import Profile from "../components/Profile";
-import Ligas from "../components/Ligas";
+import League from "../components/League";
 import Match from "../components/Match";
 import Record from "../components/Record";
 import { Platform } from "react-native";
@@ -23,8 +23,8 @@ const AppNavigator = createBottomTabNavigator(
         tabBarIcon: <Icon name="ios-home" type="ionicon" color="white" />,
       },
     },
-    Ligas: {
-      screen: Ligas,
+    Liga: {
+      screen: League,
       navigationOptions: {
         tabBarIcon: <Icon name="ios-people" type="ionicon" color="white" />,
       },
@@ -98,7 +98,7 @@ export default createAppContainer(
       App: AppNavigator,
     },
     {
-/*       initialRouteName:  "AuthLoading", */
+      //initialRouteName:  "AuthLoading",
       /* initialRouteName: 'Auth', */
       initialRouteName: 'App', 
     },

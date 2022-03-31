@@ -1,16 +1,14 @@
-import React, { useEffect, useState } from "react";
-import { View, Text } from "react-native";
+import React from "react";
+import { View} from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
-
-import { ligaStyles } from "../styles/ligaStyle";
 
 const List = ({list, Element}) => {
    return (
       <ScrollView >
-         <View style={ligaStyles.listContainer}>
+         <View style={ { marginLeft:16, marginRight:16 } }>
             { list.map( (item, i) => {
                return (
-                  <Element item={item} i={i}/>
+                  <Element item={item} key={i}/>
                )}
             )}
          </View>
