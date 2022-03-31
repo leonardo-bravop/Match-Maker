@@ -1,4 +1,5 @@
 const User = require("../models/Users");
+const Match = require('../models/Match')
 const generateToken = require("../config/generateToken");
 const jwt = require("jsonwebtoken");
 const League = require("../models/League");
@@ -137,6 +138,17 @@ exports.getLeaguesByUserId = (req, res) => {
       .then((leagues) => {
         res.send(leagues);
       });
+  });
+};
+
+exports.getMatchesByUserId = (req, res) => {
+  const { UserId } = req.params;
+  User.findById(UserId).then((matches) => {
+    Match.find(
+      { _id: { $in: matches.users } },
+    ).then((users) => {
+      res.send(users);
+    });
   });
 };
 

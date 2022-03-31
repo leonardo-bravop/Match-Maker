@@ -2,6 +2,7 @@ const Match = require("../models/Match");
 const User = require("../models/Users");
 const Invitation = require("../models/Invitation");
 
+
 exports.newMatch = (req, res) => {
   const { equipo_1, equipo_2, fecha } = req.body;
   Match.create({ equipo_1, equipo_2 }).then((match) => {
@@ -27,9 +28,11 @@ exports.deleteAll = (req, res) => {
   });
 };
 
+
 exports.findMatch = (req, res) => {
   const { id } = req.params;
   Match.findById(id).then((data) => {
     res.send(data);
   });
 };
+
