@@ -11,13 +11,13 @@ const matchSchema = new Schema({
   ],
   equipo_1: [
     {
-      type: Array,
-      ref: "Team",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
     },
   ],
   equipo_2: [
     {
-      type: Array,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Team",
     },
   ],
@@ -25,9 +25,9 @@ const matchSchema = new Schema({
     type: Date,
     default: null,
   },
-  Resultado: {
-    type: Number,
-    default: "",
+  status: {
+    type: String,
+    default: "pending",
   },
 });
 

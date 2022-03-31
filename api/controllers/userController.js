@@ -5,7 +5,6 @@ const League = require("../models/League");
 
 exports.register = (req, res) => {
   const { name, surname, nickname, email, password, age } = req.body;
-  console.log(`req body es`, req.body);
   User.findOne({ email }).then((user) => {
     if (user) {
       res.status(400);
@@ -19,7 +18,6 @@ exports.register = (req, res) => {
           } else {
             User.create({ name, surname, nickname, email, password, age })
               .then((user) => {
-                console.log("entre");
                 res.sendStatus(201);
               })
               .catch((error) => {
@@ -31,6 +29,8 @@ exports.register = (req, res) => {
           res.json(error);
         });
     }
+  }).catch((error) => {
+    res.json(error);
   });
 };
 
@@ -107,13 +107,10 @@ exports.logOut = (req, res) => {
 };
 
 exports.me = (req, res) => {
-  console.log(`entre en me`);
   jwt.verify(req.token, process.env.JWT_SECRET, (err, authData) => {
     if (err) {
-      console.log(`req token es`, req.token);
       res.sendStatus(403);
     } else {
-      console.log(`req token cuando funciona es`, req.token);
       User.findById(authData.id)
         .then((user) =>
           res.json({

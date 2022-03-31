@@ -47,7 +47,7 @@ function Register({ navigation }) {
     password: yup
       .string("Ingresa tu eontraseña")
       .min(8, "La contraseña debe tener al menos 8 caracteres")
-      .required("*Campo requerido"),
+      .required("*Campo requerido").matches(/^(?=(.*[A-Z]){1,})(?=(.*[0-9]){1,}).{8,}$/, "La contraseña debe tener al menos una mayúscula"),
   });
 
   return (
