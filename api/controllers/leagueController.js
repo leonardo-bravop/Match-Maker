@@ -2,18 +2,15 @@ const League = require("../models/League");
 const User = require("../models/Users");
 
 exports.new = (req, res) => {
-  const { name, description, sport, color } = req.body;
-  console.log(`req body es`, req.body);
+  const { name, description, sport, color, img } = req.body;
   League.findOne({ name })
     .then((league) => {
       if (league) {
         res.status(400);
         throw new Error("League Already Exists");
       } else {
-        console.log(`name es`, name);
-        League.create({ name, description, sport, color })
+        League.create({ name, description, sport, color, img })
           .then((league) => {
-            console.log("entre");
             res.sendStatus(201);
           })
           .catch((error) => {
@@ -29,8 +26,6 @@ exports.new = (req, res) => {
 exports.addUser = (req, res) => {
   const { id } = req.params;
   const { userId } = req.body;
-  console.log(`id es`, id);
-  console.log(`userid es`, userId);
   League.findByIdAndUpdate(
     id,
     { $push: { users: userId } },
@@ -40,67 +35,79 @@ exports.addUser = (req, res) => {
       userId,
       { $push: { leagues: id } },
       { new: true, useFindAndModify: false }
-    ).then(()=>res.sendStatus(200))
+    ).then(() => res.sendStatus(200));
   });
 };
 
-exports.newLeague = (req, res) => {
-  const { name, description, matches, users } = req.body;
-  League.create({
-    name: name,
-    description: description,
-    matches: matches, 
-    users: users
-  }
-  ).then((data) => {
-    res.send(data)
-  })
-};
+// exports.newLeague = (req, res) => {
+//   const { name, description, matches, users, img } = req.body;
+//   League.create({
+//     name: name,
+//     description: description,
+//     matches: matches,
+//     users: users,
+//     img
+//   }
+//   ).then((data) => {
+//     res.send(data)
+//   })
+// };
+
 exports.deleteLeague = (req, res) => {
   const { id } = req.params;
-  League.deleteOne({ where: id}
-  ).then((data) => {
-    res.send(data)
-  })
+  League.deleteOne({ _id: id }).then((data) => {
+    res.send(data);
+  });
 };
 
+//get league by id
 exports.findShowLeague = (req, res) => {
   const { id } = req.params;
   League.findById(id).then((data) => {
-    res.send(data)
-  })
+    res.send(data);
+  });
 };
 
 exports.getAll = (req, res) => {
-  League.find({}
-  ).then((data) => {
-    res.send(data)
-  })
+  League.find({}).then((data) => {
+    res.send(data);
+  });
 };
 
+//edit
 exports.changeLeague = (req, res) => {
   const { id } = req.params;
-  const {name, description, matches, users } = req.body
+  const { name, description, matches, users } = req.body;
   League.updateOne(
-    { name: name,
-      description: description,
-      matches: matches, 
-      users: users},
-    { where: id})
-    .then((data) => {
-      res.send(data)
-    })
-}
-
-exports.getAll = (req, res) => {
-  League.find({}
+    { name: name, description: description, matches: matches, users: users },
+    { where: id }
   ).then((data) => {
-    res.send(data)
-  })
+    res.send(data);
+  });
 };
 
-exports.showHistoryLeague = (req, res) => {
+exports.showHistoryLeague = (req, res) => {};
 
-}
+exports.getUserByLeagueId = (req, res) => {
+  const { leagueId } = req.params;
+  League.findById(leagueId).then((league) => {
+    User.find(
+      { _id: { $in: league.users } },
+      { _id: 1, name: 1, surname: 1, nickname: 1, img: 1 }
+    ).then((users) => {
+      res.send(users);
+    });
+  });
+};
 
-// ruta para buscar por nombre
+exports.findLeagueByName = (req, res) => {
+  const { leagueName } = req.body;
+  League.find({ name: { $regex: leagueName} }).then((leagues) => {
+    res.send(leagues);
+  })
+  // League.find({ $text : { $search: `'${leagueName}'`, $caseSensitive:false } })
+  // .then((result) => {
+  //   console.log(result);
+  // res.send(result);
+  // });
+};
