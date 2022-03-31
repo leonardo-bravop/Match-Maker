@@ -3,7 +3,7 @@ const { Schema } = mongoose;
 
 const inivitationSchema = new Schema({
   
-  match: [
+  matchId: [
     {
       type: Schema.Types.ObjectId,
       ref: "Match",
@@ -22,7 +22,8 @@ const inivitationSchema = new Schema({
     },
   ],
   status: {
-      type: String
+      type: String,
+      default: 'pending'
   }
 });
 
