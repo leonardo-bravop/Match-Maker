@@ -15,7 +15,6 @@ const screen = Dimensions.get("screen");
 
 const home = StyleSheet.create({
   container: {
-    /*     height:50*screen.height, width:50*screen.width, */
     flex: 1,
     flexDirection: "column",
   },
@@ -90,7 +89,7 @@ const home = StyleSheet.create({
   },
 });
 
-function Home({ navigation }) {
+function Home({ navigation : {navigate} }) {
   const { manifest } = Constants;
 
   const [league, setLeague] = React.useState([]);
@@ -119,8 +118,6 @@ function Home({ navigation }) {
       console.log(err);
     }
   }, []);
-
-  // console.log(`leagues es`, league[0].color)
 
   return (
     <View style={home.container}>
@@ -160,11 +157,12 @@ function Home({ navigation }) {
         renderItem={({ item }) => (
           <TouchableOpacity
             style={[home.itemContainer, { backgroundColor: item.color }]}
+            onPress={() => navigate("Ligas", item)}
           >
             <Text style={home.itemName}>{item.name}</Text>
-            <Text style={home.itemCode}>{item.code}</Text>
-          </TouchableOpacity>)
-        }
+            <Text style={home.itemCode}>{item.color}</Text>
+          </TouchableOpacity>
+      )}
       />
     </View>
   );

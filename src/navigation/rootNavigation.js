@@ -75,18 +75,14 @@ const AuthNavigator = createStackNavigator({
   Login: {
     screen: Login,
     navigationOptions: () => ({
-      headerTitle: "INICIA SESIÓN",
-      headerTransparent: true,
-      headerTintColor: "white",
+      headerShown: false
     }),
   },
   Register: {
     screen: Register,
     navigationOptions: () => ({
-      headerTitle: "REGISTRATE",
-      headerTransparent: true,
-      headerTintColor: "white",
-    }),
+      headerShown: false
+    })
   },
 });
 

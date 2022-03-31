@@ -35,6 +35,10 @@ const userSchema = new Schema({
     type: Number,
     required: [true, "Please enter your age"],
   },
+  img: {
+    type: String,
+    default: "https://static.vecteezy.com/system/resources/thumbnails/000/550/980/small/user_icon_001.jpg"
+  },
   leagues: [
     {
       type: mongoose.Schema.Types.ObjectId,
