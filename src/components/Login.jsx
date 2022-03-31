@@ -16,9 +16,9 @@ import Home from "./Home";
 import Welcome from "./Welcome";
 import { Formik } from "formik";
 import * as yup from "yup";
-import { styles } from "../styles/Styles";
+import { form } from "../styles/form";
 import Constants from "expo-constants";
-import AsyncStorage from "@react-native-async-storage/async-storage"
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { manifest } = Constants;
 
@@ -28,8 +28,8 @@ function Login({ navigation }) {
   const handleLogin = async (values) => {
     try {
       const result = await axios.post(`${uri}/api/user/login`, values);
-      const userStored = (result.data.token)
-      await AsyncStorage.setItem("userInfo", userStored)
+      const userStored = result.data.token;
+      await AsyncStorage.setItem("userInfo", userStored);
       // const returnedUser = await AsyncStorage.getItem('userInfo')
       // console.log(`STORED USER ES`, returnedUser)
       result.status == 200 ? navigation.navigate("Home") : null;
@@ -50,62 +50,73 @@ function Login({ navigation }) {
   });
 
   return (
-<SafeAreaView style={styles.fondo}>
-      <View>
-        <Formik
-          validateOnMount={true}
-          validationSchema={validationSchema}
-          initialValues={{ email: "", password: "" }}
-          onSubmit={(values) => handleLogin(values)}
-        >
-          {({
-            handleChange,
-            handleBlur,
-            handleSubmit,
-            values,
-            errors,
-            touched,
-            isValid,
-          }) => (
-            <>
-              <TextInput
-                style={styles.inputs}
-                placeholder="Email"
-                name="email"
-                onChangeText={handleChange("email")}
-                onBlur={handleBlur("email")}
-                value={values.email}
-                keyboardType="email-address"
-              />
+    <SafeAreaView style={form.container}>
+      <Formik
+        validateOnMount={true}
+        validationSchema={validationSchema}
+        initialValues={{ email: "", password: "" }}
+        onSubmit={(values) => handleLogin(values)}
+      >
+        {({
+          handleChange,
+          handleBlur,
+          handleSubmit,
+          values,
+          errors,
+          touched,
+          isValid,
+        }) => (
+          <>
+            <Text style={form.formTittle}>Inicia Sesión</Text>
+            
+            <View style={form.inputContainer}>
+            <TextInput
+              style={form.inputs}
+              placeholder="Email"
+              name="email"
+              onChangeText={handleChange("email")}
+              onBlur={handleBlur("email")}
+              value={values.email}
+              keyboardType="email-address"
+            />
 
-              {errors.email && touched.email && <Text>{errors.email}</Text>}
+            {errors.email && touched.email && <Text>{errors.email}</Text>}
 
-              <TextInput
-                style={styles.inputs}
-                onChangeText={handleChange("password")}
-                onBlur={handleBlur("password")}
-                value={values.password}
-                secureTextEntry={true}
-                placeholder="Password"
-                name="password"
-              />
-              {errors.password && touched.password && (
-                <Text>{errors.password}</Text>
-              )}
+            <TextInput
+              style={form.inputs}
+              onChangeText={handleChange("password")}
+              onBlur={handleBlur("password")}
+              value={values.password}
+              secureTextEntry={true}
+              placeholder="Password"
+              name="password"
+            />
+            {errors.password && touched.password && (
+              <Text>{errors.password}</Text>
+            )}
+            </View>
 
-              <TouchableOpacity style={styles.colorBtn} onPress={handleSubmit}>
-                <Text style={styles.colorTxtBtn}>Aceptar</Text>
-              </TouchableOpacity>
-            </>
-          )}
-        </Formik>
+            <TouchableOpacity style={form.colorBtn} onPress={handleSubmit}>
+              <Text style={form.colorTxtBtn}>Aceptar</Text>
+            </TouchableOpacity>
+          </>
+        )}
+      </Formik>
 
-          <Text style={styles.colorTxtBtn} onPress={() => navigation.navigate("Register")}>registro</Text>
-          <Text style={styles.colorTxtBtn} onPress={() => navigation.navigate("Welcome")}>welcome</Text>
-
-      </View>
+      <Text
+        style={form.colorTxtBtn}
+        onPress={() => navigation.navigate("Register")}
+      >
+        registro
+      </Text>
+      <Text
+        style={form.colorTxtBtn}
+        onPress={() => navigation.navigate("Welcome")}
+      >
+        welcome
+      </Text>
     </SafeAreaView>
-  )
+  );
 }
 
 export default Login;

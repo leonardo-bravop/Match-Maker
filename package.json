@@ -36,6 +36,7 @@
     "react-native-gesture-handler": "~2.1.0",
     "react-native-login-screen": "^3.0.2",
     "react-native-paper": "^4.11.2",
+    "react-native-popup-menu": "^0.15.12",
     "react-native-safe-area-context": "3.3.2",
     "react-native-screens": "~3.10.1",
     "react-native-super-grid": "^4.2.0",

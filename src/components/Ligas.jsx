@@ -4,11 +4,12 @@ import { ScrollView } from "react-native-gesture-handler";
 import List from "../commons/List";
 
 import { ligaStyles } from "../styles/ligaStyle";
-import { styles } from "../styles/Styles";
+import { styles } from "../styles/form";
 import FootLigue from "./FootLigue";
 import ItemLiga from "./ItemLiga";
 
-const Ligas = () => {
+const Ligas = ({navigation : {state : {params}}}) => {
+   console.log("ligas desde home", params);
    let [memberList, setMemberList] = useState([])
    let [userData, setUserData] = useState(null)
 
@@ -58,7 +59,8 @@ const Ligas = () => {
                   style={{ height: 50, width: "auto", color: '#FFFFFF'}}
                   itemStyle={{height: 50,}}
                   onValueChange={(itemValue, itemIndex) => {setSelectedValue(itemValue)
-                     changeHandler()}}
+                     //changeHandler()
+                  }}
                >
                   <Picker.Item label="Liga de Ping Pong" value="liga"/>
                   <Picker.Item label="Liga de Futbol" value="liga2" />
