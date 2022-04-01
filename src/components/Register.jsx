@@ -154,12 +154,6 @@ function Register({ navigation }) {
       >
         Login
       </Text>
-      <Text
-        style={formR.colorTxtBtn}
-        onPress={() => navigation.navigate("Welcome")}
-      >
-        welcome
-      </Text>
     </SafeAreaView>
   );
 }

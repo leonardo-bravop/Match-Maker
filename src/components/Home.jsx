@@ -6,12 +6,19 @@ import {
   Dimensions,
   StyleSheet,
   TouchableOpacity,
+  Image,
+
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FlatGrid } from "react-native-super-grid";
 import axios from "axios";
 import Constants from "expo-constants";
+
+import { leagueStyles } from "../styles/league";
+import { profile } from "../styles/profile";
+
 const screen = Dimensions.get("screen");
+
 
 const home = StyleSheet.create({
   container: {
@@ -59,13 +66,12 @@ const home = StyleSheet.create({
     color: "#34495e",
   },
   ligaTittle: {
-    alignSelf: "flex-start",
     fontStyle: "italic",
     fontWeight: "bold",
     fontSize: 25,
     marginTop: 40,
     color: "white",
-    marginLeft: 20,
+    textAlign:"center",
   },
   gridView: {
     marginTop: -90,
@@ -126,9 +132,15 @@ function Home({ navigation: { navigate } }) {
       </View>
       <View style={home.containerDos}>
         <Text style={home.lastTittle}>Ultima partida</Text>
-        <View style={home.lastContainer}>
+
+        <TouchableOpacity
+          style={home.lastContainer}
+          onPress={() => {
+            navigate("Historial");
+          }}
+        >
           <View style={home.lastItem}>
-            <Text style={home.lastText}>TENGO 10 CAR</Text>
+            <Text style={home.lastText}>NoobMaster69</Text>
           </View>
           <View style={home.lastItem}>
             <Text
@@ -141,10 +153,10 @@ function Home({ navigation: { navigate } }) {
             </Text>
           </View>
           <View style={home.lastItem}>
-            <Text style={home.lastText}>TENGO 10 CAR</Text>
+            <Text style={home.lastText}>Taserface</Text>
           </View>
-        </View>
-        <Text style={home.ligaTittle}>LIGAS</Text>
+        </TouchableOpacity>
+        <Text style={home.ligaTittle}>────────  LIGAS  ────────</Text>
       </View>
 
       <FlatGrid
@@ -161,6 +173,14 @@ function Home({ navigation: { navigate } }) {
           >
             <Text style={home.itemName}>{item.name}</Text>
             <Text style={home.itemCode}>{item.color}</Text>
+                      <View
+                        style={[leagueStyles.img, { backgroundColor: item.code }]}
+                      >
+                        <Image
+                          style={[profile.cardImage,{width:"150%"}]}
+                          source={{ uri: item.img }}
+                        />
+                      </View>
           </TouchableOpacity>
         )}
       />
