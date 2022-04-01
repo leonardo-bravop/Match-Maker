@@ -105,8 +105,8 @@ const League = ({ navigation }) => {
     }
   };
 
-  useEffect( async() => {
-    try{
+  useEffect(async () => {
+    try {
       const userString = await AsyncStorage.getItem("userInfo");
 
       const result = await axios.post(
@@ -125,9 +125,10 @@ const League = ({ navigation }) => {
     } catch (err) {
       console.log(err);
     }
-  }, [])
+  }, []);
 
   useEffect(async () => {
+    if (!state.params) return;
     if (!state.params._id) return;
     try {
       const { data } = await axios.get(
@@ -245,9 +246,12 @@ const League = ({ navigation }) => {
           </View>
         </View>
 
-        <List list={memberList} Element={ItemLeague} />
-
-        <FootLigue ligueId={state.params._id} userData={user} />
+        {state.params._id ? (
+          <>
+            <List list={memberList} Element={ItemLeague} />
+            <FootLigue ligueId={state.params._id} userData={user} />
+          </>
+        ) : null}
       </View>
     </SafeAreaView>
   );
