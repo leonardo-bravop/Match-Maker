@@ -35,7 +35,7 @@ exports.addUser = (req, res) => {
       userId,
       { $push: { leagues: id } },
       { new: true, useFindAndModify: false }
-    ).then(() => res.sendStatus(200));
+    ).then((users) => res.send(users));
   });
 };
 

@@ -50,11 +50,11 @@ const Profile = ({ navigation }) => {
     } catch (err) {
       console.log(err);
     }
-  }, []);
+  }, [navigation.state.params]);
 
-  const onPress = () => {
-    navigation.navigate("Ligas");
-  };
+  // const onPress = () => {
+  //   navigation.navigate("Ligas");
+  // };
 
   const handleLogout = async () => {
     try {
@@ -115,7 +115,7 @@ const Profile = ({ navigation }) => {
               return (
                 <View key={i}>
                   <TouchableOpacity
-                    onPress={() => navigation.navigate("Ligas", item)}
+                    onPress={() => navigation.navigate("Liga", item)}
                   >
                     <View
                       style={[
