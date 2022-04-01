@@ -27,7 +27,11 @@ import { leagueStyles } from "../styles/league";
 import List from "../commons/List";
 import UserLeagues from "./UserLeagues";
 
+import { useDispatch, useSelector } from 'react-redux'
+
 const Profile = ({ navigation }) => {
+  const user2 = useSelector((state) => state.user)
+  console.log("AAAAAAA",user2)
   const [user, setUser] = useState({});
   const [leagues, setLeagues] = useState({});
 
