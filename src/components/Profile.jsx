@@ -50,7 +50,7 @@ const Profile = ({ navigation }) => {
     } catch (err) {
       console.log(err);
     }
-  }, []);
+  }, [navigation.state.params]);
 
   const onPress = () => {
     navigation.navigate("Ligas");

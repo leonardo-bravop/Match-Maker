@@ -10,7 +10,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import {Picker} from '@react-native-picker/picker'
 
 
-const Match = () => {
+const Match = ({navigation}) => {
    let [memberList, setMemberList] = useState([])
    let [leagueList, setLeagueList] = useState([])
    let [actualleague, setActualLeague] = useState({})
@@ -19,7 +19,7 @@ const Match = () => {
 const { manifest } = Constants;
 const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 
-   const [selectedValue, setSelectedValue] = useState(" ");
+   const [selectedValue, setSelectedValue] = useState("");
 
    const getUser = async () => {
       try {
@@ -120,7 +120,7 @@ const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 
          await AsyncStorage.setItem("A", "")
          await AsyncStorage.setItem("B", "")
-         
+         navigation.navigate('Perfil')
       } catch (e) { console.log(e)
       }
    }

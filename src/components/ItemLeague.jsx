@@ -2,7 +2,7 @@ import { View, Text } from "react-native";
 import React from "react";
 import { leagueStyles } from "../styles/league";
 
-const ItemLeague = ({ item, key }) => {
+const ItemLeague = ({ item }) => {
 
    return (
       <View style={leagueStyles.item} >

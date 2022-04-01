@@ -15,15 +15,14 @@ const FootLigue = ({ ligueId, userData }) => {
 
    const buttonHandler = async () => {
       try {
-         const userString = await AsyncStorage.getItem("userInfo")
+         // const userString = await AsyncStorage.getItem("userInfo")
             
-         const result = await axios
-         .post(`${uri}/api/user/me`, {}, 
-               { headers: { Authorization: `Bearer ${userString}` } } )
+         // const result = await axios
+         // .post(`${uri}/api/user/me`, {}, 
+         //       { headers: { Authorization: `Bearer ${userString}` } } )
 
          const res = await axios
-         .put(`${uri}/api/league/addUser/${ligueId}`, {userId: result.data._id})
-
+         .put(`${uri}/api/league/addUser/${ligueId}`, {userId: userData.id})
       } catch (err) { console.log(err); }
    }
 
