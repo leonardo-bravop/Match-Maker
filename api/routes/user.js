@@ -8,8 +8,6 @@ router.post("/login", userController.login);
 
 router.put("/edit/:_id", userController.edit);
 
-// router.get("getGroups", userController.getGroups)
-
 router.post("/logout", userController.logOut)
 
 router.get("/getLeagues/:userId", userController.getLeaguesByUserId)
@@ -17,14 +15,12 @@ router.get("/getLeagues/:userId", userController.getLeaguesByUserId)
 // router.get("/getMatches/:userId", userController.getMatchesByUserId)
 
 function verifyToken(req, res, next) {
-  console.log(`dentro de verify`)
   const bearerHeader = req.headers["authorization"];
   if (typeof bearerHeader !== "undefined") {
     const bearerToken = bearerHeader.split(" ")[1];
     req.token = bearerToken;
     next();
   } else {
-    console.log(`dentro del else`)
     res.sendStatus(403);
   }
 }
@@ -41,6 +37,8 @@ function verifyToken(req, res, next) {
 //     }
 //   });
 // });
+
+router.get("/getMatches", userController.getMatchesByUserId)
 
 router.post("/me", verifyToken, userController.me);
 

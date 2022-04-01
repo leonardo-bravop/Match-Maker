@@ -7,3 +7,7 @@ router.post("/newMatch", matchController.newMatch);
 router.delete("/deleteMatch/:id", matchController.deleteMatch);
 
 router.get("/showMatch/:id", matchController.findMatch);
+
+router.delete("/deleteAll", matchController.deleteAll)
+
+module.exports = router;

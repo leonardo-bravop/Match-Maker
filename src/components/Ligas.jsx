@@ -59,7 +59,8 @@ const Ligas = ({navigation : {state : {params}}}) => {
                   style={{ height: 50, width: "auto", color: '#FFFFFF'}}
                   itemStyle={{height: 50,}}
                   onValueChange={(itemValue, itemIndex) => {setSelectedValue(itemValue)
-                     changeHandler()}}
+                     //changeHandler()
+                  }}
                >
                   <Picker.Item label="Liga de Ping Pong" value="liga"/>
                   <Picker.Item label="Liga de Futbol" value="liga2" />

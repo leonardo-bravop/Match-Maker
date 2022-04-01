@@ -12,7 +12,7 @@ const matchSchema = new Schema({
   equipo_1: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Team",
+      ref: "User",
     },
   ],
   equipo_2: [
@@ -25,9 +25,9 @@ const matchSchema = new Schema({
     type: Date,
     default: null,
   },
-  Resultado: {
-    type: Number,
-    default: "",
+  status: {
+    type: String,
+    default: "pending",
   },
 });
 

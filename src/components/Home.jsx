@@ -89,7 +89,7 @@ const home = StyleSheet.create({
   },
 });
 
-function Home({ navigation : {navigate} }) {
+function Home({ navigation: { navigate } }) {
   const { manifest } = Constants;
 
   const [league, setLeague] = React.useState([]);
@@ -156,13 +156,13 @@ function Home({ navigation : {navigate} }) {
         spacing={10}
         renderItem={({ item }) => (
           <TouchableOpacity
+            onPress={() => navigate("Liga", item)}
             style={[home.itemContainer, { backgroundColor: item.color }]}
-            onPress={() => navigate("Ligas", item)}
           >
             <Text style={home.itemName}>{item.name}</Text>
             <Text style={home.itemCode}>{item.color}</Text>
           </TouchableOpacity>
-      )}
+        )}
       />
     </View>
   );

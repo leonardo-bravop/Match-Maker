@@ -1,31 +1,46 @@
-const Match = require('../models/Match')
+const Match = require("../models/Match");
 const User = require("../models/Users");
+const Invitation = require("../models/Invitation");
 
 exports.newMatch = (req, res) => {
-    const { league, equipo_1, equipo_2, fecha, resultado} = req.body;
-    Match.create({
-        league: league,
-        equipo_1: equipo_1,
-        equipo_2: equipo_2,
-        Fecha: fecha,
-        Resultado: resultado
-    }
-    ).then((data) => {
-      res.send(data)
-    })
-  };
-  exports.deleteMatch = (req, res) => {
-    const { id } = req.params;
-    Match.deleteOne({ where: id}
-    ).then((data) => {
-      res.send(data)
-    })
-  };
+  const { equipo_1, equipo_2, fecha } = req.body;
+  Match.create({ equipo_1, equipo_2 }).then((match) => {
+    const equipos = equipo_1.concat(equipo_2);
+    const matchId = match._id.toString();
+    return Promise.all(
+      equipos.map((user) =>
+        User.findByIdAndUpdate(
+          user._id,
+          { $push: { matches: matchId } },
+          { new: true, useFindAndModify: false }
+        )
+      )
+    )
+      .then(() => {
+        return Promise.all(
+          equipos.map((user) => Invitation.create({ matchId, toId: user._id }))
+        );
+      })
+      .then((invitations) => res.send(invitations));
+  });
+};
 
-  exports.findMatch = (req, res) => {
-    const { id } = req.params;
-    Match.findById({ where: id}
-    ).then((data) => {
-      res.send(data)
-    })
-  };
+exports.deleteMatch = (req, res) => {
+  const { id } = req.params;
+  Match.deleteOne({ where: id }).then((data) => {
+    res.send(data);
+  });
+};
+
+exports.deleteAll = (req, res) => {
+  Match.deleteMany().then((data) => {
+    res.send(data);
+  });
+};
+
+exports.findMatch = (req, res) => {
+  const { id } = req.params;
+  Match.findById(id).then((data) => {
+    res.send(data);
+  });
+};
