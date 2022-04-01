@@ -72,7 +72,7 @@ function Login({ navigation }) {
             <View style={form.inputContainer}>
             <TextInput
               style={form.inputs}
-              placeholder="Email"
+              placeholder="Email o Nickname"
               name="email"
               onChangeText={handleChange("email")}
               onBlur={handleBlur("email")}

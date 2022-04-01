@@ -41,7 +41,7 @@ export const profile = StyleSheet.create({
     },
     settingsMenu: {
       height: 100,
-      marginBottom: 20,
+      marginBottom: 30,
     },
     menu: {
       height: 30,
@@ -67,6 +67,10 @@ export const profile = StyleSheet.create({
         flexDirection: "row",
         marginBottom: 3,
         justifyContent: "space-around"
+    },
+    listContainer: {
+      marginLeft:16,
+      marginRight:16,
     },
     headerList: {
       color: "#FFF",

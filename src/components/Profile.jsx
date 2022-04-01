@@ -77,7 +77,7 @@ const Profile = ({ navigation }) => {
             </MenuTrigger>
             <MenuOptions>
               <MenuOption onSelect={handleLogout}>
-                <Text style={{ color: "red" }}>Salir</Text>
+                <Text style={{ color: "red", fontSize: 20 }}>Salir</Text>
               </MenuOption>
             </MenuOptions>
           </Menu>
@@ -110,7 +110,7 @@ const Profile = ({ navigation }) => {
           </View>
         </View>
         {leagues[0] ? (
-          <ScrollView style={leagueStyles.listContainer}>
+          <ScrollView style={profile.listContainer}>
             {leagues.map((item, i) => {
               return (
                 <View key={i}>
