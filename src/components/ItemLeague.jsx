@@ -5,7 +5,7 @@ import { leagueStyles } from "../styles/league";
 const ItemLeague = ({ item, key }) => {
 
    return (
-      <View style={leagueStyles.item} key = {key} >
+      <View style={leagueStyles.item} >
          <View style={leagueStyles.rank}>
             <Text style={{color: '#FFFFFF'}}>{item.rank}</Text>
          </View>

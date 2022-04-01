@@ -15,14 +15,12 @@ router.get("/getLeagues/:userId", userController.getLeaguesByUserId)
 // router.get("/getMatches/:userId", userController.getMatchesByUserId)
 
 function verifyToken(req, res, next) {
-  console.log(`dentro de verify`)
   const bearerHeader = req.headers["authorization"];
   if (typeof bearerHeader !== "undefined") {
     const bearerToken = bearerHeader.split(" ")[1];
     req.token = bearerToken;
     next();
   } else {
-    console.log(`dentro del else`)
     res.sendStatus(403);
   }
 }

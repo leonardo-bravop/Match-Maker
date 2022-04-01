@@ -1,6 +1,6 @@
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import React from "react";
-import { ligaStyles } from "../styles/ligaStyle";
+import { ligaStyles } from "../styles/league";
 import { profile } from "../styles/profile";
 
 const UserLeagues = ({ item, i }) => {

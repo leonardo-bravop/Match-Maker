@@ -156,7 +156,7 @@ function Home({ navigation: { navigate } }) {
         spacing={10}
         renderItem={({ item }) => (
           <TouchableOpacity
-            onPress={() => navigation.navigate("Liga", item)}
+            onPress={() => navigate("Liga", item)}
             style={[home.itemContainer, { backgroundColor: item.color }]}
           >
             <Text style={home.itemName}>{item.name}</Text>
