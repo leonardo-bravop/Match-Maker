@@ -23,7 +23,7 @@ import {
   MenuOption,
   MenuTrigger,
 } from "react-native-popup-menu";
-import { ligaStyles } from "../styles/ligaStyle";
+import { leagueStyles } from "../styles/league";
 import List from "../commons/List";
 import UserLeagues from "./UserLeagues";
 
@@ -92,9 +92,9 @@ const Profile = ({ navigation }) => {
       <Text style={profile.userNameText}>{`${user.name} ${user.surname}`}</Text>
       <Text style={profile.userNameText}>{`${user.nickname}`}</Text>
 
-      <View style={[ligaStyles.body, { width: "95%" }]}>
-        <View style={ligaStyles.listHead}>
-          <View style={ligaStyles.enum}>
+      <View style={[leagueStyles.body, { width: "95%" }]}>
+        <View style={leagueStyles.listHead}>
+          <View style={leagueStyles.enum}>
             <View style={{ width: 50, alignItems: "center" }}>
               <Text style={{ color: "#FFFFFF" }}>Rank</Text>
             </View>
@@ -110,7 +110,7 @@ const Profile = ({ navigation }) => {
           </View>
         </View>
         {leagues[0] ? (
-          <ScrollView style={ligaStyles.listContainer}>
+          <ScrollView style={leagueStyles.listContainer}>
             {leagues.map((item, i) => {
               return (
                 <View key={i}>
@@ -119,27 +119,27 @@ const Profile = ({ navigation }) => {
                   >
                     <View
                       style={[
-                        ligaStyles.item,
+                        leagueStyles.item,
                         { backgroundColor: `${item.color}` },
                       ]}
                     >
-                      <View style={ligaStyles.rank}>
+                      <View style={leagueStyles.rank}>
                         <Text style={{ color: "#FFFFFF" }}>
                           {parseInt(Math.random() * (1 - 20 + 1) + 20)}
                         </Text>
                       </View>
                       <View
-                        style={[ligaStyles.img, { backgroundColor: item.code }]}
+                        style={[leagueStyles.img, { backgroundColor: item.code }]}
                       >
                         <Image
                           style={profile.cardImage}
                           source={{ uri: item.img }}
                         />
                       </View>
-                      <View style={ligaStyles.nick}>
+                      <View style={leagueStyles.nick}>
                         <Text style={{ color: "#FFFFFF" }}>{item.name}</Text>
                       </View>
-                      <View style={ligaStyles.elo}>
+                      <View style={leagueStyles.elo}>
                         <Text style={{ color: "#FFFFFF" }}>
                           {parseInt(Math.random() * (400 - 3000 + 1) + 3000)}
                         </Text>
