@@ -77,7 +77,7 @@ const Profile = ({ navigation }) => {
             </MenuTrigger>
             <MenuOptions>
               <MenuOption onSelect={handleLogout}>
-                <Text style={{ color: "red" }}>Salir</Text>
+                <Text style={{ color: "red", fontSize: 20 }}>Salir</Text>
               </MenuOption>
             </MenuOptions>
           </Menu>

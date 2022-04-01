@@ -41,7 +41,7 @@ export const profile = StyleSheet.create({
     },
     settingsMenu: {
       height: 100,
-      marginBottom: 20,
+      marginBottom: 30,
     },
     menu: {
       height: 30,
