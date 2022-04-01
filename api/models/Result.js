@@ -24,5 +24,5 @@ const resultSchema = new Schema({
     },
 });
 
-const Match = mongoose.model("match", resultSchema);
-module.exports = Match;
+const Result = mongoose.model("result", resultSchema);
+module.exports = Result;

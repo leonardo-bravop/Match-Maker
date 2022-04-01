@@ -8,3 +8,5 @@ router.post("/newMatch", teamController.newTeam);
 router.delete("/deleteMatch/:id", teamController.deleteTeam);
 
 router.get("/showMatch/:id", teamController.changeNameTeam);
+
+module.exports = router;
