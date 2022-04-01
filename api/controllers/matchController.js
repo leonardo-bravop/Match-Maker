@@ -2,16 +2,26 @@ const Match = require("../models/Match");
 const User = require("../models/Users");
 const Invitation = require("../models/Invitation");
 
-
 exports.newMatch = (req, res) => {
   const { equipo_1, equipo_2, fecha } = req.body;
   Match.create({ equipo_1, equipo_2 }).then((match) => {
     const equipos = equipo_1.concat(equipo_2);
     const matchId = match._id.toString();
-    return Promise.all(equipos.map(user=>Invitation.create({ matchId, toId: user._id })))
-    .then((invitations) =>
-      res.send(invitations)
-    );
+    return Promise.all(
+      equipos.map((user) =>
+        User.findByIdAndUpdate(
+          user._id,
+          { $push: { matches: matchId } },
+          { new: true, useFindAndModify: false }
+        )
+      )
+    )
+      .then(() => {
+        return Promise.all(
+          equipos.map((user) => Invitation.create({ matchId, toId: user._id }))
+        );
+      })
+      .then((invitations) => res.send(invitations));
   });
 };
 
@@ -28,11 +38,9 @@ exports.deleteAll = (req, res) => {
   });
 };
 
-
 exports.findMatch = (req, res) => {
   const { id } = req.params;
   Match.findById(id).then((data) => {
     res.send(data);
   });
 };
-
