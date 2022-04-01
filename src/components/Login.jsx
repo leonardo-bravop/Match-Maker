@@ -13,7 +13,6 @@ import {
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Home from "./Home";
-import Welcome from "./Welcome";
 import { Formik } from "formik";
 import * as yup from "yup";
 import { form } from "../styles/form";
@@ -108,12 +107,6 @@ function Login({ navigation }) {
         onPress={() => navigation.navigate("Register")}
       >
         registro
-      </Text>
-      <Text
-        style={form.colorTxtBtn}
-        onPress={() => navigation.navigate("Welcome")}
-      >
-        welcome
       </Text>
     </SafeAreaView>
   );
