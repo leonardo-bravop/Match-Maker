@@ -1,25 +1,26 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, SafeAreaView, TouchableOpacity} from "react-native";
+import { View, Text, SafeAreaView } from "react-native";
 import List from "../commons/List";
 
 import { leagueStyles } from "../styles/league";
+import FootLigue from "./FootLeague";
 import Constants from "expo-constants";
-import ItemMatch from "./ItemMatch";
 import axios from "axios";
+import ItemLeague from "./ItemLeague";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {Picker} from '@react-native-picker/picker'
 
 
-const Match = () => {
+const League = ({ route, navigation }) => {
    let [memberList, setMemberList] = useState([])
    let [leagueList, setLeagueList] = useState([])
    let [actualleague, setActualLeague] = useState({})
    let  [user, setUser] = useState({})
+   let [selectedValue, setSelectedValue] = useState(" ");
+    
+   const { manifest } = Constants;
+   const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 
-const { manifest } = Constants;
-const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
-
-   const [selectedValue, setSelectedValue] = useState(" ");
 
    const getUser = async () => {
       try {
@@ -101,30 +102,6 @@ const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
          setActualLeague(data)
       })
    }
-
-   const buttonHandler = async () => {
-      try {
-         const jsonTeam = await AsyncStorage.getItem("A")
-         let arr = jsonTeam ? JSON.parse(jsonTeam) : [];
-
-         const jsonTeam2 = await AsyncStorage.getItem("B")
-         let arr2 = jsonTeam2 ? JSON.parse(jsonTeam2) : [];
-
-         await axios
-         .post(`${uri}/api/match/newMatch`, 
-            {
-               equipo_1: arr, 
-               equipo_2: arr2, 
-               fecha: null
-            })
-
-         await AsyncStorage.setItem("A", "")
-         await AsyncStorage.setItem("B", "")
-         
-      } catch (e) { console.log(e)
-      }
-   }
-
    return (
       <SafeAreaView style={leagueStyles.back}>
          
@@ -139,8 +116,9 @@ const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
                      setSelectedValue(itemValue)
                   }}
                >
+                  {navigation.state.params && <Picker.Item label={navigation.state.params.name} value={navigation.state.params._id} key= {0}/>}
                   {leagueList.map( (element, i) => 
-                     <Picker.Item label={element.name} value={element._id} key= {i}/> )}
+                     <Picker.Item label={element.name} value={element._id} key= {i+1}/> )}
                </Picker>
             </View>
             
@@ -152,31 +130,26 @@ const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
          <View style={leagueStyles.body}>
             <View style={leagueStyles.listHead}>
                <View style={leagueStyles.enum}>
-                  <View style={{width: 50, alignItems: "center"}}>
+                  <View style={{width: 50, alignItems: "center", marginVertical: 5}}>
                      <Text style={{color: '#FFFFFF'}}>Rank</Text>
                   </View>
-                  <View style={{width: 50, alignItems: "center"}}>
+                  <View style={{width: 50, alignItems: "center", marginVertical: 5}}>
                      <Text style={{color: '#FFFFFF'}}></Text>
                   </View>
-                  <View style={{flex: 1, width: "auto", alignItems: "center"}}>
+                  <View style={{flex: 1, width: "auto", alignItems: "center", marginVertical: 5}}>
                      <Text style={{color: '#FFFFFF'}}>Nick</Text>
                   </View>
-                  <View style={{width: 100, alignItems: "center"}}>
-                     <Text style={{color: '#FFFFFF'}}>Equipos</Text>
+                  <View style={{width: 100, alignItems: "center", marginVertical: 5}}>
+                     <Text style={{color: '#FFFFFF'}}>ELO</Text>
                   </View>
                </View>
             </View>
             
-            <List list={memberList} Element={ItemMatch}/>
+            <List list={memberList} Element={ItemLeague}/>
             
-            <View style={[leagueStyles.foot, { height: 100 }]}>
-               <TouchableOpacity style={[leagueStyles.join, {backgroundColor:"#16a085"}]} 
-                  onPress={buttonHandler}>
-                  <Text style={leagueStyles.joinTxt}>Crear</Text>
-               </TouchableOpacity> 
-            </View>
+            <FootLigue ligueId={selectedValue} userData={user}/>
          </View>
       </SafeAreaView>
 ) }
 
-export default Match;
+export default League;
