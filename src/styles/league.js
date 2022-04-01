@@ -30,9 +30,14 @@ export const leagueStyles = StyleSheet.create({
       marginLeft:16,
       marginRight:16,
       flex: 1,
+      justifyContent: "center"
    },
    title:{
-      fontSize: 70
+      fontSize: 25,
+      alignSelf: "center",
+      fontStyle: "italic",
+      fontWeight: "bold",
+      color: "white",
    },
 
    listHead:{

@@ -10,33 +10,25 @@ const { manifest } = Constants;
 
 const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 
-const FootLigue = ({ ligueId, rank }) => {
-   let [userData, setUserData] = useState(null)
+const FootLigue = ({ ligueId, userData }) => {
+   // if (!userData.rank) return <></>
 
-   useEffect(async () => {
+   const buttonHandler = async () => {
       try {
-        const userString = await AsyncStorage.getItem("userInfo");
-        if (userString) {
-          const result = await axios
-          .post(`${uri}/api/user/me`, {},
-            {
-              headers: { Authorization: `Bearer ${userString}` },
-            }
-          )
-          setUserData({
-            id: result.data._id,
-            rank: rank,
-            color:"red",
-            nickname: result.data.nickname,
-            elo: 2931,
-         })
-        }
-      } 
-      catch (err) { console.log(err) }
-   },[])
+         const userString = await AsyncStorage.getItem("userInfo")
+            
+         const result = await axios
+         .post(`${uri}/api/user/me`, {}, 
+               { headers: { Authorization: `Bearer ${userString}` } } )
+
+         const res = await axios
+         .put(`${uri}/api/league/addUser/${ligueId}`, {userId: result.data._id})
+
+      } catch (err) { console.log(err); }
+   }
 
    return ( <>
-      { userData
+      { userData.rank && userData.rank !== 0
          ?  ( userData.rank > 8 
             ? <View style={leagueStyles.foot}>
                <View style={leagueStyles.user}>
@@ -54,8 +46,9 @@ const FootLigue = ({ ligueId, rank }) => {
                </View>
             </View>
             :  <></> )
-         : <View style={leagueStyles.foot}>
-            <TouchableOpacity style={[leagueStyles.join, {backgroundColor:"#16a085"}]}>
+         : <View style={[leagueStyles.foot, { height: 100 }]}>
+            <TouchableOpacity style={[leagueStyles.join, {backgroundColor:"#16a085"}]}
+               onPress={buttonHandler}>
                <Text style={leagueStyles.joinTxt}>Unirse</Text>
             </TouchableOpacity> 
          </View>}

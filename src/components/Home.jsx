@@ -160,7 +160,7 @@ function Home({ navigation }) {
         renderItem={({ item }) => {
           console.log(`item es`, item.color)
           return(
-          <TouchableOpacity
+          <TouchableOpacity onPress={()=> navigation.navigate("Liga", item)}
             style={[home.itemContainer, { backgroundColor: item.color }]}
           >
             <Text style={home.itemName}>{item.name}</Text>
