@@ -110,7 +110,7 @@ const Profile = ({ navigation }) => {
           </View>
         </View>
         {leagues[0] ? (
-          <ScrollView style={leagueStyles.listContainer}>
+          <ScrollView style={profile.listContainer}>
             {leagues.map((item, i) => {
               return (
                 <View key={i}>

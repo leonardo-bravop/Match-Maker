@@ -68,6 +68,10 @@ export const profile = StyleSheet.create({
         marginBottom: 3,
         justifyContent: "space-around"
     },
+    listContainer: {
+      marginLeft:16,
+      marginRight:16,
+    },
     headerList: {
       color: "#FFF",
       fontSize: 16,
