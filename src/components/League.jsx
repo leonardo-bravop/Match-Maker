@@ -17,8 +17,6 @@ const League = ({ navigation }) => {
   const userData = useSelector((state) => state.user)
   const selectLeague = useSelector((state) => state.selectLeague)
 
-  console.log('SE CARGO BIEN ====>', selectLeague)
-
   let [memberList, setMemberList] = useState([]);
   let [leagueList, setLeagueList] = useState([]);
   let [actualleague, setActualLeague] = useState({});

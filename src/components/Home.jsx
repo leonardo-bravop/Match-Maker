@@ -7,6 +7,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  ImageBackground,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FlatGrid } from "react-native-super-grid";
@@ -158,7 +159,7 @@ function Home({ navigation: { navigate } }) {
 
       <FlatGrid
         style={home.gridView}
-        itemDimension={110}
+        itemDimension={120}
         data={leagues}
         // staticDimension={300}
         // fixed
@@ -166,18 +167,20 @@ function Home({ navigation: { navigate } }) {
         renderItem={({ item }) => (
           <TouchableOpacity
             onPress={() => {
-              dispatch(setLeague(item))
-              navigate("Liga", item)}}
+              dispatch(setLeague(item));
+              navigate("Liga", item);
+            }}
             style={[home.itemContainer, { backgroundColor: item.color }]}
           >
-            <Text style={home.itemName}>{item.name}</Text>
-            <Text style={home.itemCode}>{item.color}</Text>
-            <View style={[leagueStyles.img, { backgroundColor: item.code }]}>
+            <View style={{ flex: 1, justifyContent: "flex-start" }}>
               <Image
-                style={[profile.cardImage, { width: "150%" }]}
-                source={{ uri: item.img }}
+                source={{ uri: item.img ? item.img : "https://trome.pe/resizer/G8-kkwwutkrNacKh5S6TJplAluU=/980x0/smart/filters:format(jpeg):quality(75)/cloudfront-us-east-1.images.arcpublishing.com/elcomercio/OXHJSIF4SZDAJP6F5PHFZTLRYI.jpg" }}
+                resizeMode="cover"
+                style={{ height: "100%" }}
               />
             </View>
+            <Text style={home.itemName}>{item.name}</Text>
+            <Text style={home.itemCode}>{item.color}</Text>
           </TouchableOpacity>
         )}
       />
