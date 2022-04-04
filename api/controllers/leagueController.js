@@ -40,6 +40,21 @@ exports.addUser = (req, res) => {
   });
 };
 
+exports.deleteUser = (req, res) => {
+  const { id } = req.params;
+  const { userId } = req.body;
+  League.findById({where: id })
+  .then((league) => {
+    for (let i = 0; i < league.users.length; i++) {
+      if(league.users[i] === userId)
+      {
+        league.users.splice(i,1)
+      }
+    }
+  });
+};
+
+
 // exports.newLeague = (req, res) => {
 //   const { name, description, matches, users, img } = req.body;
 //   League.create({
@@ -97,7 +112,6 @@ exports.showHistoryLeague = (req, res) => {
     });
   });
 };
-
 
 exports.findLeagueByName = (req, res) => {
   const { leagueName } = req.body;
