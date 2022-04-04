@@ -7,12 +7,17 @@ import { View, Text, SafeAreaView } from 'react-native'
 import * as React from 'react';
 import RootNavigation from "./src/navigation/rootNavigation";
 
+import { Provider } from 'react-redux'
+import store from './src/state/store';
+
 
 function App() {
   return (
+    <Provider store={store}>
     <SafeAreaView style={{flex : 1, backgroundColor: "#0e0b29"}}>
       <RootNavigation/>
     </SafeAreaView>
+    </Provider>
   );
 }
 

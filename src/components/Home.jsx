@@ -7,7 +7,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
-
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FlatGrid } from "react-native-super-grid";
@@ -16,9 +15,10 @@ import Constants from "expo-constants";
 
 import { leagueStyles } from "../styles/league";
 import { profile } from "../styles/profile";
+import { useDispatch } from "react-redux";
+import {setUserMe} from "../state/user"
 
 const screen = Dimensions.get("screen");
-
 
 const home = StyleSheet.create({
   container: {
@@ -71,7 +71,7 @@ const home = StyleSheet.create({
     fontSize: 25,
     marginTop: 40,
     color: "white",
-    textAlign:"center",
+    textAlign: "center",
   },
   gridView: {
     marginTop: -90,
@@ -97,6 +97,7 @@ const home = StyleSheet.create({
 
 function Home({ navigation: { navigate } }) {
   const { manifest } = Constants;
+  const dispatch = useDispatch();
 
   const [league, setLeague] = React.useState([]);
   const [user, setUser] = useState({});
@@ -107,15 +108,7 @@ function Home({ navigation: { navigate } }) {
     try {
       const userString = await AsyncStorage.getItem("userInfo");
       if (userString) {
-        const result = await axios.post(
-          `${uri}/api/user/me`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${userString}`,
-            },
-          }
-        );
+        const result = await dispatch(setUserMe(userString))
         setUser(result.data);
       }
       const { data } = await axios.get(`${uri}/api/league/getAll`);
@@ -123,7 +116,7 @@ function Home({ navigation: { navigate } }) {
     } catch (err) {
       console.log(err);
     }
-  }, []);
+  }, [dispatch]);
 
   return (
     <View style={home.container}>
@@ -156,7 +149,7 @@ function Home({ navigation: { navigate } }) {
             <Text style={home.lastText}>Taserface</Text>
           </View>
         </TouchableOpacity>
-        <Text style={home.ligaTittle}>────────  LIGAS  ────────</Text>
+        <Text style={home.ligaTittle}>──────── LIGAS ────────</Text>
       </View>
 
       <FlatGrid
@@ -173,14 +166,12 @@ function Home({ navigation: { navigate } }) {
           >
             <Text style={home.itemName}>{item.name}</Text>
             <Text style={home.itemCode}>{item.color}</Text>
-                      <View
-                        style={[leagueStyles.img, { backgroundColor: item.code }]}
-                      >
-                        <Image
-                          style={[profile.cardImage,{width:"150%"}]}
-                          source={{ uri: item.img }}
-                        />
-                      </View>
+            <View style={[leagueStyles.img, { backgroundColor: item.code }]}>
+              <Image
+                style={[profile.cardImage, { width: "150%" }]}
+                source={{ uri: item.img }}
+              />
+            </View>
           </TouchableOpacity>
         )}
       />
