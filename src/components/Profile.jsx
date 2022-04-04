@@ -24,37 +24,33 @@ import {
   MenuTrigger,
 } from "react-native-popup-menu";
 import { leagueStyles } from "../styles/league";
-import List from "../commons/List";
-import UserLeagues from "./UserLeagues";
 
 import { useDispatch, useSelector } from 'react-redux'
 
 const Profile = ({ navigation }) => {
-  const user2 = useSelector((state) => state.user)
-  console.log("AAAAAAA",user2)
-  const [user, setUser] = useState({});
-  const [leagues, setLeagues] = useState({});
+  const user = useSelector((state) => state.user)
+  const leagues = useSelector((state) => state.userLeagues)
 
-  const { manifest } = Constants;
-  const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
+  // const { manifest } = Constants;
+  // const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 
-  useEffect(async () => {
-    try {
-      const userToken = await AsyncStorage.getItem("userInfo");
-      const user = await axios.post(
-        `${uri}/api/user/me`,
-        {},
-        { headers: { Authorization: `Bearer ${userToken}` } }
-      );
-      setUser(user.data);
-      const leagues = await axios.get(
-        `${uri}/api/user/getLeagues/${user.data._id}`
-      );
-      setLeagues(leagues.data);
-    } catch (err) {
-      console.log(err);
-    }
-  }, [navigation.state.params]);
+  // useEffect(async () => {
+  //   try {
+  //     const userToken = await AsyncStorage.getItem("userInfo");
+  //     const user = await axios.post(
+  //       `${uri}/api/user/me`,
+  //       {},
+  //       { headers: { Authorization: `Bearer ${userToken}` } }
+  //     );
+  //     setUser(user.data);
+  //     const leagues = await axios.get(
+  //       `${uri}/api/user/getLeagues/${user.data._id}`
+  //     );
+  //     setLeagues(leagues.data);
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // }, [navigation.state.params]);
 
   // const onPress = () => {
   //   navigation.navigate("Ligas");

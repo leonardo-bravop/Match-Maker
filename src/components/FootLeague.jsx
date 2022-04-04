@@ -6,11 +6,14 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { leagueStyles } from "../styles/league";
 import axios from "axios";
 import Constants from "expo-constants";
+import { useDispatch } from "react-redux";
+import { addUserToLeague } from "../state/selectLeague";
 const { manifest } = Constants;
 
 const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 
 const FootLigue = ({ ligueId, userData }) => {
+   const dispatch = useDispatch()
    // if (!userData.rank) return <></>
 
    const buttonHandler = async () => {
@@ -21,14 +24,15 @@ const FootLigue = ({ ligueId, userData }) => {
          // .post(`${uri}/api/user/me`, {}, 
          //       { headers: { Authorization: `Bearer ${userString}` } } )
 
-         const res = await axios
-         .put(`${uri}/api/league/addUser/${ligueId}`, {userId: userData.id})
+         const res = await dispatch(addUserToLeague({ligueId: ligueId, userData: userData}))
+
+
       } catch (err) { console.log(err); }
    }
 
-   useEffect(()=>{
-      console.log(`User data es =======>`, userData)
-   }, [])
+   // useEffect(()=>{
+   //    console.log(`User data es =======>`, userData)
+   // }, [])
 
    return ( <>
       { userData.rank && userData.rank !== 0

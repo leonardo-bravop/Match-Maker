@@ -93,17 +93,10 @@ export default createAppContainer(
       Auth: AuthNavigator,
       App: AppNavigator,
     },
-<<<<<<< HEAD
     {
       initialRouteName: "AuthLoading",
       /* initialRouteName: 'Auth', */
       //initialRouteName: 'App',
-=======
-    {      initialRouteName: "AuthLoading",
-      /* initialRouteName: 'Auth', */
-/*       initialRouteName: 'App', */
-
->>>>>>> 763e19aff63f5f21d4a00119bdc41cd361a60f80
     },
     {
       defaultNavigationOptions: {

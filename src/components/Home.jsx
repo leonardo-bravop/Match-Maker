@@ -15,8 +15,11 @@ import Constants from "expo-constants";
 
 import { leagueStyles } from "../styles/league";
 import { profile } from "../styles/profile";
-import { useDispatch } from "react-redux";
-import {setUserMe} from "../state/user"
+import { useDispatch, useSelector } from "react-redux";
+import { setUserMe } from "../state/user";
+import { setUserLeagues } from "../state/userLeague";
+import { setLeagues } from "../state/league";
+import { setLeague } from "../state/selectLeague";
 
 const screen = Dimensions.get("screen");
 
@@ -98,9 +101,9 @@ const home = StyleSheet.create({
 function Home({ navigation: { navigate } }) {
   const { manifest } = Constants;
   const dispatch = useDispatch();
-
-  const [league, setLeague] = React.useState([]);
-  const [user, setUser] = useState({});
+  const user = useSelector((state) => state.user);
+  const userLeagues = useSelector((state) => state.userLeagues);
+  const leagues = useSelector((state) => state.leagues);
 
   const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 
@@ -108,11 +111,12 @@ function Home({ navigation: { navigate } }) {
     try {
       const userString = await AsyncStorage.getItem("userInfo");
       if (userString) {
-        const result = await dispatch(setUserMe(userString))
-        setUser(result.data);
+        const result = await dispatch(setUserMe(userString));
+        const userLeagues = await dispatch(
+          setUserLeagues({ userId: result.payload._id })
+        );
       }
-      const { data } = await axios.get(`${uri}/api/league/getAll`);
-      setLeague(data);
+      const { payload } = await dispatch(setLeagues());
     } catch (err) {
       console.log(err);
     }
@@ -133,7 +137,7 @@ function Home({ navigation: { navigate } }) {
           }}
         >
           <View style={home.lastItem}>
-            <Text style={home.lastText}>NoobMaster69</Text>
+            <Text style={home.lastText}>{user.nickname}</Text>
           </View>
           <View style={home.lastItem}>
             <Text
@@ -155,13 +159,15 @@ function Home({ navigation: { navigate } }) {
       <FlatGrid
         style={home.gridView}
         itemDimension={110}
-        data={league}
+        data={leagues}
         // staticDimension={300}
         // fixed
         spacing={10}
         renderItem={({ item }) => (
           <TouchableOpacity
-            onPress={() => navigate("Liga", item)}
+            onPress={() => {
+              dispatch(setLeague(item))
+              navigate("Liga", item)}}
             style={[home.itemContainer, { backgroundColor: item.color }]}
           >
             <Text style={home.itemName}>{item.name}</Text>

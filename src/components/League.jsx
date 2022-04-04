@@ -9,14 +9,20 @@ import axios from "axios";
 import ItemLeague from "./ItemLeague";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Picker } from "@react-native-picker/picker";
+import { useSelector } from "react-redux";
 
 const League = ({ navigation }) => {
   const { state, navigate } = navigation;
 
+  const userData = useSelector((state) => state.user)
+  const selectLeague = useSelector((state) => state.selectLeague)
+
+  console.log('SE CARGO BIEN ====>', selectLeague)
+
   let [memberList, setMemberList] = useState([]);
   let [leagueList, setLeagueList] = useState([]);
   let [actualleague, setActualLeague] = useState({});
-  let [user, setUser] = useState({});
+  let [user, setUser] = useState({})
   let [selectedValue, setSelectedValue] = useState(" ");
 
   const { manifest } = Constants;
@@ -128,7 +134,6 @@ const League = ({ navigation }) => {
   }, []);
 
   useEffect(async () => {
-    console.log(state);
     if (state.params) {
       try {
         const { data } = await axios.get(
@@ -255,7 +260,7 @@ const League = ({ navigation }) => {
         {state.params ? (
           <>
             <List list={memberList} Element={ItemLeague} />
-            <FootLigue ligueId={state.params._id} userData={user} />
+            <FootLigue ligueId={state.params._id} userData={userData} />
           </>
         ) : null}
       </View>
