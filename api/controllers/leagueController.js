@@ -44,6 +44,8 @@ exports.addUser = (req, res) => {
 };
 
 
+//devolver users ordenados por elo
+
 exports.deleteUser = (req, res) => {
   const { leagueId, userId } = req.params;
   League.findById(leagueId)
