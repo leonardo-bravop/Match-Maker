@@ -1,34 +1,39 @@
-
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const matchSchema = new Schema({
   league: [
     {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "League",
     },
   ],
   equipo_1: [
     {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "User",
     },
   ],
   equipo_2: [
     {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "Team",
     },
   ],
-  Fecha: {
+  fecha: {
     type: Date,
-    default: null,
+    default: Date.now(),
   },
   status: {
     type: String,
     default: "pending",
   },
+  result: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Result",
+    },
+  ],
 });
 
 const Match = mongoose.model("match", matchSchema);

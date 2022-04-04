@@ -6,7 +6,7 @@ router.get("/getAll", leagueController.getAll)
 
 router.post("/new", leagueController.new);
 
-router.put("/addUser/:id", leagueController.addUser);
+router.put("/:leagueId/addUser/:userId", leagueController.addUser);
 
 router.put("/deleteUser/:id", leagueController.deleteUser);
 
@@ -18,10 +18,10 @@ router.delete("/deleteLeague/:id", leagueController.deleteLeague);
 
 router.get("/showLeague/:id", leagueController.findShowLeague);
 
-router.put("/changeLeague/:id", leagueController.changeLeague);
+router.put("/editLeague/:id", leagueController.editLeague);
 
 router.get("/findLeague/", leagueController.findLeagueByName);
 
-router.get("/showHistory/:id", leagueController.showHistoryLeague);
+router.get("/showHistory/:leagueId", leagueController.showHistoryLeague);
 
 module.exports = router;
