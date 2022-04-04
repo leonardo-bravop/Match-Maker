@@ -18,6 +18,8 @@ router.get("/showLeague/:id", leagueController.findShowLeague);
 
 router.put("/changeLeague/:id", leagueController.changeLeague);
 
-router.get("/findLeague/", leagueController.findLeagueByName)
+router.get("/findLeague/", leagueController.findLeagueByName);
+
+router.get("/showHistory/:id", leagueController.showHistoryLeague);
 
 module.exports = router;

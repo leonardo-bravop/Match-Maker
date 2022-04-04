@@ -143,14 +143,25 @@ exports.getLeaguesByUserId = (req, res) => {
 
 exports.getMatchesByUserId = (req, res) => {
   const { UserId } = req.params;
-  User.findById(UserId).then((matches) => {
+  User.findById(UserId).then((users) => {
     Match.find(
-      { _id: { $in: matches.users } },
+      { _id: { $in: users.matches } },
     ).then((users) => {
       res.send(users);
     });
   });
 };
+
+exports.verifyToken = (req, res, next) => {
+  const bearerHeader = req.headers["authorization"];
+  if (typeof bearerHeader !== "undefined") {
+    const bearerToken = bearerHeader.split(" ")[1];
+    req.token = bearerToken;
+    next();
+  } else {
+    res.sendStatus(403);
+  }
+}
 
 // exports.getMatchesByUserId = (req, res) => {
 //   const {userId} = req.params
