@@ -12,7 +12,20 @@ router.post("/logout", userController.logOut)
 
 router.get("/getLeagues/:userId", userController.getLeaguesByUserId)
 
-// router.get("/getMatches/:userId", userController.getMatchesByUserId)
+router.get("/getMatches/:userId", userController.getMatchesByUserId)
+
+// router.post("/check", verifyToken, (req, res) => {
+//   jwt.verify(req.token, "secretkey", (err, authData) => {
+//     if (err) {
+//       res.sendStatus(403);
+//     } else {
+//       res.json({
+//         mensaje: "token fue creado",
+//         authData: authData,
+//       });
+//     }
+//   });
+// });
 
 router.get("/getMatches", userController.getMatchesByUserId)
 

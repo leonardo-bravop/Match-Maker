@@ -142,8 +142,8 @@ exports.getLeaguesByUserId = (req, res) => {
 };
 
 exports.getMatchesByUserId = (req, res) => {
-  const { UserId } = req.params;
-  User.findById(UserId).then((users) => {
+  const { userId } = req.params;
+  User.findById(userId).then((users) => {
     Match.find(
       { _id: { $in: users.matches } },
     ).then((users) => {
