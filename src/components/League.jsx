@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, SafeAreaView } from "react-native";
+import { View, Text, SafeAreaView, ImageBackground } from "react-native";
 import List from "../commons/List";
 
 import { leagueStyles } from "../styles/league";
@@ -117,7 +117,7 @@ const League = ({ navigation }) => {
 
       setUser({
         id: result.data._id,
-        rank: 0,
+        rank: 7,
         color: "red",
         nickname: result.data.nickname,
         elo: 2931,
@@ -128,41 +128,42 @@ const League = ({ navigation }) => {
   }, []);
 
   useEffect(async () => {
-    if (!state.params) return;
-    if (!state.params._id) return;
-    try {
-      const { data } = await axios.get(
-        `${uri}/api/league/getUsers/${state.params._id}`
-      );
+    console.log(state);
+    if (state.params) {
+      try {
+        const { data } = await axios.get(
+          `${uri}/api/league/getUsers/${state.params._id}`
+        );
 
-      setMemberList(
-        data.map((element, i) => {
-          if (data._id === element._id) {
-            setUser({
-              id: data._id,
+        setMemberList(
+          data.map((element, i) => {
+            if (data._id === element._id) {
+              setUser({
+                id: data._id,
+                rank: i + 1,
+
+                color: "red",
+                nickname: data.nickname,
+                elo: 2931,
+              });
+            }
+            return {
+              id: element._id,
               rank: i + 1,
-
-              color: "red",
-              nickname: data.nickname,
+              color: "blue",
+              nickname: element.nickname,
               elo: 2931,
-            });
-          }
-          return {
-            id: element._id,
-            rank: i + 1,
-            color: "blue",
-            nickname: element.nickname,
-            elo: 2931,
-          };
-        })
-      );
-    } catch (err) {
-      console.log(err);
+            };
+          })
+        );
+      } catch (err) {
+        console.log(err);
+      }
     }
-    return;
+    // return;
     //getUser();
     getLeagues();
-  }, [state.params._id]);
+  }, [state.params]);
 
   // useEffect(() => {
   //   getLeagues();
@@ -209,10 +210,15 @@ const League = ({ navigation }) => {
             ))}
           </Picker>
         </View> */}
-
-        <View style={leagueStyles.info}>
-          <Text style={leagueStyles.title}>{state.params.name}</Text>
-        </View>
+        {state.params ?
+        <ImageBackground resizeMode="cover" source={{uri: state.params.img}} style={{flex: 1}}>
+          <View style={leagueStyles.info}>
+            <Text style={leagueStyles.title}>
+              {state.params.name}
+            </Text>
+          </View>
+        </ImageBackground>
+        : null}
       </View>
 
       <View style={leagueStyles.body}>
@@ -246,7 +252,7 @@ const League = ({ navigation }) => {
           </View>
         </View>
 
-        {state.params._id ? (
+        {state.params ? (
           <>
             <List list={memberList} Element={ItemLeague} />
             <FootLigue ligueId={state.params._id} userData={user} />

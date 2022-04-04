@@ -26,6 +26,10 @@ const FootLigue = ({ ligueId, userData }) => {
       } catch (err) { console.log(err); }
    }
 
+   useEffect(()=>{
+      console.log(`User data es =======>`, userData)
+   }, [])
+
    return ( <>
       { userData.rank && userData.rank !== 0
          ?  ( userData.rank > 8 

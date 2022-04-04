@@ -4,7 +4,7 @@ import { leagueStyles } from "../styles/league";
 import { CheckBox } from 'react-native-elements';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const ItemMatch = ({ item, key }) => {
+const ItemMatch = ({ item }) => {
    let [userData, setUserData] = useState(null),
       [select, setSelect] = useState(false),
       [select2, setSelect2] = useState(false)
@@ -38,7 +38,7 @@ const ItemMatch = ({ item, key }) => {
       }
 
    return (
-      <View style={leagueStyles.item} key = {key} >
+      <View style={leagueStyles.item}>
          <View style={leagueStyles.rank}>
             <Text style={{color: '#FFFFFF'}}>{item.rank}</Text>
          </View>

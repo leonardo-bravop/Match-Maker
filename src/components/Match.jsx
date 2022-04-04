@@ -110,6 +110,9 @@ const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
          const jsonTeam2 = await AsyncStorage.getItem("B")
          let arr2 = jsonTeam2 ? JSON.parse(jsonTeam2) : [];
 
+         console.log(`arr 1 es`, arr)
+         console.log(`arr 2 es`, arr2)
+
          await axios
          .post(`${uri}/api/match/newMatch`, 
             {
