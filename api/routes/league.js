@@ -8,6 +8,8 @@ router.post("/new", leagueController.new);
 
 router.put("/:leagueId/addUser/:userId", leagueController.addUser);
 
+router.put("/:leagueId/deleteUser/:userId", leagueController.deleteUser);
+
 router.get("/getUsers/:leagueId", leagueController.getUserByLeagueId)
 
 // router.post("/newLeague", leagueController.newLeague);
