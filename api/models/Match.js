@@ -21,6 +21,7 @@ const matchSchema = new Schema({
     },
   ],
   fecha: {
+    //cambiar date a string
     type: Date,
     default: Date.now(),
   },

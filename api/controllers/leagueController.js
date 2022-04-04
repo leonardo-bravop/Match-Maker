@@ -43,6 +43,7 @@ exports.addUser = (req, res) => {
   });
 };
 
+//devolver users ordenados por elo
 exports.getUserByLeagueId = (req, res) => {
   const { leagueId } = req.params;
   League.findById(leagueId).then((league) => {

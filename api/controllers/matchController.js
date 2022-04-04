@@ -65,3 +65,5 @@ exports.deleteAll = (req, res) => {
     res.send(data);
   });
 };
+
+//get matches by date
