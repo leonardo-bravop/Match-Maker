@@ -4,7 +4,7 @@ const resultController = require("../controllers/resultController")
 
 router.put("/updateResult/:resultId", resultController.updateResult)
 
-router.put("/confirmationTeam/:team/:id", resultController.confirmateResultTeam);
+router.put("/confirmationTeam/:team/:resultId", resultController.confirmResultTeam);
 
 
 module.exports = router;

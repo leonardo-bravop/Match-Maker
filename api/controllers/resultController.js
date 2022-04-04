@@ -10,15 +10,14 @@ exports.updateResult = (req, res) => {
   });
 };
 
-exports.confirmateResultTeam = (req, res) => {
-  const { id, team } = req.params;
-  if (team === 1) {
-    Result.updateOne({ confirmation_1: true }, { where: id }).then((data) => {
-      res.send(data);
+exports.confirmResultTeam = (req, res) => {
+  const { resultId, team } = req.params;
+  if (team === "1" || team === 2) {
+    Result.findById(resultId).then((result) => {
+      result[`confirmation_${team}`] = true;
+      result.save().then((updatedResult) => res.send(updatedResult));
     });
-  } else if (team === 2) {
-    Result.updateOne({ confirmation_2: true }, { where: id }).then((data) => {
-      res.send(data);
-    });
+  } else {
+    res.send("Enter a valid team number").status(400);
   }
 };
