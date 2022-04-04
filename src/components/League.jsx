@@ -9,15 +9,15 @@ import axios from "axios";
 import ItemLeague from "./ItemLeague";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Picker } from "@react-native-picker/picker";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 const League = ({ navigation }) => {
+  const dispatch = useDispatch()
   const { state, navigate } = navigation;
 
   const userData = useSelector((state) => state.user)
   const selectLeague = useSelector((state) => state.selectLeague)
-
-  console.log('SE CARGO BIEN ====>', selectLeague)
+  const members = useSelector((state) => state.members)
 
   let [memberList, setMemberList] = useState([]);
   let [leagueList, setLeagueList] = useState([]);
@@ -141,8 +141,8 @@ const League = ({ navigation }) => {
         );
 
         setMemberList(
-          data.map((element, i) => {
-            if (data._id === element._id) {
+          members.map((element, i) => {
+            if (members._id === element._id) {
               setUser({
                 id: data._id,
                 rank: i + 1,
@@ -168,7 +168,7 @@ const League = ({ navigation }) => {
     // return;
     //getUser();
     getLeagues();
-  }, [state.params]);
+  }, [members]);
 
   // useEffect(() => {
   //   getLeagues();
@@ -260,7 +260,7 @@ const League = ({ navigation }) => {
         {state.params ? (
           <>
             <List list={memberList} Element={ItemLeague} />
-            <FootLigue ligueId={state.params._id} userData={userData} />
+            <FootLigue ligueId={selectLeague._id} userData={userData} />
           </>
         ) : null}
       </View>

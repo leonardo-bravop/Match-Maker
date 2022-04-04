@@ -24,15 +24,19 @@ import {
   MenuTrigger,
 } from "react-native-popup-menu";
 import { leagueStyles } from "../styles/league";
+import { setLeague } from "../state/selectLeague";
+import { setMembers } from "../state/memberList";
 
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch, useSelector } from "react-redux";
 
 const Profile = ({ navigation }) => {
-  const user = useSelector((state) => state.user)
-  const leagues = useSelector((state) => state.userLeagues)
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
+  const leagues = useSelector((state) => state.userLeagues);
+  const [userData, setUserData] = useState({});
 
-  // const { manifest } = Constants;
-  // const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
+  const { manifest } = Constants;
+  const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 
   // useEffect(async () => {
   //   try {
@@ -60,7 +64,7 @@ const Profile = ({ navigation }) => {
     try {
       const result = await axios.post(`${uri}/api/user/logout`);
       const emptyUser = result.data;
-      setUser(emptyUser);
+      setUserData(emptyUser);
       navigation.navigate("Welcome");
     } catch (err) {
       console.log(err);
@@ -115,7 +119,11 @@ const Profile = ({ navigation }) => {
               return (
                 <View key={i}>
                   <TouchableOpacity
-                    onPress={() => navigation.navigate("Liga", item)}
+                    onPress={() => {
+                      dispatch(setLeague(item));
+                      dispatch(setMembers(item._id));
+                      navigation.navigate("Liga", item);
+                    }}
                   >
                     <View
                       style={[
@@ -129,7 +137,10 @@ const Profile = ({ navigation }) => {
                         </Text>
                       </View>
                       <View
-                        style={[leagueStyles.img, { backgroundColor: item.code }]}
+                        style={[
+                          leagueStyles.img,
+                          { backgroundColor: item.code },
+                        ]}
                       >
                         <Image
                           style={profile.cardImage}
