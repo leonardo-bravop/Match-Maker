@@ -8,7 +8,7 @@ router.post("/new", leagueController.new);
 
 router.put("/:leagueId/addUser/:userId", leagueController.addUser);
 
-router.put("/deleteUser/:id", leagueController.deleteUser);
+router.put("/:leagueId/deleteUser/:userId", leagueController.deleteUser);
 
 router.get("/getUsers/:leagueId", leagueController.getUserByLeagueId)
 
