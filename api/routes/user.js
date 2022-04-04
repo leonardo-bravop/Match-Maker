@@ -12,7 +12,7 @@ router.post("/logout", userController.logOut)
 
 router.get("/getLeagues/:userId", userController.getLeaguesByUserId)
 
-// router.get("/getMatches/:userId", userController.getMatchesByUserId)
+router.get("/getMatches/:userId", userController.getMatchesByUserId)
 
 function verifyToken(req, res, next) {
   const bearerHeader = req.headers["authorization"];
@@ -38,7 +38,7 @@ function verifyToken(req, res, next) {
 //   });
 // });
 
-router.get("/getMatches", userController.getMatchesByUserId)
+// router.get("/getMatches", userController.getMatchesByUserId)
 
 router.post("/me", verifyToken, userController.me);
 

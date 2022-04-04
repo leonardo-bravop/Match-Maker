@@ -142,10 +142,10 @@ exports.getLeaguesByUserId = (req, res) => {
 };
 
 exports.getMatchesByUserId = (req, res) => {
-  const { UserId } = req.params;
-  User.findById(UserId).then((matches) => {
+  const { userId } = req.params;
+  User.findById(userId).then((users) => {
     Match.find(
-      { _id: { $in: matches.users } },
+      { _id: { $in: users.matches } },
     ).then((users) => {
       res.send(users);
     });
