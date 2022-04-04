@@ -8,17 +8,18 @@ exports.newMatch = (req, res) => {
     const equipos = equipo_1.concat(equipo_2);
     const matchId = match._id.toString();
     return Promise.all(
-      equipos.map((user) =>
-        User.findByIdAndUpdate(
-          user._id,
+      equipos.map((userId) => {
+        return User.findByIdAndUpdate(
+          userId,
           { $push: { matches: matchId } },
           { new: true, useFindAndModify: false }
-        )
+        )}
       )
     )
       .then(() => {
+        console.log(`equipos son`, equipos)
         return Promise.all(
-          equipos.map((user) => Invitation.create({ matchId, toId: user._id }))
+          equipos.map((userId) => Invitation.create({ matchId, toId: userId }))
         );
       })
       .then((invitations) => res.send(invitations));
