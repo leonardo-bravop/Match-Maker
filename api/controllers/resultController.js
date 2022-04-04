@@ -14,24 +14,26 @@ exports.createResult = (req, res) => {
     })
   };
   
-  exports.confirmateResultTeam1 = (req, res) => {
-    const { resultId } = req.params;
-    Result.updateOne(
-    {confirmation_1: true},
-    { where: resultId})
-    .then((data) => {
-      res.send(data)
-    })
+  exports.confirmateResultTeam = (req, res) => {
+    const { id, team } = req.params;
+    if (team === 1){
+      Result.updateOne(
+        {confirmation_1: true},
+        { where: id})
+        .then((data) => {
+          res.send(data)
+        })
+    }
+    else if (team === 2)
+    {
+      Result.updateOne(
+        {confirmation_2: true},
+        { where: id})
+        .then((data) => {
+          res.send(data)
+        })
+    }
   };
 
-  exports.confirmateResultTeam2 = (req, res) => {
-    const { resultId } = req.params;
-    Result.updateOne(
-    {confirmation_2: true},
-    { where: resultId})
-    .then((data) => {
-      res.send(data)
-    })
-  };
   
   

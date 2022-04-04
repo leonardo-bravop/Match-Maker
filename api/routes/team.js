@@ -3,7 +3,7 @@ const router = express.Router();
 const teamController = require("../controllers/teamController")
 
 
-router.post("/newMatch", teamController.newTeam);
+router.post("/newTeam", teamController.newTeam);
 
 router.delete("/deleteMatch/:id", teamController.deleteTeam);
 

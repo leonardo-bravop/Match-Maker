@@ -1,5 +1,6 @@
 const League = require("../models/League");
 const User = require("../models/Users");
+const Match = require('../models/Match')
 
 exports.new = (req, res) => {
   const { name, description, sport, color, img } = req.body;
@@ -86,19 +87,17 @@ exports.changeLeague = (req, res) => {
   });
 };
 
-exports.showHistoryLeague = (req, res) => {};
-
-exports.getUserByLeagueId = (req, res) => {
+exports.showHistoryLeague = (req, res) => {
   const { leagueId } = req.params;
   League.findById(leagueId).then((league) => {
-    User.find(
-      { _id: { $in: league.users } },
-      { _id: 1, nickname: 1, img: 1 }
+    Match.find(
+      { _id: { $in: league.matches } },
     ).then((users) => {
       res.send(users);
     });
   });
 };
+
 
 exports.findLeagueByName = (req, res) => {
   const { leagueName } = req.body;

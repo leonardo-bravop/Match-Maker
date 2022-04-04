@@ -152,6 +152,17 @@ exports.getMatchesByUserId = (req, res) => {
   });
 };
 
+exports.verifyToken = (req, res, next) => {
+  const bearerHeader = req.headers["authorization"];
+  if (typeof bearerHeader !== "undefined") {
+    const bearerToken = bearerHeader.split(" ")[1];
+    req.token = bearerToken;
+    next();
+  } else {
+    res.sendStatus(403);
+  }
+}
+
 // exports.getMatchesByUserId = (req, res) => {
 //   const {userId} = req.params
 //   User.findById(userId).then(
