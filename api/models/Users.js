@@ -51,6 +51,12 @@ const userSchema = new Schema({
       ref: "Match",
     },
   ],
+  elo: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Elo",
+    },
+  ],
 });
 
 userSchema.pre("save", async function () {

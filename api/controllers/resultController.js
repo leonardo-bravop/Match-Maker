@@ -1,39 +1,24 @@
-const Result = require('../models/Result');
+const Result = require("../models/Result");
 
+exports.updateResult = (req, res) => {
+  const { score_1, score_2 } = req.body;
+  const { resultId } = req.params;
+  Result.findById(resultId).then((result) => {
+    result.score_1 = score_1;
+    result.score_2 = score_2;
+    result.save().then((updatedResult) => res.send(updatedResult));
+  });
+};
 
-exports.createResult = (req, res) => {
-    const { score1, score2} = req.body;
-    Result.create({
-        score_1: score1, 
-        score_2: score2, 
-        confirmation_1: false,
-        confirmation_2: false
-    }
-    ).then((data) => {
-      res.send(data)
-    })
-  };
-  
-  exports.confirmateResultTeam = (req, res) => {
-    const { id, team } = req.params;
-    if (team === 1){
-      Result.updateOne(
-        {confirmation_1: true},
-        { where: id})
-        .then((data) => {
-          res.send(data)
-        })
-    }
-    else if (team === 2)
-    {
-      Result.updateOne(
-        {confirmation_2: true},
-        { where: id})
-        .then((data) => {
-          res.send(data)
-        })
-    }
-  };
-
-  
-  
+exports.confirmateResultTeam = (req, res) => {
+  const { id, team } = req.params;
+  if (team === 1) {
+    Result.updateOne({ confirmation_1: true }, { where: id }).then((data) => {
+      res.send(data);
+    });
+  } else if (team === 2) {
+    Result.updateOne({ confirmation_2: true }, { where: id }).then((data) => {
+      res.send(data);
+    });
+  }
+};
