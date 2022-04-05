@@ -16,7 +16,10 @@ const Invitation = require("../models/Invitation")
   };
 
   exports.invitationRejected = (req, res) => {
-    Invitation.updateOne({ status: rejected })
+    const { id } = req.params;
+    Invitation.updateOne(
+      { where: id },
+      { status: rejected })
     .then((data) => {
       res.send(data)
     })

@@ -1,5 +1,4 @@
 import React from "react";
-
 import {
   Button,
   View,
@@ -8,8 +7,8 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
+  ActivityIndicator
 } from "react-native";
-
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Home from "./Home";
@@ -19,16 +18,17 @@ import { form } from "../styles/form";
 import Constants from "expo-constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-
 const { manifest } = Constants;
-
 const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 
 function Login({ navigation }) {
 
+  const [isLoading, setIsLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState(false)
 
   const handleLogin = async (values) => {
     try {
+      setIsLoading(true)
       const result = await axios.post(`${uri}/api/user/login`, values);
       const userStored = result.data.token;
       await AsyncStorage.setItem("userInfo", userStored);
@@ -36,6 +36,8 @@ function Login({ navigation }) {
       // console.log(`STORED USER ES`, returnedUser)
       result.status == 200 ? navigation.navigate("Home") : null;
     } catch (err) {
+      setIsLoading(false)
+      setErrorMessage(true)
       console.log(err);
     }
   };
@@ -104,13 +106,14 @@ function Login({ navigation }) {
           </>
         )}
       </Formik>
-
+      {errorMessage ? <Text style={{color : "white", fontSize : 18, textAlign : "center", backgroundColor : "pink", marginTop: 20}}>El email o la contraseña ingresado no coniceden con ningun usuario registrado</Text> : null}
       <Text
         style={form.colorTxtBtn}
         onPress={() => navigation.navigate("Register")}
       >
         registro
       </Text>
+      {isLoading ? <ActivityIndicator size="large" color="#00ff00" /> : null}
     </SafeAreaView>
   );
 }
