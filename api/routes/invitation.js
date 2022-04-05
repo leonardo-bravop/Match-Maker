@@ -4,8 +4,8 @@ const invitationsController = require("../controllers/invitationsController")
 
 router.delete("/deleteAll", invitationsController.deleteAll)
 
-router.delete("/invitAcepted", invitationsController.invitationAcepted)
+router.delete("/invitAcepted/:id", invitationsController.invitationAcepted)
 
-router.delete("/invitRejected", invitationsController.invitationRejected)
+router.delete("/invitRejected/:id", invitationsController.invitationRejected)
 
 module.exports = router;
