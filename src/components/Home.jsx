@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Image,
   ImageBackground,
+  ScrollView
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FlatGrid } from "react-native-super-grid";
@@ -74,12 +75,10 @@ const home = StyleSheet.create({
     fontStyle: "italic",
     fontWeight: "bold",
     fontSize: 25,
-    marginTop: 40,
     color: "white",
     textAlign: "center",
   },
   gridView: {
-    marginTop: -90,
     flex: 1,
   },
   itemContainer: {
@@ -155,9 +154,11 @@ function Home({ navigation: { navigate } }) {
             <Text style={home.lastText}>Taserface</Text>
           </View>
         </TouchableOpacity>
-        <Text style={home.ligaTittle}>──────── LIGAS ────────</Text>
       </View>
 
+      <ScrollView horizontal={true}>
+      <View>
+        <Text style={home.ligaTittle}>──────── LIGAS ────────</Text>
       <FlatGrid
         style={home.gridView}
         itemDimension={120}
@@ -186,6 +187,40 @@ function Home({ navigation: { navigate } }) {
           </TouchableOpacity>
         )}
       />
+      </View>
+      <View>
+      <Text style={home.ligaTittle}>──────── PRIV ────────</Text>
+      <FlatGrid
+        style={home.gridView}
+        itemDimension={120}
+        data={leagues}
+        // staticDimension={300}
+        // fixed
+        spacing={10}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            onPress={() => {
+              dispatch(setLeague(item));
+              dispatch(setMembers(item._id));
+              navigate("Liga", item);
+            }}
+            style={[home.itemContainer, { backgroundColor: "red" }]}
+          >
+            <View style={{ flex: 1, justifyContent: "flex-start" }}>
+              <Image
+                source={{ uri: item.img ? item.img : "https://trome.pe/resizer/G8-kkwwutkrNacKh5S6TJplAluU=/980x0/smart/filters:format(jpeg):quality(75)/cloudfront-us-east-1.images.arcpublishing.com/elcomercio/OXHJSIF4SZDAJP6F5PHFZTLRYI.jpg" }}
+                resizeMode="cover"
+                style={{ height: "100%" }}
+              />
+            </View>
+            <Text style={home.itemName}>{item.name}</Text>
+            <Text style={home.itemCode}>{item.color}</Text>
+          </TouchableOpacity>
+        )}
+      />
+      </View>
+
+</ScrollView>
     </View>
   );
 }
