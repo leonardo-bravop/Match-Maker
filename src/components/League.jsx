@@ -9,7 +9,6 @@ import axios from "axios";
 import ItemLeague from "./ItemLeague";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Picker } from "@react-native-picker/picker";
-import ItemRecord from "./ItemRrecord";
 
 const League = ({ navigation }) => {
   const { state, navigate } = navigation;
@@ -255,7 +254,7 @@ const League = ({ navigation }) => {
 
         {state.params ? (
           <>
-            <List list={memberList} Element={ItemRecord} />
+            <List list={memberList} Element={ItemLeague} />
             <FootLigue ligueId={state.params._id} userData={user} />
           </>
         ) : null}

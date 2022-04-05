@@ -1,37 +1,107 @@
-import React from "react";
-import {
-  SafeAreaView,
-  Text,
-  View,
-  TouchableOpacity,
-  Image,
-  Alert,
-  ScrollView,
-} from "react-native";
-import { recordStyles } from "../styles/record";
+import 'moment';
+import 'moment/locale/es'
+
+import React, { useEffect, useState } from "react";
+import { SafeAreaView, View, Text, TouchableOpacity } from "react-native";
+import CalendarStrip from 'react-native-calendar-strip'
+
 import Constants from "expo-constants";
 
-const Record = () => {
+import List from "../commons/List";
+import ItemRecord from "./ItemRecord";
 
-    const { manifest } = Constants;
-    const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
+import { recordStyles } from "../styles/record";
+import { useSelector } from 'react-redux';
+import axios from 'axios';
+
+const Record = () => {
+    let [recordList, setRecordList] = useState([])
+
+    const { manifest } = Constants
+    const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`      
+    
+    const user= useSelector( state => state.user)
+
+    useEffect(()=>{
+
+      axios.get(`${uri}/api/user/getMatches/${user._id}`)
+      .then(({data}) => {
+          console.log("Esta es la data\n\n", data ,"\n")
+      })
+
+      setRecordList([{
+        color: "blue",
+        nickname: "menganito",
+        result: false
+    },{
+        color: "red",
+        nickname: "fulan",
+        result: true
+    },{
+        color: "yellow",
+        nickname: "nito",
+        result: false
+    },
+        {
+          color: "green",
+          nickname: "fulanito",
+          result: true
+      },{
+        color: "blue",
+        nickname: "menganito",
+        result: false
+    },{
+        color: "red",
+        nickname: "fulan",
+        result: true
+    },{
+        color: "yellow",
+        nickname: "nito",
+        result: false
+    },
+        {
+          color: "green",
+          nickname: "fulanito",
+          result: true
+      },
+    ])
+    },[])
     
     return (
       <SafeAreaView style= {recordStyles.back}>
-        <View style={[recordStyles.head, {backgroundColor: "yellow"}]}>
+        <View style={[recordStyles.head]}>
             
             <View style={recordStyles.info}>
                <Text style={recordStyles.title}>Historial</Text>
             </View>
 
-            <View style={recordStyles.menu}>
-               
+            <View style={[recordStyles.calendar]}>
+              <CalendarStrip
+                scrollable
+                startingDate={Date.now()}
+                iconStyle={{color: 'white'}}
+                highlightDateNameStyle={{color: 'red'}}
+                highlightDateNumberStyle={{color: 'red'}}
+                minDate={"01-01-2022"}
+                maxDate={"05-31-2022"}
+                style={{height:100, paddingTop: 20, paddingBottom: 5}}
+                calendarHeaderStyle={{color: 'white'}}
+                dateNumberStyle={{color: 'white'}}
+                dateNameStyle={{color: 'white'}}
+                iconContainer={{flex: 0.1}}
+                locale={ {name: "es", config: {
+                  months: 'Enero_Febrero_Marzo_Abril_Mayo_Junio_Julio_Agosto_Septiembre_Octubre_Noviembre_Diciembre'.split('_'),
+                  weekdaysShort: 'DOM_LUN_MAR_MIE_JUE_VIE_SAB'.split('_'),}}}
+              />
             </View>
-            
+
+            <TouchableOpacity  style={{ height: 50, alignItems: "center", justifyContent: "center"}}>
+              <Text style={{ color: "#FFFFFF" }}>Mostrar todo</Text>
+            </TouchableOpacity>
          </View>
 
         <View style={recordStyles.body}>
-          <View style={[recordStyles.listHead, {backgroundColor: "red"}]}>
+          <View style={[recordStyles.listHead]}>
             <View style={recordStyles.enum}>
               <View style={{ width: 50, alignItems: "center", marginVertical: 5 }}>
                 <Text style={{ color: "#FFFFFF" }}>Fecha</Text>
@@ -47,9 +117,9 @@ const Record = () => {
               </View>
             </View>
           </View>
-{/*             
+             
           <List list={recordList} Element={ItemRecord} />
-          
+    {/*      
           <FootLigue ligueId={state.params._id} userData={user} /> */}
         </View>
       </SafeAreaView>
@@ -57,150 +127,3 @@ const Record = () => {
   }
 
 export default Record
-// var { height, width } = Dimensions.get("window");
-
-// export default class Menu extends Component {
-//   constructor(props) {
-//     super(props);
-//     this.state = {
-//       data: [
-//         {
-//           id: 1,
-//           user: "Pepe",
-//           opponent: 'Oponente',
-//           color: "#dc2f02",
-//         },
-//         {
-//           id: 2,
-//           user: "Pepe",
-//           opponent: 'Oponente',
-//           color: "#dc2f02",
-//         },
-//         {
-//           id: 3,
-//           user: "Pepe",
-//           opponent: 'Oponente',
-//           color: "#90be6d",
-//         },
-//         {
-//           id: 4,
-//           user: "Pepe",
-//           opponent: 'Oponente',
-//           color: "#90be6d",
-//         },
-//         {
-//           id: 5,
-//           user: "Pepe",
-//           opponent: 'Oponente',
-//           color: "#90be6d",
-//         },
-//         {
-//           id: 6,
-//           user: "Pepe",
-//           opponent: 'Oponente',
-//           color: "#dc2f02",
-//         },
-//         {
-//           id: 7,
-//           user: "Pepe",
-//           opponent: 'Oponente',
-//           color: "#90be6d",
-//         },
-//         {
-//           id: 8,
-//           user: "Pepe",
-//           opponent: 'Oponente',
-//           color: "#90be6d",
-//         },
-//         {
-//           id: 9,
-//           user: "Pepe",
-//           opponent: 'Oponente',
-//           color: "#dc2f02",
-//         },
-//         {
-//           id: 10,
-//           user: "Pepe",
-//           opponent: 'Oponente',
-//           color: "#dc2f02",
-//         },
-//       ],
-//     };
-//   }
-
-//   clickEventListener(item) {
-//     Alert.alert(item.title);
-//   }
-
-//   render() {
-//     return (
-//       <SafeAreaView>
-//         <View style={styles.container}>
-//           <FlatList
-//             style={styles.list}
-//             contentContainerStyle={styles.listContainer}
-//             data={this.state.data}
-//             horizontal={false}
-//             keyExtractor={(item) => {
-//               return item.id;
-//             }}
-//             renderItem={({ item }) => {
-//               return (
-//                 <TouchableOpacity
-//                   style={[styles.card, { backgroundColor: item.color }]}
-//                   onPress={() => {
-//                     this.clickEventListener(item);
-//                   }}
-//                 >
-//                   <Text style={styles.title}>{item.user}</Text>
-//                   <Text style={styles.title}>{item.opponent}</Text>
-//                 </TouchableOpacity>
-//               );
-//             }}
-//           />
-//         </View>
-//       </SafeAreaView>
-//     );
-//   }
-// }
-
-// const styles = StyleSheet.create({
-//   container: {
-//     marginTop: 20,
-//   },
-//   list: {
-//     backgroundColor: "#0e0b29",
-//   },
-
-//   /******** card **************/
-//   card: {
-//     width: width,
-//     height: 100,
-//     flexDirection: "row",
-//     padding: 20,
-//     borderWidth:2,
-//     borderColor: 'white',
-//     justifyContent: "center",
-//     alignItems: "center",
-//   },
-//   cardImage: {
-//     height: 70,
-//     width: 70,
-//   },
-//   title: {
-//     fontSize: 28,
-//     flex: 1,
-//     color: "#FFFFFF",
-//     fontWeight: "bold",
-//     marginLeft: 40,
-//   },
-//   subTitle: {
-//     fontSize: 12,
-//     flex: 1,
-//     color: "#FFFFFF",
-//   },
-//   icon: {
-//     height: 20,
-//     width: 20,
-//   },
-// });
