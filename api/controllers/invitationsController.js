@@ -6,12 +6,11 @@ const Invitation = require("../models/Invitation")
     })
   };
 
-  exports.invitationAcepted = (req, res) => {
-    const { id } = req.params;
-    Invitation.updateOne(
-      { where: id },
-      { status: accepted })
+  exports.matchInvitationAcepted = (req, res) => {
+    const {matchId, userId} = req.params
+    Invitation.findOne( {$and: [{"fromId.matchId": matchId}, {"toId": userId}]})
     .then((data) => {
+      console.log(data)
       res.send(data)
     })
   };
