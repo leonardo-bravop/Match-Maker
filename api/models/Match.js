@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
+const Invitation = require("../models/Invitation");
 
 const matchSchema = new Schema({
   league: [
@@ -18,6 +19,18 @@ const matchSchema = new Schema({
     {
       type: Schema.Types.ObjectId,
       ref: "user",
+    },
+  ],
+  invitations_team1: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "invitation",
+    },
+  ],
+  invitations_team2: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "invitation",
     },
   ],
   fecha: {

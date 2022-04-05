@@ -18,141 +18,149 @@ exports.confirmResultTeam = (req, res) => {
   const { resultId, team, matchId } = req.params;
   let scorefinal;
   let result1;
-  let result2
+  let result2;
   if (team === "1" || team === "2") {
-    Result.findById(resultId).populate("match").then((result) => {
-      console.log(`result essssssssssss`, result)
-      result[`confirmation_${team}`] = true;
-      result.save().then((updatedResult) => {
-        if (updatedResult.confirmation_1 && updatedResult.confirmation_2) {
-          Match.findById(matchId).then((match) => {
-            match.status = "confirmed";
-            let eloTeam1 = 0;
-            let eloTeam2 = 0;
-            scorefinal = Math.abs(result.score_1 - result.score_2);
-            console.log(`match equipo 1 es`, match.equipo_1);
-            Promise.all(
-              match.equipo_1.map((element) => {
-                return User.findById(element).then((user) => {
-                  console.log(`user es`, user);
-                  console.log(`match es`, match);
-                  return Elo.findOne({
-                    user: user._id,
-                    league: match.league.toString(),
-                  }).then((elo) => {
-                    eloTeam1 += elo.value/(match.equipo_1.length);
-                    console.log("updateando elo");
-                    console.log("elo team 1", eloTeam1);
-                  });
-                });
-              })
-            ).then(() => {
+    Result.findById(resultId)
+      .populate("match")
+      .then((result) => {
+        // console.log(`result essssssssssss`, result)
+        result[`confirmation_${team}`] = true;
+        result.save().then((updatedResult) => {
+          if (updatedResult.confirmation_1 && updatedResult.confirmation_2) {
+            Match.findById(matchId).then((match) => {
+              match.status = "confirmed";
+              let eloTeam1 = 0;
+              let eloTeam2 = 0;
+              scorefinal = Math.abs(result.score_1 - result.score_2);
+              console.log(`match equipo 1 es`, match.equipo_1);
               Promise.all(
-                match.equipo_2.map((element) => {
+                match.equipo_1.map((element) => {
                   return User.findById(element).then((user) => {
-                    console.log(`user es`, user);
-                    console.log(`match es`, match);
+                    // console.log(`user es`, user);
+                    // console.log(`match es`, match);
                     return Elo.findOne({
                       user: user._id,
                       league: match.league.toString(),
                     }).then((elo) => {
-                      eloTeam2 += elo.value/(match.equipo_2.length);
+                      eloTeam1 += elo.value / match.equipo_1.length;
                       console.log("updateando elo");
-                      console.log("elo team 2", eloTeam2);
+                      console.log("elo team 1", eloTeam1);
                     });
                   });
                 })
-              )
-                .then(() => {
-                  let probabilidadTeam1 =
-                    1 / (1 + 10 ** ((eloTeam2 - eloTeam1) / 400));
-                  let probabilidadTeam2 =
-                    1 / (1 + 10 ** ((eloTeam1 - eloTeam2) / 400));
-                  console.log("Proabilidad team 1", probabilidadTeam1);
-                  console.log("Proabilidad team 2", probabilidadTeam2);
-                  console.log("elo team 1", eloTeam1);
-                  console.log("elo team 2", eloTeam2);
-                  let eloDiff;
-                  let eloDiff2;
-                  let operador
-                  console.log(`scorefinal es`, scorefinal);
-                  console.log(`match es`, match);
-                  console.log(`result es`, result);
-                  if (result.score_1 > result.score_2) {
-                    operador = 1
-                    // eloDiff = 5 * (scorefinal - probabilidadTeam1);
-                    eloDiff = 15 * (1 - probabilidadTeam1);
-                  } else if (result.score_2 > result.score_1) {
-                    // operador = -1
-                    operador = 1
-                    // eloDiff = 5 * (scorefinal - probabilidadTeam2);
-                    eloDiff = 15 * (0 - probabilidadTeam1);
-                  } else { //definir la probabilidad de quien
-                    operador = 1
-                    // (probabilidadTeam1 > probabilidadTeam2) ? operador = 1 : operador = -1
-                    // eloDiff = 5 * (0.5 - Math.max(probabilidadTeam1, probabilidadTeam2));
-                    eloDiff = 15 * (0.5 - probabilidadTeam1);
-                  }
-
-                  const promisesArray = match.equipo_1.map((userId) => {
-                    Elo.findOne({
-                      user: userId,
-                      league: match.league,
-                    }).then((elo) => {
-                      elo.value = elo.value + Math.round((operador)*eloDiff);
-                      console.log(`elo essssss`, elo);
-                      return elo.save()
+              ).then(() => {
+                Promise.all(
+                  match.equipo_2.map((element) => {
+                    return User.findById(element).then((user) => {
+                      // console.log(`user es`, user);
+                      // console.log(`match es`, match);
+                      return Elo.findOne({
+                        user: user._id,
+                        league: match.league.toString(),
+                      }).then((elo) => {
+                        eloTeam2 += elo.value / match.equipo_2.length;
+                        console.log("updateando elo");
+                        console.log("elo team 2", eloTeam2);
+                      });
                     });
                   })
-                  promisesArray.concat(match.equipo_2.map((userId) => {
-                    Elo.findOne({
-                      user: userId,
-                      league: match.league,
-                    }).then((elo) => {
-                      // elo.value = elo.value - (operador)*eloDiff;
-                      elo.value = elo.value - Math.round((operador)*eloDiff);
-                      console.log(`elo essssss`, elo);
-                      return elo.save()
-                    });
-                  }))
-                  return Promise.all(
-                    promisesArray
-                  );
-                  //si son empate elodiff que seria?
-                })
-                .then((promises) => {
-                  console.log(promises);
-                  res.send(updatedResult);
-                });
-            });
+                )
+                  .then(() => {
+                    let probabilidadTeam1 =
+                      1 / (1 + 10 ** ((eloTeam2 - eloTeam1) / 400));
+                    let probabilidadTeam2 =
+                      1 / (1 + 10 ** ((eloTeam1 - eloTeam2) / 400));
+                    console.log("Proabilidad team 1", probabilidadTeam1);
+                    console.log("Proabilidad team 2", probabilidadTeam2);
+                    console.log("elo team 1", eloTeam1);
+                    console.log("elo team 2", eloTeam2);
+                    let eloDiff;
+                    let operador;
+                    console.log(`scorefinal es`, scorefinal);
+                    // console.log(`match es`, match);
+                    // console.log(`result es`, result);
+                    if (result.score_1 > result.score_2) {
+                      operador = 1;
+                      // eloDiff = 5 * (scorefinal - probabilidadTeam1);
+                      eloDiff = Math.ceil(15 * (1 - probabilidadTeam1));
+                    } else if (result.score_2 > result.score_1) {
+                      // operador = -1
+                      operador = 1;
+                      // eloDiff = 5 * (scorefinal - probabilidadTeam2);
+                      eloDiff = Math.ceil(15 * (0 - probabilidadTeam1));
+                    } else {
+                      operador = 1;
+                      //definir la probabilidad de quien
+                      // (probabilidadTeam1 > probabilidadTeam2) ? operador = 1 : operador = -1
+                      // eloDiff = 5 * (0.5 - Math.max(probabilidadTeam1, probabilidadTeam2));
+                      // eloDiff = 15 * (0.5 - probabilidadTeam1);
+                      console.log(`elodiff es`, eloDiff);
+                      eloDiff = 15 * (0.5 - probabilidadTeam1);
+                      console.log(`elodiff es`, eloDiff);
+                      eloDiff < 0
+                        ? (eloDiff = (-1) * Math.ceil(Math.abs(eloDiff)))
+                        : (eloDiff = Math.ceil(eloDiff));
+                    }
+                    console.log(`AHORA elodiff es`, eloDiff);
 
-            // match.equipo_1.forEach((element) => {
-            //   console.log(`entrando al foreach de equipo1`)
-            //   User.findById(element).then((user) => {
-            //     console.log(`entrando al then del user luego de user findby id`)
-            //     Elo.findOne({ user: user._id, league: match.league }).then(
-            //       (elo) => {
-            //         eloTeam1 += elo;
-            //         console.log("updateando elo")
-            //       }
-            //     );
-            //   });
-            // });
-            // match.equipo_2.forEach((element) => {
-            //   User.findById(element).then((user) => {
-            //     Elo.findOne({ user: user._id, league: match.league }).then(
-            //       (elo) => {
-            //         eloTeam2 += elo;
-            //       }
-            //     );
-            //   });
-            // });
-          });
-        } else {
-          res.send(updatedResult);
-        }
+                    const promisesArray = match.equipo_1.map((userId) => {
+                      Elo.findOne({
+                        user: userId,
+                        league: match.league,
+                      }).then((elo) => {
+                        elo.value = elo.value + operador * eloDiff;
+                        console.log(`elo essssss`, elo);
+                        return elo.save();
+                      });
+                    });
+                    promisesArray.concat(
+                      match.equipo_2.map((userId) => {
+                        Elo.findOne({
+                          user: userId,
+                          league: match.league,
+                        }).then((elo) => {
+                          // elo.value = elo.value - (operador)*eloDiff;
+                          elo.value = elo.value - operador * eloDiff;
+                          console.log(`elo essssss`, elo);
+                          return elo.save();
+                        });
+                      })
+                    );
+                    return Promise.all(promisesArray);
+                    //si son empate elodiff que seria?
+                  })
+                  .then(() => {
+                    res.send(updatedResult);
+                  });
+              });
+
+              // match.equipo_1.forEach((element) => {
+              //   console.log(`entrando al foreach de equipo1`)
+              //   User.findById(element).then((user) => {
+              //     console.log(`entrando al then del user luego de user findby id`)
+              //     Elo.findOne({ user: user._id, league: match.league }).then(
+              //       (elo) => {
+              //         eloTeam1 += elo;
+              //         console.log("updateando elo")
+              //       }
+              //     );
+              //   });
+              // });
+              // match.equipo_2.forEach((element) => {
+              //   User.findById(element).then((user) => {
+              //     Elo.findOne({ user: user._id, league: match.league }).then(
+              //       (elo) => {
+              //         eloTeam2 += elo;
+              //       }
+              //     );
+              //   });
+              // });
+            });
+          } else {
+            res.send(updatedResult);
+          }
+        });
       });
-    });
   } else {
     res.send("Enter a valid team number").status(400);
   }
