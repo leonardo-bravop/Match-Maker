@@ -29,7 +29,7 @@ const resultSchema = new Schema({
   match: [
     {
       type: Schema.Types.ObjectId,
-      ref: "Match",
+      ref: "match",
     },
   ],
 });

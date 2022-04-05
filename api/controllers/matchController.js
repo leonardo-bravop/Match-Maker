@@ -34,9 +34,10 @@ exports.newMatch = (req, res) => {
           })
           .then(() => {
             console.log(`equipos son`, equipos);
+            console.log(`match id es`, matchId)
             return Promise.all(
               equipos.map((userId) =>
-                Invitation.create({ matchId, toId: userId })
+                Invitation.create({ fromId: {matchId: matchId}, toId: userId })
               )
             );
           })
@@ -65,5 +66,6 @@ exports.deleteAll = (req, res) => {
     res.send(data);
   });
 };
+
 
 //get matches by date
