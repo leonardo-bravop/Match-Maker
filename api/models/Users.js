@@ -42,13 +42,19 @@ const userSchema = new Schema({
   leagues: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "League",
+      ref: "league",
     },
   ],
   matches: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Match",
+      ref: "match",
+    },
+  ],
+  elo: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "elo",
     },
   ],
 });

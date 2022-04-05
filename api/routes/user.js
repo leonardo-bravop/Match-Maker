@@ -12,18 +12,7 @@ router.post("/logout", userController.logOut)
 
 router.get("/getLeagues/:userId", userController.getLeaguesByUserId)
 
-// router.get("/getMatches/:userId", userController.getMatchesByUserId)
-
-function verifyToken(req, res, next) {
-  const bearerHeader = req.headers["authorization"];
-  if (typeof bearerHeader !== "undefined") {
-    const bearerToken = bearerHeader.split(" ")[1];
-    req.token = bearerToken;
-    next();
-  } else {
-    res.sendStatus(403);
-  }
-}
+router.get("/getMatches/:userId", userController.getMatchesByUserId)
 
 // router.post("/check", verifyToken, (req, res) => {
 //   jwt.verify(req.token, "secretkey", (err, authData) => {
@@ -40,6 +29,6 @@ function verifyToken(req, res, next) {
 
 router.get("/getMatches", userController.getMatchesByUserId)
 
-router.post("/me", verifyToken, userController.me);
+router.post("/me", userController.verifyToken, userController.me);
 
 module.exports = router;

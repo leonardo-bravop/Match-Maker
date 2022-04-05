@@ -1,38 +1,40 @@
 const User = require("../models/Users");
-const Match = require('../models/Match')
+const Match = require("../models/Match");
 const generateToken = require("../config/generateToken");
 const jwt = require("jsonwebtoken");
 const League = require("../models/League");
 
 exports.register = (req, res) => {
   const { name, surname, nickname, email, password, age } = req.body;
-  User.findOne({ email }).then((user) => {
-    if (user) {
-      res.status(400);
-      res.send("Email Already Exists");
-    } else {
-      User.findOne({ nickname })
-        .then((user) => {
-          if (user) {
-            res.status(400);
-            res.send("Nickname Already Exists");
-          } else {
-            User.create({ name, surname, nickname, email, password, age })
-              .then((user) => {
-                res.sendStatus(201);
-              })
-              .catch((error) => {
-                res.json(error);
-              });
-          }
-        })
-        .catch((error) => {
-          res.json(error);
-        });
-    }
-  }).catch((error) => {
-    res.json(error);
-  });
+  User.findOne({ email })
+    .then((user) => {
+      if (user) {
+        res.status(400);
+        res.send("Email Already Exists");
+      } else {
+        User.findOne({ nickname })
+          .then((user) => {
+            if (user) {
+              res.status(400);
+              res.send("Nickname Already Exists");
+            } else {
+              User.create({ name, surname, nickname, email, password, age })
+                .then((user) => {
+                  res.sendStatus(201);
+                })
+                .catch((error) => {
+                  res.json(error);
+                });
+            }
+          })
+          .catch((error) => {
+            res.json(error);
+          });
+      }
+    })
+    .catch((error) => {
+      res.json(error);
+    });
 };
 
 exports.login = (req, res) => {
@@ -142,14 +144,29 @@ exports.getLeaguesByUserId = (req, res) => {
 };
 
 exports.getMatchesByUserId = (req, res) => {
-  const { UserId } = req.params;
-  User.findById(UserId).then((matches) => {
-    Match.find(
-      { _id: { $in: matches.users } },
-    ).then((users) => {
-      res.send(users);
+  const { userId } = req.params;
+  User.findById(userId)
+    .populate({
+      path: "matches",
+      populate: [
+        { path: "equipo_1", select: "nickname" },
+        { path: "equipo_2", select: "nickname" },
+      ],
+    })
+    .then((user) => {
+      res.send(user.matches);
     });
-  });
+};
+
+exports.verifyToken = (req, res, next) => {
+  const bearerHeader = req.headers["authorization"];
+  if (typeof bearerHeader !== "undefined") {
+    const bearerToken = bearerHeader.split(" ")[1];
+    req.token = bearerToken;
+    next();
+  } else {
+    res.sendStatus(403);
+  }
 };
 
 // exports.getMatchesByUserId = (req, res) => {
