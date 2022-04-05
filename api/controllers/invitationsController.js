@@ -7,14 +7,20 @@ const Invitation = require("../models/Invitation")
   };
 
   exports.invitationAcepted = (req, res) => {
-    Invitation.updateOne({ status: accepted })
+    const { id } = req.params;
+    Invitation.updateOne(
+      { where: id },
+      { status: accepted })
     .then((data) => {
       res.send(data)
     })
   };
 
   exports.invitationRejected = (req, res) => {
-    Invitation.updateOne({ status: rejected })
+    const { id } = req.params;
+    Invitation.updateOne(
+      { where: id },
+      { status: rejected })
     .then((data) => {
       res.send(data)
     })
