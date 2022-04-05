@@ -6,15 +6,23 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { leagueStyles } from "../styles/league";
 import axios from "axios";
 import Constants from "expo-constants";
-import { useDispatch } from "react-redux";
-import { addUserToLeague } from "../state/selectLeague";
+import { useDispatch, useSelector } from "react-redux";
+import { addUserToLeague } from "../state/memberList";
+import { setUserLeagues } from "../state/userLeague";
 const { manifest } = Constants;
 
 const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 
 const FootLigue = ({ ligueId, userData }) => {
    const dispatch = useDispatch()
+   const members = useSelector((state) => state.members)
+   const user = useSelector(state => state.user)
    // if (!userData.rank) return <></>
+
+/*    const [buttonValue, setButtonValue] = useState(false) */
+
+   let member = members?.filter( (member) => member?.nickname == user.nickname)
+
 
    const buttonHandler = async () => {
       try {
@@ -24,19 +32,19 @@ const FootLigue = ({ ligueId, userData }) => {
          // .post(`${uri}/api/user/me`, {}, 
          //       { headers: { Authorization: `Bearer ${userString}` } } )
 
-         const res = await dispatch(addUserToLeague({ligueId: ligueId, userData: userData}))
-
-
+         const res = await dispatch(addUserToLeague({ligueId: ligueId, userData: user}))
+         await dispatch(setUserLeagues({userId: user._id}))
+         setButtonValue(true)
       } catch (err) { console.log(err); }
    }
 
-   // useEffect(()=>{
-   //    console.log(`User data es =======>`, userData)
-   // }, [])
+   useEffect(()=>{
+      member = members?.filter( (member) => member?.nickname == user.nickname)
+   }, [dispatch])
 
    return ( <>
-      { userData.rank && userData.rank !== 0
-         ?  ( userData.rank > 8 
+      { member[0] /* && buttonValue */ ?
+           ( userData.rank > 8 
             ? <View style={leagueStyles.foot}>
                <View style={leagueStyles.user}>
                   <View style={leagueStyles.rank}>

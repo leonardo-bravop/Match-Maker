@@ -21,6 +21,7 @@ import { setUserMe } from "../state/user";
 import { setUserLeagues } from "../state/userLeague";
 import { setLeagues } from "../state/league";
 import { setLeague } from "../state/selectLeague";
+import { setMembers } from "../state/memberList";
 
 const screen = Dimensions.get("screen");
 
@@ -168,6 +169,7 @@ function Home({ navigation: { navigate } }) {
           <TouchableOpacity
             onPress={() => {
               dispatch(setLeague(item));
+              dispatch(setMembers(item._id));
               navigate("Liga", item);
             }}
             style={[home.itemContainer, { backgroundColor: item.color }]}

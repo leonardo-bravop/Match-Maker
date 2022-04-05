@@ -30,12 +30,12 @@ exports.addUser = (req, res) => {
     id,
     { $push: { users: userId } },
     { new: true, useFindAndModify: false }
-  ).then(() => {
+  ).then((users) => {
     User.findByIdAndUpdate(
       userId,
       { $push: { leagues: id } },
       { new: true, useFindAndModify: false }
-    ).then((users) => res.send(users));
+    ).then(() => res.send(users));
   });
 };
 
@@ -102,9 +102,9 @@ exports.getUserByLeagueId = (req, res) => {
 
 exports.findLeagueByName = (req, res) => {
   const { leagueName } = req.body;
-  League.find({ name: { $regex: leagueName} }).then((leagues) => {
+  League.find({ name: { $regex: leagueName } }).then((leagues) => {
     res.send(leagues);
-  })
+  });
   // League.find({ $text : { $search: `'${leagueName}'`, $caseSensitive:false } })
   // .then((result) => {
   //   console.log(result);
