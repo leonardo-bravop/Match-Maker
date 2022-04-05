@@ -6,13 +6,13 @@ const teamSchema = new Schema({
   users: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "user",
     },
   ],
   match: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Match",
+      ref: "match",
     },
   ],
 });

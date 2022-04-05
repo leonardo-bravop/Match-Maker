@@ -5,25 +5,24 @@ const matchSchema = new Schema({
   league: [
     {
       type: Schema.Types.ObjectId,
-      ref: "League",
+      ref: "league",
     },
   ],
   equipo_1: [
     {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: "user",
     },
   ],
   equipo_2: [
     {
       type: Schema.Types.ObjectId,
-      ref: "Team",
+      ref: "user",
     },
   ],
   fecha: {
-    //cambiar date a string
-    type: Date,
-    default: Date.now(),
+    type: String,
+    // default: Date.now(),
   },
   status: {
     type: String,
@@ -32,7 +31,7 @@ const matchSchema = new Schema({
   result: [
     {
       type: Schema.Types.ObjectId,
-      ref: "Result",
+      ref: "result",
     },
   ],
 });

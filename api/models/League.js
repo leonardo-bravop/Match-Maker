@@ -18,13 +18,13 @@ const leagueSchema = new Schema({
   matches: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Match",
+      ref: "match",
     },
   ],
   users: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "user",
     },
   ],
 });

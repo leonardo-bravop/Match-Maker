@@ -10,13 +10,13 @@ const eloSchema = new Schema({
   league: [
     {
       type: Schema.Types.ObjectId,
-      ref: "League",
+      ref: "league",
     },
   ],
   user: [
     {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: "user",
     },
   ],
 });
