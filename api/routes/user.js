@@ -8,6 +8,8 @@ router.post("/login", userController.login);
 
 router.put("/edit/:_id", userController.edit);
 
+router.put("/changePassword/:_id", userController.changePassword);
+
 router.post("/logout", userController.logOut)
 
 router.get("/getLeagues/:userId", userController.getLeaguesByUserId)

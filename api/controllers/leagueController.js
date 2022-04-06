@@ -43,56 +43,57 @@ exports.addUser = (req, res) => {
   });
 };
 
-
 //devolver users ordenados por elo
 
 exports.deleteUser = (req, res) => {
   const { leagueId, userId } = req.params;
-  League.findById(leagueId)
-  .then((league) => {
-    console.log("entre al then del league")
+  League.findById(leagueId).then((league) => {
+    console.log("entre al then del league");
     for (let i = 0; i < league.users.length; i++) {
-      console.log("entre al for del league")
-      if(league.users[i].toString() === userId)
-      {
-        console.log("entre al if del league")
-        league.users.splice(i,1)
+      console.log("entre al for del league");
+      if (league.users[i].toString() === userId) {
+        console.log("entre al if del league");
+        league.users.splice(i, 1);
       }
     }
-    league.save().then(() => {
-      User.findById(userId)
-      .then((user) => {
-        console.log("entre al then del user")
-        for (let j = 0; j < user.leagues.length; j++) {
-          console.log("entre al for del user")
-          if(user.leagues[j].toString() === leagueId)
-          {
-            console.log("entre al if del user")
-            user.leagues.splice(j,1)
-          }
-        }
-        Elo.findOne({user: userId, league: leagueId}).then((elo) => {
-          console.log("entre al then del elo")
-          for (let k = 0; k < user.elo.length; k++) {
-            console.log("entre al for del elo")
-            if(user.elo[k].toString() === elo._id.toString()){
-              console.log("entre al if del elo")
-              user.elo.splice(k,1)
+    league
+      .save()
+      .then(() => {
+        User.findById(userId).then((user) => {
+          console.log("entre al then del user");
+          for (let j = 0; j < user.leagues.length; j++) {
+            console.log("entre al for del user");
+            if (user.leagues[j].toString() === leagueId) {
+              console.log("entre al if del user");
+              user.leagues.splice(j, 1);
             }
           }
-        })
-        user.save().then(() => {
-          console.log("entre al save del user ")
-          Elo.findOneAndDelete({user: userId,league: leagueId})
-          .then((elo) => {
-            console.log("saque el elo")
-            res.send("delete elo success")
-          })
-          })
+          Elo.findOne({ user: userId, league: leagueId }).then((elo) => {
+            console.log("entre al then del elo");
+            for (let k = 0; k < user.elo.length; k++) {
+              console.log("entre al for del elo");
+              if (user.elo[k].toString() === elo._id.toString()) {
+                console.log("entre al if del elo");
+                user.elo.splice(k, 1);
+              }
+            }
+          });
+          user.save().then(() => {
+            console.log("entre al save del user ");
+            Elo.findOneAndDelete({ user: userId, league: leagueId }).then(
+              (elo) => {
+                console.log("saque el elo");
+                res.send("delete elo success");
+              }
+            );
+          });
+        });
       })
-  })
-  .catch(() => { console.log("error al deletear")});
-})};
+      .catch(() => {
+        console.log("error al deletear");
+      });
+  });
+};
 
 exports.getUserByLeagueId = (req, res) => {
   const { leagueId } = req.params;
@@ -163,9 +164,28 @@ exports.showHistoryLeague = (req, res) => {
 
 exports.findLeagueByName = (req, res) => {
   const { leagueName } = req.body;
-  League.find({ name: { $regex: leagueName } }).then((leagues) => {
-    res.send(leagues);
-  });
+  const concatenado = leagueName.split(" ");
+  let reg = "";
+  console.log(concatenado);
+  if (concatenado.length > 1) {
+    reg = concatenado.join("|");
+    const otroArray = reg.split(" ");
+    otroArray.push(")");
+    otroArray.unshift("(");
+    reg = otroArray.join("");
+    console.log(otroArray);
+  } else {
+    reg = concatenado.join("");
+  }
+
+  console.log(reg);
+  console.log(`al final concat es`, concatenado);
+
+  League.find({ name: { $regex: reg }, $options: "i" })
+    .select("name")
+    .then((leagues) => {
+      res.send(leagues);
+    });
   // League.find({ $text : { $search: `'${leagueName}'`, $caseSensitive:false } })
   // .then((result) => {
   //   console.log(result);

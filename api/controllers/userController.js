@@ -10,34 +10,34 @@ exports.register = (req, res) => {
     .then((user) => {
       if (user) {
         res.status(400);
-        res.send("Email Already Exists");
+        next(new Error("Email already exists")) 
       } else {
         User.findOne({ nickname })
           .then((user) => {
             if (user) {
               res.status(400);
-              res.send("Nickname Already Exists");
+              next(new Error("Nickname already exists")) 
             } else {
               User.create({ name, surname, nickname, email, password, age })
                 .then((user) => {
                   res.sendStatus(201);
                 })
                 .catch((error) => {
-                  res.json(error);
+                  next(new Error(error))
                 });
             }
           })
           .catch((error) => {
-            res.json(error);
+            next(new Error(error))
           });
       }
     })
     .catch((error) => {
-      res.json(error);
+      next(new Error(error))
     });
 };
 
-exports.login = (req, res) => {
+exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
   User.findOne({ email }).then((user) => {
@@ -56,11 +56,11 @@ exports.login = (req, res) => {
             });
           } else {
             res.status(400);
-            throw new Error("An error ocurred");
+            next(new Error("Password invalid")) 
           }
         })
         .catch((error) => {
-          res.send("Email or password invalid");
+          res.send("Password invalid");
         });
     } else {
       User.findOne({ nickname: email }).then((user) => {
@@ -79,7 +79,7 @@ exports.login = (req, res) => {
                 });
               } else {
                 res.status(400);
-                throw new Error("An error ocurred");
+                next(new Error("Password invalid")) 
               }
             })
             .catch((error) => {
@@ -87,7 +87,7 @@ exports.login = (req, res) => {
             });
         } else {
           res.status(400);
-          throw new Error("An error ocurred");
+          next(new Error("Email/Nickname or password invalid")) 
         }
       });
     }
@@ -98,12 +98,19 @@ exports.edit = (req, res) => {
   const { _id } = req.params;
   const { name, surname, nickname, age } = req.body;
 
-  User.updateOne({ _id }, { name, surname, nickname, age }).then((result) => {
+  User.updateOne({ _id }, { name, surname, nickname, age }).select("name nickname").then((result) => {
     res.send(result);
   });
 };
 
-exports.getGroups = (req, res) => {};
+exports.changePassword = (req, res) => {
+  const { _id } = req.params;
+  const { password } = req.body;
+
+  User.findByIdAndUpdate( _id , { password }).select("name nickname").then((result) => {
+    res.send(result);
+  });
+};
 
 exports.logOut = (req, res) => {
   res.send({});
@@ -124,7 +131,8 @@ exports.me = (req, res) => {
           })
         )
         .catch((error) => {
-          res.send("Email or password invalid");
+          res.status(400);
+          next(new Error("Email/Nickname or password invalid")) 
         });
     }
   });
@@ -166,6 +174,7 @@ exports.verifyToken = (req, res, next) => {
     next();
   } else {
     res.sendStatus(403);
+    next(new Error("Invalid token")) 
   }
 };
 
