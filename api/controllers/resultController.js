@@ -3,18 +3,23 @@ const Match = require("../models/Match");
 const User = require("../models/Users");
 const Elo = require("../models/Elo");
 
-exports.updateResult = (req, res) => {
+exports.updateResult = (req, res, next) => {
   const { score_1, score_2 } = req.body;
   const { resultId } = req.params;
-  Result.findById(resultId).then((result) => {
-    result.score_1 = score_1;
-    result.score_2 = score_2;
-    result.save().then((updatedResult) => res.send(updatedResult));
-  });
+  Result.findById(resultId)
+    .then((result) => {
+      result.score_1 = score_1;
+      result.score_2 = score_2;
+      result.save().then((updatedResult) => res.send(updatedResult));
+    })
+    .catch((error) => {
+      res.status(400);
+      next(new Error(error));
+    });
 };
 //entrar a update result desde el id del match
 
-exports.confirmResultTeam = (req, res) => {
+exports.confirmResultTeam = (req, res, next) => {
   const { resultId, team, matchId } = req.params;
   let scorefinal;
   let result1;
@@ -32,9 +37,9 @@ exports.confirmResultTeam = (req, res) => {
               let eloTeam1 = 0;
               let eloTeam2 = 0;
               scorefinal = Math.abs(result.score_1 - result.score_2);
-              console.log(`match equipo 1 es`, match.equipo_1);
+              console.log(`match equipo 1 es`, match.team_1);
               Promise.all(
-                match.equipo_1.map((element) => {
+                match.team_1.map((element) => {
                   return User.findById(element).then((user) => {
                     // console.log(`user es`, user);
                     // console.log(`match es`, match);
@@ -42,7 +47,7 @@ exports.confirmResultTeam = (req, res) => {
                       user: user._id,
                       league: match.league.toString(),
                     }).then((elo) => {
-                      eloTeam1 += elo.value / match.equipo_1.length;
+                      eloTeam1 += elo.value / match.team_1.length;
                       console.log("updateando elo");
                       console.log("elo team 1", eloTeam1);
                     });
@@ -50,7 +55,7 @@ exports.confirmResultTeam = (req, res) => {
                 })
               ).then(() => {
                 Promise.all(
-                  match.equipo_2.map((element) => {
+                  match.team_2.map((element) => {
                     return User.findById(element).then((user) => {
                       // console.log(`user es`, user);
                       // console.log(`match es`, match);
@@ -58,7 +63,7 @@ exports.confirmResultTeam = (req, res) => {
                         user: user._id,
                         league: match.league.toString(),
                       }).then((elo) => {
-                        eloTeam2 += elo.value / match.equipo_2.length;
+                        eloTeam2 += elo.value / match.team_2.length;
                         console.log("updateando elo");
                         console.log("elo team 2", eloTeam2);
                       });
@@ -98,12 +103,12 @@ exports.confirmResultTeam = (req, res) => {
                       eloDiff = 15 * (0.5 - probabilidadTeam1);
                       console.log(`elodiff es`, eloDiff);
                       eloDiff < 0
-                        ? (eloDiff = (-1) * Math.ceil(Math.abs(eloDiff)))
+                        ? (eloDiff = -1 * Math.ceil(Math.abs(eloDiff)))
                         : (eloDiff = Math.ceil(eloDiff));
                     }
                     console.log(`AHORA elodiff es`, eloDiff);
 
-                    const promisesArray = match.equipo_1.map((userId) => {
+                    const promisesArray = match.team_1.map((userId) => {
                       Elo.findOne({
                         user: userId,
                         league: match.league,
@@ -114,7 +119,7 @@ exports.confirmResultTeam = (req, res) => {
                       });
                     });
                     promisesArray.concat(
-                      match.equipo_2.map((userId) => {
+                      match.team_2.map((userId) => {
                         Elo.findOne({
                           user: userId,
                           league: match.league,
@@ -134,7 +139,7 @@ exports.confirmResultTeam = (req, res) => {
                   });
               });
 
-              // match.equipo_1.forEach((element) => {
+              // match.team_1.forEach((element) => {
               //   console.log(`entrando al foreach de equipo1`)
               //   User.findById(element).then((user) => {
               //     console.log(`entrando al then del user luego de user findby id`)
@@ -146,7 +151,7 @@ exports.confirmResultTeam = (req, res) => {
               //     );
               //   });
               // });
-              // match.equipo_2.forEach((element) => {
+              // match.team_2.forEach((element) => {
               //   User.findById(element).then((user) => {
               //     Elo.findOne({ user: user._id, league: match.league }).then(
               //       (elo) => {
@@ -159,10 +164,11 @@ exports.confirmResultTeam = (req, res) => {
           } else {
             res.send(updatedResult);
           }
-        });
-      });
+        })
+      })
   } else {
-    res.send("Enter a valid team number").status(400);
+    res.status(400);
+    next(new Error("Enter a valid team number"));
   }
 };
 

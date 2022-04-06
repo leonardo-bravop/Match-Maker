@@ -1,26 +1,36 @@
-const Invitation = require("../models/Invitation")
+const Invitation = require("../models/Invitation");
 
-  exports.deleteAll = (req, res) => {
-    Invitation.deleteMany().then((data) => {
-      res.send(data)
-    })
-  };
-
-  exports.matchInvitationAcepted = (req, res) => {
-    const {matchId, userId} = req.params
-    Invitation.findOne( {$and: [{"fromId.matchId": matchId}, {"toId": userId}]})
+exports.deleteAll = (req, res, next) => {
+  Invitation.deleteMany()
     .then((data) => {
-      console.log(data)
-      res.send(data)
+      res.send(data);
     })
-  };
+    .catch((error) => {
+      next(new Error(error));
+    });
+};
 
-  exports.invitationRejected = (req, res) => {
-    const { id } = req.params;
-    Invitation.updateOne(
-      { where: id },
-      { status: rejected })
+exports.matchInvitationAcepted = (req, res, next) => {
+  const { matchId, userId } = req.params;
+  Invitation.findOne({
+    $and: [{ "fromId.matchId": matchId }, { toId: userId }],
+  })
     .then((data) => {
-      res.send(data)
+      console.log(data);
+      res.send(data);
     })
-  };
+    .catch((error) => {
+      next(new Error(error));
+    });
+};
+
+exports.invitationRejected = (req, res, next) => {
+  const { id } = req.params;
+  Invitation.updateOne({ where: id }, { status: rejected })
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((error) => {
+      next(new Error(error));
+    });
+};

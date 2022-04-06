@@ -3,19 +3,18 @@ const { Schema } = mongoose;
 const Invitation = require("../models/Invitation");
 
 const matchSchema = new Schema({
-  league: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "league",
-    },
-  ],
-  equipo_1: [
+  league: {
+    type: Schema.Types.ObjectId,
+    ref: "league",
+  },
+
+  team_1: [
     {
       type: Schema.Types.ObjectId,
       ref: "user",
     },
   ],
-  equipo_2: [
+  team_2: [
     {
       type: Schema.Types.ObjectId,
       ref: "user",
@@ -33,9 +32,15 @@ const matchSchema = new Schema({
       ref: "invitation",
     },
   ],
-  fecha: {
+  invitationText: {
+    type: String,
+  },
+  date: {
     type: String,
     // default: Date.now(),
+  },
+  time: {
+    type: String,
   },
   status: {
     type: String,

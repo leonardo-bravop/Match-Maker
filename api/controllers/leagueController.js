@@ -3,49 +3,96 @@ const User = require("../models/Users");
 const Match = require("../models/Match");
 const Elo = require("../models/Elo");
 
-exports.new = (req, res) => {
-  const { name, description, sport, color, img } = req.body;
+exports.new = (req, res, next) => {
+  const { name, sport, description, isPrivate, secretKey, color, img } =
+    req.body;
   League.findOne({ name })
     .then((league) => {
       if (league) {
         res.status(400);
-        throw new Error("League Already Exists");
+        next(new Error("League Already Exists"));
       } else {
-        League.create({ name, description, sport, color, img })
+        League.create({
+          name,
+          sport,
+          description,
+          isPrivate,
+          secretKey,
+          color,
+          img,
+        })
           .then((league) => {
             res.sendStatus(201);
           })
           .catch((error) => {
-            res.json({ message: error });
+            next(new Error(error));
           });
       }
     })
     .catch((error) => {
-      res.json({ message: error });
+      next(new Error(error));
     });
 };
 
-exports.addUser = (req, res) => {
+exports.addUser = (req, res, next) => {
   const { leagueId, userId } = req.params;
-  League.findByIdAndUpdate(
-    leagueId,
-    { $push: { users: userId } },
-    { new: true, useFindAndModify: false }
-  ).then((users) => {
-    Elo.create({ league: leagueId, user: userId }).then((elo) => {
-      const eloId = elo._id.toString();
-      User.findByIdAndUpdate(
-        userId,
-        { $push: { leagues: leagueId, elo: eloId } },
-        { new: true, useFindAndModify: false }
-      ).then(() => res.send(users));
+  const { enteredKey } = req.body;
+  let updatedLeague = {};
+  League.findById(leagueId)
+    .then((league) => {
+      if (!league) {
+        res.status(400);
+        next(new Error("Invalid leagueId or userId"));
+        return false;
+      } else if (league.users.includes(userId)) {
+        res.status(400);
+        next(new Error("User is already in the league"));
+        return "already";
+      }
+      if (league.isPrivate) {
+        return league.matchSecretKey(enteredKey);
+      } else return true;
+    })
+    .then((isValid) => {
+      if (isValid === true) {
+        return League.findByIdAndUpdate(
+          leagueId,
+          { $push: { users: userId } },
+          { new: true, useFindAndModify: false }
+        );
+      } else if (isValid === "already") {
+        return false;
+      } else {
+        res.status(400);
+        next(new Error("Invalid SecretKey"));
+        return false;
+      }
+    })
+    .then((league) => {
+      if (league) {
+        updatedLeague = league;
+        return Elo.create({ league: leagueId, user: userId }).then((elo) => {
+          const eloId = elo._id.toString();
+          User.findByIdAndUpdate(
+            userId,
+            { $push: { leagues: leagueId, elo: eloId } },
+            { new: true, useFindAndModify: false }
+          );
+        });
+      }
+    })
+    .then(() => {
+      if (updatedLeague._id) {
+        res.send(updatedLeague);
+      }
+    })
+    .catch((error) => {
+      res.status(400);
+      next(new Error(error));
     });
-  });
 };
 
-//devolver users ordenados por elo
-
-exports.deleteUser = (req, res) => {
+exports.deleteUser = (req, res, next) => {
   const { leagueId, userId } = req.params;
   League.findById(leagueId).then((league) => {
     console.log("entre al then del league");
@@ -89,105 +136,147 @@ exports.deleteUser = (req, res) => {
           });
         });
       })
-      .catch(() => {
-        console.log("error al deletear");
+      .catch((error) => {
+        res.status(400);
+        next(new Error(error));
       });
   });
 };
 
-exports.getUserByLeagueId = (req, res) => {
+exports.getUserByLeagueId = (req, res, next) => {
   const { leagueId } = req.params;
-  League.findById(leagueId).then((league) => {
-    User.find(
-      { _id: { $in: league.users } },
-      { _id: 1, nickname: 1, img: 1 }
-    ).then((users) => {
-      res.send(users);
+  League.findById(leagueId)
+    .populate({
+      path: "users",
+      select: "nickname img elo",
+      populate: { path: "elo", match: { league: leagueId }, select: "value" },
+    })
+    .then(({ users }) => {
+      if (users) {
+        users.sort((a, b) => {
+          if (a["elo"][0] && b["elo"][0]) {
+            console.log(`a elo value es`, a["elo"]["0"]["value"]);
+            return a["elo"]["0"]["value"] > b["elo"]["0"]["value"]
+              ? -1
+              : b["elo"]["0"]["value"] > a["elo"]["0"]["value"]
+              ? 1
+              : 0;
+          } else if (!a["elo"][0] && b["elo"][0]) return 1;
+          else if (!b["elo"][0] && a["elo"][0]) return -1;
+        });
+        const rankedUsers = users.map((user, i) => {
+          return { rank: i + 1, ...user._doc };
+        });
+        res.send(rankedUsers);
+      } else {
+        res.status(400);
+        next(new Error("Invalid league id"));
+      }
+    })
+    .catch((error) => {
+      res.status(400);
+      next(new Error("An error ocurred"));
     });
-  });
 };
 
-// exports.newLeague = (req, res) => {
-//   const { name, description, matches, users, img } = req.body;
-//   League.create({
-//     name: name,
-//     description: description,
-//     matches: matches,
-//     users: users,
-//     img
-//   }
-//   ).then((data) => {
-//     res.send(data)
-//   })
-// };
-
-exports.deleteLeague = (req, res) => {
+exports.deleteLeague = (req, res, next) => {
   const { id } = req.params;
-  League.deleteOne({ _id: id }).then((data) => {
-    res.send(data);
-  });
+  League.deleteOne({ _id: id })
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((error) => {
+      res.status(400);
+      next(new Error(error));
+    });
 };
 
 //get league by id
-exports.findShowLeague = (req, res) => {
+exports.findShowLeague = (req, res, next) => {
   const { id } = req.params;
-  League.findById(id).then((data) => {
-    res.send(data);
-  });
+  League.findById(id)
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((error) => {
+      res.status(400);
+      next(new Error(error));
+    });
 };
 
-exports.getAll = (req, res) => {
-  League.find({}).then((data) => {
-    res.send(data);
-  });
+exports.getAll = (req, res, next) => {
+  League.find({})
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((error) => {
+      res.status(400);
+      next(new Error(error));
+    });
 };
 
-exports.editLeague = (req, res) => {
+exports.editLeague = (req, res, next) => {
   const { id } = req.params;
   const { name, description, users } = req.body;
   League.updateOne(
     { name: name, description: description, users: users },
     { where: id }
-  ).then((data) => {
-    res.send(data);
-  });
-};
-
-exports.showHistoryLeague = (req, res) => {
-  const { leagueId } = req.params;
-  League.findById(leagueId).then((league) => {
-    Match.find({ _id: { $in: league.matches } }).then((users) => {
-      res.send(users);
+  )
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((error) => {
+      res.status(400);
+      next(new Error(error));
     });
-  });
 };
 
-exports.findLeagueByName = (req, res) => {
+exports.showHistoryLeague = (req, res, next) => {
+  const { leagueId } = req.params;
+  League.findById(leagueId)
+    .then((league) => {
+      Match.find({ _id: { $in: league.matches } }).then((users) => {
+        res.send(users);
+      });
+    })
+    .catch((error) => {
+      res.status(400);
+      next(new Error(error));
+    });
+};
+
+exports.findLeagueByName = (req, res, next) => {
   const { leagueName } = req.body;
-  const concatenado = leagueName
+  if (leagueName) {
+    const cleanedName = leagueName
     .trim()
     .split(" ")
     .filter((el) => el !== "");
   let reg = "";
-  if (concatenado.length > 1) {
-    reg = concatenado.join("|");
-    const otroArray = reg.split(" ");
-    otroArray.push(")");
-    otroArray.unshift("(");
-    reg = otroArray.join("");
-    console.log(otroArray);
+  if (cleanedName.length > 1) {
+    reg = cleanedName.join("|");
+    reg = "(" + reg + ")";
   } else {
-    reg = concatenado.join("");
+    reg = cleanedName.join("");
   }
-  const pruebaRegex = new RegExp(reg, "i");
-  League.find({ name: { $regex: pruebaRegex }})
+  const searchReg = new RegExp(reg, "i");
+  League.find({ name: { $regex: searchReg } })
     .select("name")
     .then((leagues) => {
       res.send(leagues);
+    })
+    .catch((error) => {
+      res.status(400);
+      next(new Error(error));
     });
   // League.find({ $text : { $search: `'${leagueName}'`, $caseSensitive:false } })
   // .then((result) => {
   //   console.log(result);
   // res.send(result);
   // });
+  }
+  else {
+    res.status(400);
+    next(new Error(error));
+  }
 };
