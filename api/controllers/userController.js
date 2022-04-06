@@ -152,6 +152,7 @@ exports.me = (req, res, next) => {
   });
 };
 
+//add rank to league info
 exports.getLeaguesByUserId = (req, res, next) => {
   const { userId } = req.params;
   User.findById(userId)

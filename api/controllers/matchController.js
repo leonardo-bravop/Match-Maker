@@ -4,7 +4,7 @@ const Invitation = require("../models/Invitation");
 const League = require("../models/League");
 const Result = require("../models/Result");
 
-//verificar que la longitud de team_1 sea igual a la de team_2
+//falta verificar que la longitud de team_1 sea igual a la de team_2
 exports.newMatch = (req, res, next) => {
   const { team_1, team_2, league, invitationText, date, time } = req.body;
   Match.create({ team_1, team_2, league, invitationText, date, time }).then(
@@ -93,8 +93,12 @@ exports.deleteMatch = (req, res, next) => {
           const filteredMatches = user.matches.filter(
             (matchId) => matchId !== id
           );
+          user.matches = filteredMatches
+          console.log(`user updated es`, user)
+          return user.save()
         });
-      });
+      })
+      return Promise.all(promisesArray)
     })
     .then(() => {
       res.send(matchDirection);
