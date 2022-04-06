@@ -9,6 +9,7 @@ import selectLeaguesReducer from "./selectLeague";
 import membersReducer from "./memberList";
 import {teamsReducer} from "./teams";
 import { checksReducer } from './checks';
+import { matchReducer } from "./record";
 
 const store = configureStore({
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger),
@@ -20,6 +21,7 @@ const store = configureStore({
     members: membersReducer,
     teams: teamsReducer,
     checks: checksReducer,
+    match: matchReducer
   },
 });
 

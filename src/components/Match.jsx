@@ -41,7 +41,10 @@ const Match = ({navigation}) => {
    let [match, setMatch] = useState({})
    let [selectedValue, setSelectedValue] = useState("")
    let [showCard, setShowCard] = useState(false)
-   let [onDate, setOnDate] = useState(moment().format("YYYY-MM-DD"))
+   let [onDate, setOnDate] = useState(moment())
+   let [nicks1, setNicks1] = useState([])
+   let [nicks2, setNicks2] = useState([])
+   let [description, setDescription] = useState("")
    
 
    const dispatch = useDispatch();
@@ -92,21 +95,49 @@ const Match = ({navigation}) => {
       .get(`${uri}/api/league/showLeague/${itemValue}`)
       .then( ({ data }) => {
          setActualLeague(data)
+         dispatch( resetChecks() )
+         dispatch( resetTeams() )
       })
    }
    
 
    const createHandler = () => {
 
+         let members1Nick = []
+         let members1Id = []
+         teams.teamA.map( item =>{
+            members1Nick = [...members1Nick, item.nick]
+            members1Id = [...members1Id, item.id]
+            return
+         })
+         let members2Nick = []
+         let members2Id = []
+         teams.teamB.map( item =>{
+            members2Nick = [...members2Nick, item.nick]
+            members2Id = [...members2Id, item.id]
+            return
+         })
+
+         setNicks1(members1Nick)
+         setNicks2(members2Nick)
+
+         console.log("Descri                 \n\n\n", description)
+
          setMatch({
-            equipo_1: teams.teamA, 
-            equipo_2: teams.teamB, 
-            fecha: onDate
+            league:actualleague._id,
+            // team_1: members1Id, 
+            // team_2: members2Id, 
+            // date: moment(onDate, "DD-MM-YYYY"),
+            // time: "16:45",
+            // invitationText: "",
+            equipo_1: members1Id,
+            equipo_2: members2Id,
+            time: "16:45",
+            fecha: moment(onDate, "DD-MM-YYYY")
          })
 
          setShowCard(true)
 
-         dispatch( resetTeams() )
    }
 
    const confirmHandler = () => {
@@ -115,7 +146,8 @@ const Match = ({navigation}) => {
       .post(`${uri}/api/match/newMatch`, match)
       .then(()=>{
          setShowCard(false)
-         dispatch(resetChecks())
+         dispatch( resetChecks() )
+         dispatch( resetTeams() )
          navigation.navigate('Historial')
       })
    }
@@ -165,36 +197,27 @@ const Match = ({navigation}) => {
                <View style={[matchStyles.calendar]}>
                   <CalendarStrip
                      scrollable
+                     iconContainer={{flex: 0.1}}
+                     style={{height:110, paddingTop: 20, paddingBottom: 5}}
                      iconStyle={{backgroundColor: 'white'}}
                      highlightDateNameStyle={{color: 'red'}}
                      highlightDateNumberStyle={{color: 'red'}}
-                     minDate={"01-01-2022"}
-                     maxDate={"05-31-2022"}
-                     style={{height:100, paddingTop: 20, paddingBottom: 5}}
                      calendarHeaderStyle={{color: 'white'}}
                      dateNumberStyle={{color: 'white'}}
                      dateNameStyle={{color: 'white'}}
-                     iconContainer={{flex: 0.1}}
                      locale={ {name: "es", config: {
                         months: 'Enero_Febrero_Marzo_Abril_Mayo_Junio_Julio_Agosto_Septiembre_Octubre_Noviembre_Diciembre'.split('_'),
                         weekdaysShort: 'DOM_LUN_MAR_MIE_JUE_VIE_SAB'.split('_'),}}}
+                     minDate={moment("01-01-2022", "MM-DD-YYYY")}
+                     maxDate={moment().add(6, "M")}
                      selectedDate={onDate}
-                     onDateSelected={ selected => setOnDate(selected.format("YYYY-MM-DD"))}
+                     onDateSelected={ selected => 
+                        setOnDate(moment(selected, "YYYY-MM-DDTHH:mm:ss.SSSZ"))}
                   />
                </View>
 
                <View style={{marginHorizontal: 16, height: 84, marginTop: 16, borderRadius: 10}}>
-                  <ScrollView>
-                     <TextInput
-                        style={{backgroundColor:"white", paddingHorizontal: 8,borderRadius: 10}}
-                        multiline={true}
-                        numberOfLines={4}
-                        placeholder="Texto de invitacion"
-                        name="textArea"
-                        keyboardType="default"
-                        value={"1"}
-                     />
-                  </ScrollView>
+                  
                </View>
       
                <TouchableOpacity style={[leagueStyles.join, {backgroundColor:"#16a085"}]} 
@@ -228,12 +251,51 @@ const Match = ({navigation}) => {
                   </Pressable>
                   
                   <View style={{ flex: 1, backgroundColor: "blue"}} >
-                     <View style={{ height: 50, backgroundColor: "green"}} >
+                     <View style={{ height: 50, backgroundColor: "green", alignItems: "center", justifyContent: "center"}} >
+                        <Text>
+                           Detalles del match
+                        </Text>
                      </View>
                      <View style={{ flex: 1, backgroundColor: "yellow"}} >
+
+                        <View style={{ flex: 1, backgroundColor: "blue", flexDirection: "row"}} >
+                           <View style={{ flex: 1, backgroundColor: "grey", alignItems: "center"}} >
+                              <Text style={{ marginVertical: 8}}>Equipo A</Text>
+                              <View style={{flex: 1, alignItems: "center"}}>
+                                 {nicks1.map( (nick, i) => {
+                                    return (
+                                       <Text>{nick}</Text>)
+                                 })}
+                              </View>
+                              </View>
+                           <View style={{ flex: 1, backgroundColor: "red", alignItems: "center"}} >
+                              <Text style={{ marginVertical: 8}}>Equipo B</Text>
+                              <View style={{flex: 1, alignItems: "center"}}>
+                                 {nicks2.map( (nick, i) => {
+                                    return (
+                                       <Text>{nick}</Text>)
+                                 })}
+                              </View>
+                           </View>
+                        </View>
+
                         <Text>
-                           {match.fecha}
+                           El partido se disputara el {moment(match.fecha).format("DD [de] MMMM [de] YYYY")} a las {match.time}
                         </Text>
+                        <View style={{ height: 84, marginTop: 16, borderRadius: 10}}>
+                           <ScrollView>
+                              <TextInput
+                                 style={{backgroundColor:"white", paddingHorizontal: 8,borderRadius: 10}}
+                                 multiline={true}
+                                 numberOfLines={4}
+                                 placeholder="Texto de invitacion"
+                                 name="textArea"
+                                 keyboardType="default"
+                                 onChangeText={ text =>setDescription(text)}
+                                 value={description}
+                              />
+                           </ScrollView>
+                        </View>
                      </View>
                      <View style={{ height: 115, backgroundColor: "red"}} >
                         <TouchableOpacity style={[leagueStyles.join, {backgroundColor:"#16a085"}]} 
