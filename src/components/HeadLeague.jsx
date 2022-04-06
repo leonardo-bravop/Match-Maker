@@ -1,7 +1,8 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { View, Text, Picker } from "react-native";
+import { View, Text } from "react-native";
 import Constants from "expo-constants";
+import {Picker} from '@react-native-picker/picker'
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { leagueStyles } from "../styles/league";
