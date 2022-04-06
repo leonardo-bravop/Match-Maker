@@ -8,22 +8,24 @@ import {
   StyleSheet,
   TouchableHighlight,
   TouchableOpacity,
+  ActivityIndicator
 } from "react-native";
 import { Formik } from "formik";
 import * as yup from "yup";
 import { formR } from "../styles/form";
-
 import { useEffect, useState } from "react";
 import axios from "axios";
-
 import Constants from "expo-constants";
 
 const { manifest } = Constants;
-
 const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 
+
 function Register({ navigation }) {
+  const [isLoading, setIsLoading] = useState(false)
+
   const handleRegister = (values) => {
+    setIsLoading(true)
     axios.post(`${uri}/api/user/register`, values).then((res) => {
       res.status == 201 ? navigation.navigate("Login") : null;
     });
@@ -154,6 +156,7 @@ function Register({ navigation }) {
       >
         Login
       </Text>
+      {isLoading ? <ActivityIndicator size="large" color="#00ff00" /> : null}
     </SafeAreaView>
   );
 }
