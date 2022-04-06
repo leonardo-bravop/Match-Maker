@@ -23,48 +23,12 @@ const Record = () => {
     const user= useSelector( state => state.user)
 
     useEffect(()=>{
-
+      console.log("este es el usuario", user)
       axios.get(`${uri}/api/user/getMatches/${user._id}`)
       .then(({data}) => {
-          console.log("Esta es la data\n\n", data ,"\n")
+          setRecordList(data)
       })
-
-      setRecordList([{
-        color: "blue",
-        nickname: "menganito",
-        result: false
-    },{
-        color: "red",
-        nickname: "fulan",
-        result: true
-    },{
-        color: "yellow",
-        nickname: "nito",
-        result: false
-    },
-        {
-          color: "green",
-          nickname: "fulanito",
-          result: true
-      },{
-        color: "blue",
-        nickname: "menganito",
-        result: false
-    },{
-        color: "red",
-        nickname: "fulan",
-        result: true
-    },{
-        color: "yellow",
-        nickname: "nito",
-        result: false
-    },
-        {
-          color: "green",
-          nickname: "fulanito",
-          result: true
-      },
-    ])
+      
     },[])
     
     return (
@@ -79,7 +43,6 @@ const Record = () => {
               <CalendarStrip
                 scrollable
                 startingDate={Date.now()}
-                iconStyle={{color: 'white'}}
                 highlightDateNameStyle={{color: 'red'}}
                 highlightDateNumberStyle={{color: 'red'}}
                 minDate={"01-01-2022"}

@@ -7,9 +7,10 @@ import { record2Styles } from "../styles/record";
 const ItemRecord = ({ item }) => {
 
    return (
-      <TouchableOpacity style={[record2Styles.item]} >
-         <View style={[record2Styles.date, {backgroundColor: item.color}]}>
-            <Text style={{color: '#FFFFFF'}}>16 OCT</Text>
+      <View>
+      <TouchableOpacity style={[record2Styles.item] }>
+         <View style={[record2Styles.date, {backgroundColor: "grey"}]}>
+            <Text style={{color: '#FFFFFF'}}>{item.fecha} {item.status}</Text>
          </View>
          
          <View style={{flex:1, borderBottomRightRadius: 10, borderTopRightRadius: 10}}>
@@ -26,30 +27,28 @@ const ItemRecord = ({ item }) => {
          
             <View style={{flex:1, flexDirection: "row", borderBottomRightRadius: 10 }}>
                <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
-                  
-                  <Text style={{color: '#FFFFFF'}}>
-                     {item.nickname}
-                  </Text>
-                  <Text style={{color: '#FFFFFF'}}>
-                     {item.nickname}
-                  </Text>
-                  <Text style={{color: '#FFFFFF'}}>
-                     {item.nickname} 5+
-                  </Text>
-               
+                  {item.equipo_1.map( (user, i, arr) => {
+                     if (i>2) return (<></>)
+                     return (
+                     <Text style={{color: '#FFFFFF'}} key= {i}>
+                        {arr.length > 3 && i === 2 
+                        ?  `${user.nickname}`+` y ${arr.length-3} mas` 
+                        : user.nickname }
+                     </Text>)
+                  })}
                </View>
          
                <View style={{flex: 1, justifyContent: "center", alignItems: "center" , borderBottomRightRadius: 10}}>
 
-                  <Text style={{color: '#FFFFFF'}}>
-                     {item.nickname}
-                  </Text>
-                  <Text style={{color: '#FFFFFF'}}>
-                     {item.nickname}
-                  </Text>
-                  <Text style={{color: '#FFFFFF'}}>
-                     {item.nickname} 5+
-                  </Text>
+                  {item.equipo_2.map( (user, i, arr) => {
+                     if (i>2) return (<></>)
+                     return (
+                     <Text style={{color: '#FFFFFF'}} key= {i}>
+                        {arr.length > 3 && i === 2 
+                        ?  `${user.nickname}`+` y ${arr.length-3} mas` 
+                        : user.nickname }
+                     </Text>)
+                  })}
                
                </View>
             </View>
@@ -57,6 +56,7 @@ const ItemRecord = ({ item }) => {
          </View>
          
       </TouchableOpacity> 
+      </View>
   );
 };
 

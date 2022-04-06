@@ -2,72 +2,79 @@ import { View, Text } from "react-native";
 import React, { useEffect, useState } from "react";
 import { leagueStyles } from "../styles/league";
 import { CheckBox } from 'react-native-elements';
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useDispatch, useSelector } from "react-redux";
+import { removeTeam, setTeam, setTeamA } from "../state/teams";
 
 const ItemMatch = ({ item }) => {
-   let [userData, setUserData] = useState(null),
-      [select, setSelect] = useState(false),
+      
+   let [select, setSelect] = useState(false),
       [select2, setSelect2] = useState(false)
 
-   const setTeam = async (team, value, del) => {
-         try {
-            const jsonTeam = await AsyncStorage.getItem(team)
-            let arr = jsonTeam ? JSON.parse(jsonTeam) : [];
-            if ( del ){
-               arr = arr.filter( element => value !== element )
-            }
-            else{
-               arr.push(value)
-            }
-            const jsonArr = JSON.stringify(arr)
-            await AsyncStorage.setItem(team, jsonArr)
-         } catch (e) { console.log(e)
-         }
-      }
+   const dispatch = useDispatch();
+
+   const isCreated = useSelector( state => state.checks )
+
+   useEffect(()=>{
+      setSelect(false)
+      setSelect2(false)
+   },[isCreated])
+
       
-      const checker = () => {
-         setTeam("A", item.id, select)
-         setSelect(!select)
-         setSelect2(false)
+   const checker = () => {
+      if ( select ){
+         dispatch( removeTeam({ team: "teamA", id: item.id }))
       }
+      else {
+         dispatch( setTeam({ team: "teamA", id: item.id }))
+      }
+      setSelect(!select)
+      setSelect2(false)
+   }
       
-      const checker2 = () => {
-         setTeam("B", item.id, select2)
-         setSelect2(!select2)
-         setSelect(false)
+   const checker2 = () => {
+      if ( select2 ){
+         dispatch( removeTeam({ team: "teamB", id: item.id }))
       }
+      else {
+         dispatch( setTeam({ team: "teamB", id: item.id }))
+      }
+      setSelect2(!select2)
+      setSelect(false)
+   }
 
    return (
       <View style={leagueStyles.item}>
-         <View style={leagueStyles.rank}>
-            <Text style={{color: '#FFFFFF'}}>{item.rank}</Text>
-         </View>
-         <View style={[leagueStyles.img, {backgroundColor: "blue"                                                                                                                                                                                                                                                                              }]}>
-         </View>
-         <View style={leagueStyles.nick}>
-            <Text style={{color: '#FFFFFF'}}>{item.nickname}</Text>
-         </View>
          <View style={[leagueStyles.elo, {flexDirection: "row"}]}>
             <View style={leagueStyles.checkContainer}>
                <CheckBox
                   checked={select}
                   onPress={checker}
-                  iconType="material"
-                  uncheckedIcon="add"
-                  checkedIcon="clear"
+                  iconType="ionicon"
+                  uncheckedIcon="checkbox-outline"
+                  checkedIcon="checkbox"
                   uncheckedColor='green'
-                  checkedColor="red"
+                  checkedColor="green"
                />
             </View>
+         </View>
+
+         <View style={[leagueStyles.img, {backgroundColor: "blue"                                                                                                                                                                                                                                                                              }]}>
+         </View>
+         
+         <View style={leagueStyles.nick}>
+            <Text style={{color: '#FFFFFF'}}>{item.nickname}</Text>
+         </View>
+
+         <View style={[leagueStyles.elo, {flexDirection: "row"}]}>
             <View style={leagueStyles.checkContainer}>
                <CheckBox
                   checked={select2}
                   onPress={checker2}
-                  iconType="material"
-                  uncheckedIcon="add"
-                  checkedIcon="clear"
+                  iconType="ionicon"
+                  uncheckedIcon="checkbox-outline"
+                  checkedIcon="checkbox"
                   uncheckedColor='green'
-                  checkedColor="red"
+                  checkedColor="green"
                />
             </View>
          </View>
