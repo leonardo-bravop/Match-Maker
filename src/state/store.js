@@ -7,6 +7,8 @@ import userLeaguesReducer from "./userLeague";
 import leaguesReducer from "./league";
 import selectLeaguesReducer from "./selectLeague";
 import membersReducer from "./memberList";
+import {teamsReducer} from "./teams";
+import { checksReducer } from './checks';
 
 const store = configureStore({
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger),
@@ -16,6 +18,8 @@ const store = configureStore({
     leagues: leaguesReducer,
     selectLeague: selectLeaguesReducer,
     members: membersReducer,
+    teams: teamsReducer,
+    checks: checksReducer,
   },
 });
 
