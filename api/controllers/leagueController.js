@@ -164,9 +164,11 @@ exports.showHistoryLeague = (req, res) => {
 
 exports.findLeagueByName = (req, res) => {
   const { leagueName } = req.body;
-  const concatenado = leagueName.split(" ");
+  const concatenado = leagueName
+    .trim()
+    .split(" ")
+    .filter((el) => el !== "");
   let reg = "";
-  console.log(concatenado);
   if (concatenado.length > 1) {
     reg = concatenado.join("|");
     const otroArray = reg.split(" ");
@@ -177,11 +179,8 @@ exports.findLeagueByName = (req, res) => {
   } else {
     reg = concatenado.join("");
   }
-
-  console.log(reg);
-  console.log(`al final concat es`, concatenado);
-
-  League.find({ name: { $regex: reg }, $options: "i" })
+  const pruebaRegex = new RegExp(reg, "i");
+  League.find({ name: { $regex: pruebaRegex }})
     .select("name")
     .then((leagues) => {
       res.send(leagues);
