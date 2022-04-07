@@ -208,7 +208,7 @@ exports.findShowLeague = (req, res, next) => {
 //dividir get all en privadas y publicas
 exports.getAll = (req, res, next) => {
   const{isPrivate} = req.params
-  League.find({isPrivate})
+  League.find({isPrivate: (isPrivate==="true")})
     .then((data) => {
       res.send(data);
     })

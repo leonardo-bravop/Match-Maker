@@ -6,8 +6,8 @@ const { manifest } = Constants;
 
 const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 
-export const setLeagues = createAsyncThunk("GET_LEAGUES", () => {
-  return axios.get(`${uri}/api/league/getAll`).then((res) => res.data);
+export const setLeagues = createAsyncThunk("GET_LEAGUES", (isPrivate) => {
+  return axios.get(`${uri}/api/league/getAll/private/${isPrivate}`).then((res) => res.data);
 });
 
 const initialState = [];

@@ -127,7 +127,7 @@ function Home({ navigation: { navigate } }) {
           setUserLeagues({ userId: result.payload._id })
         );
       }
-      const { payload } = await dispatch(setLeagues());
+      const { payload } = await dispatch(setLeagues(false));
     } catch (err) {
       console.log(err);
     }
