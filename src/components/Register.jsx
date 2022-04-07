@@ -8,7 +8,7 @@ import {
   StyleSheet,
   TouchableHighlight,
   TouchableOpacity,
-  ActivityIndicator
+  ActivityIndicator,
 } from "react-native";
 import { Formik } from "formik";
 import * as yup from "yup";
@@ -20,26 +20,25 @@ import Constants from "expo-constants";
 const { manifest } = Constants;
 const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 
-
 function Register({ navigation }) {
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleRegister = (values) => {
-    setIsLoading(true)
+    setIsLoading(true);
     axios.post(`${uri}/api/user/register`, values).then((res) => {
+      setIsLoading(false)
       res.status == 201 ? navigation.navigate("Login") : null;
     });
   };
 
   const validationSchema = yup.object().shape({
-    name: yup
-      .string("Ingresa tu nombre")
-      .required("*Campo requerido")
-      .max(10, "La contraseña debe tener un maximo de 10 caracteres"),
-
+    name: yup.string("Ingresa tu nombre").required("*Campo requerido"),
     surname: yup.string("Ingresa tu apellido").required("*Campo requerido"),
 
-    nickname: yup.string("Ingresa tu nickname").required("*Campo requerido"),
+    nickname: yup
+      .string("Ingresa tu nickname")
+      .required("*Campo requerido")
+      .max(10, "El nickname debe tener un maximo de 10 caracteres"),
 
     email: yup
       .string("Ingresa tu email")
@@ -49,7 +48,11 @@ function Register({ navigation }) {
     password: yup
       .string("Ingresa tu eontraseña")
       .min(8, "La contraseña debe tener al menos 8 caracteres")
-      .required("*Campo requerido").matches(/^(?=(.*[A-Z]){1,})(?=(.*[0-9]){1,}).{8,}$/, "La contraseña debe tener al menos una mayúscula"),
+      .required("*Campo requerido")
+      .matches(
+        /^(?=(.*[A-Z]){1,})(?=(.*[0-9]){1,}).{8,}$/,
+        "La contraseña debe tener al menos una mayúscula y un número"
+      ),
   });
 
   return (

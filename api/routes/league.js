@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const leagueController = require("../controllers/leagueController")
 
-router.get("/getAll", leagueController.getAll)
+router.get("/getAll/private/:isPrivate", leagueController.getAll)
 
 router.post("/new", leagueController.new);
 
@@ -11,8 +11,6 @@ router.put("/:leagueId/addUser/:userId", leagueController.addUser);
 router.put("/:leagueId/deleteUser/:userId", leagueController.deleteUser);
 
 router.get("/getUsers/:leagueId", leagueController.getUserByLeagueId)
-
-// router.post("/newLeague", leagueController.newLeague);
 
 router.delete("/deleteLeague/:id", leagueController.deleteLeague);
 

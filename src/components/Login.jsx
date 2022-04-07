@@ -49,7 +49,7 @@ function Login({ navigation }) {
 
     password: yup
       .string("Ingresa tu Contraseña")
-      .min(6, "La contraseña debe tener al menos 6 caracteres")
+      .min(8, "La contraseña debe tener al menos 8 caracteres")
       .required("*Campo requerido"),
   });
 
@@ -100,7 +100,7 @@ function Login({ navigation }) {
             )}
             </View>
 
-            <TouchableOpacity style={form.colorBtn} onPress={handleSubmit}>
+            <TouchableOpacity disable style={form.colorBtn} onPress={handleSubmit}>
               <Text style={form.colorTxtBtn}>Aceptar</Text>
             </TouchableOpacity>
           </>

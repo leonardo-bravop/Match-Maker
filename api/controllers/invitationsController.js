@@ -1,4 +1,5 @@
 const Invitation = require("../models/Invitation");
+const Match = require("../models/Match");
 
 exports.deleteAll = (req, res, next) => {
   Invitation.deleteMany()
@@ -12,21 +13,46 @@ exports.deleteAll = (req, res, next) => {
 
 exports.matchInvitationAcepted = (req, res, next) => {
   const { matchId, userId } = req.params;
-  Invitation.findOne({
-    $and: [{ "fromId.matchId": matchId }, { toId: userId }],
-  })
-    .then((data) => {
-      console.log(data);
-      res.send(data);
+  Invitation.findOneAndUpdate(
+    {
+      $and: [{ "fromId.matchId": matchId }, { toId: userId }],
+    },
+    { status: "accepted" }, {new: true}
+  )
+    .then((updatedInvitation) => {
+      return Match.findById(matchId).populate([
+        { path: "invitations_team1" },
+        { path: "invitations_team2" },
+      ]);
     })
+    .then((match) => {
+      let acceptedNumber = 0
+      const invitationsArray = match["invitations_team1"].concat(
+        match["invitations_team2"]
+      );
+      invitationsArray.forEach(invitation => {
+        if(invitation.status ==="accepted") acceptedNumber++
+      })
+      if(acceptedNumber === invitationsArray.length) {
+        return Match.findByIdAndUpdate(matchId, {status: "active"}, {new: true})
+      }
+      else {
+       return match
+      }
+    }).then(result=>res.send(result))
     .catch((error) => {
       next(new Error(error));
     });
 };
 
 exports.invitationRejected = (req, res, next) => {
-  const { id } = req.params;
-  Invitation.updateOne({ where: id }, { status: rejected })
+  const { matchId, userId } = req.params;
+  Invitation.findOneAndUpdate(
+    {
+      $and: [{ "fromId.matchId": matchId }, { toId: userId }],
+    },
+    { status: "rejected" }, {new: true}
+  )
     .then((data) => {
       res.send(data);
     })

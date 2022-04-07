@@ -26,12 +26,11 @@ const resultSchema = new Schema({
         required: [true, "Please, team 2 confirm the result"],
         default: false
     },
-  match: [
+  match: 
     {
       type: Schema.Types.ObjectId,
       ref: "match",
     },
-  ],
 });
 
 const Result = mongoose.model("result", resultSchema);

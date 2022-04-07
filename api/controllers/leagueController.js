@@ -22,7 +22,7 @@ exports.new = (req, res, next) => {
           img,
         })
           .then((league) => {
-            res.sendStatus(201);
+            res.status(201).send(league);
           })
           .catch((error) => {
             next(new Error(error));
@@ -71,17 +71,18 @@ exports.addUser = (req, res, next) => {
     .then((league) => {
       if (league) {
         updatedLeague = league;
-        return Elo.create({ league: leagueId, user: userId }).then((elo) => {
-          const eloId = elo._id.toString();
-          User.findByIdAndUpdate(
-            userId,
-            { $push: { leagues: leagueId, elo: eloId } },
-            { new: true, useFindAndModify: false }
-          );
-        });
+        return Elo.create({ league: leagueId, user: userId });
       }
     })
-    .then(() => {
+    .then((elo) => {
+      const eloId = elo._id.toString();
+      return User.findByIdAndUpdate(
+        userId,
+        { $push: { leagues: leagueId, elo: eloId } },
+        { new: true, useFindAndModify: false }
+      );
+    })
+    .then((result) => {
       if (updatedLeague._id) {
         res.send(updatedLeague);
       }
@@ -204,8 +205,10 @@ exports.findShowLeague = (req, res, next) => {
     });
 };
 
+//dividir get all en privadas y publicas
 exports.getAll = (req, res, next) => {
-  League.find({})
+  const{isPrivate} = req.params
+  League.find({isPrivate: (isPrivate==="true")})
     .then((data) => {
       res.send(data);
     })
@@ -249,33 +252,32 @@ exports.findLeagueByName = (req, res, next) => {
   const { leagueName } = req.body;
   if (leagueName) {
     const cleanedName = leagueName
-    .trim()
-    .split(" ")
-    .filter((el) => el !== "");
-  let reg = "";
-  if (cleanedName.length > 1) {
-    reg = cleanedName.join("|");
-    reg = "(" + reg + ")";
+      .trim()
+      .split(" ")
+      .filter((el) => el !== "");
+    let reg = "";
+    if (cleanedName.length > 1) {
+      reg = cleanedName.join("|");
+      reg = "(" + reg + ")";
+    } else {
+      reg = cleanedName.join("");
+    }
+    const searchReg = new RegExp(reg, "i");
+    League.find({ name: { $regex: searchReg } })
+      .select("name")
+      .then((leagues) => {
+        res.send(leagues);
+      })
+      .catch((error) => {
+        res.status(400);
+        next(new Error(error));
+      });
+    // League.find({ $text : { $search: `'${leagueName}'`, $caseSensitive:false } })
+    // .then((result) => {
+    //   console.log(result);
+    // res.send(result);
+    // });
   } else {
-    reg = cleanedName.join("");
-  }
-  const searchReg = new RegExp(reg, "i");
-  League.find({ name: { $regex: searchReg } })
-    .select("name")
-    .then((leagues) => {
-      res.send(leagues);
-    })
-    .catch((error) => {
-      res.status(400);
-      next(new Error(error));
-    });
-  // League.find({ $text : { $search: `'${leagueName}'`, $caseSensitive:false } })
-  // .then((result) => {
-  //   console.log(result);
-  // res.send(result);
-  // });
-  }
-  else {
     res.status(400);
     next(new Error(error));
   }
