@@ -16,7 +16,6 @@ import Constants from "expo-constants";
 import moment from 'moment';
 import 'moment/locale/es'
 import CalendarStrip from 'react-native-calendar-strip'
-import {Picker} from '@react-native-picker/picker'
 import { Icon } from "react-native-elements";
 
 import { leagueStyles } from "../styles/league";
@@ -41,7 +40,14 @@ const Match = ({navigation}) => {
    let [match, setMatch] = useState({})
    let [selectedValue, setSelectedValue] = useState("")
    let [showCard, setShowCard] = useState(false)
-   let [onDate, setOnDate] = useState(moment().format("YYYY-MM-DD"))
+   let [showPicker, setShowPicker] = useState(false)
+   let [onDate, setOnDate] = useState(moment())
+   let [nicks1, setNicks1] = useState([])
+   let [nicks2, setNicks2] = useState([])
+   let [description, setDescription] = useState("")
+   let [noPress, setNoPress] = useState(false)
+   let [errMessage, setErrMessage] = useState("No ha seleccionado ningun participante")
+   
    
 
    const dispatch = useDispatch();
@@ -49,9 +55,21 @@ const Match = ({navigation}) => {
    const userData = useSelector( state => state.user)
    const teams = useSelector( state => state.teams )
 
+   useEffect(()=>{
+      setNoPress(false)
+   },[teams])
+
    useEffect(() => {
 
       let rank = 0
+      
+      axios
+      .get(`${uri}/api/user/getLeagues/${userData._id}`)
+      .then(({data})=>{
+         setLeagueList(data)
+         if (selectedValue === "") 
+            setSelectedValue(data[0]._id)
+      })
 
       axios
       .get(`${uri}/api/league/getUsers/${selectedValue}`)
@@ -78,35 +96,56 @@ const Match = ({navigation}) => {
          })
       })
 
+      
       axios
-      .get(`${uri}/api/user/getLeagues/${userData._id}`)
-      .then(({data})=>{
-         setLeagueList(data)
-      })
-
-   },[selectedValue])
-
-   const changeHandler = (itemValue) => {
-
-      axios
-      .get(`${uri}/api/league/showLeague/${itemValue}`)
+      .get(`${uri}/api/league/showLeague/${selectedValue}`)
       .then( ({ data }) => {
          setActualLeague(data)
+         dispatch( resetChecks() )
+         dispatch( resetTeams() )
+         setDescription("")
       })
-   }
-   
+
+   },[selectedValue])   
 
    const createHandler = () => {
+      if (teams.teamA.length === 0 && teams.teamB.length === 0) return setNoPress(true)
+
+      if (teams.teamA.length === teams.teamB.length) {
+         let members1Nick = []
+         let members1Id = []
+         teams.teamA.map( item =>{
+            members1Nick = [...members1Nick, item.nick]
+            members1Id = [...members1Id, item.id]
+            return
+         })
+         let members2Nick = []
+         let members2Id = []
+         teams.teamB.map( item =>{
+            members2Nick = [...members2Nick, item.nick]
+            members2Id = [...members2Id, item.id]
+            return
+         })
+
+         setNicks1(members1Nick)
+         setNicks2(members2Nick)
 
          setMatch({
-            equipo_1: teams.teamA, 
-            equipo_2: teams.teamB, 
-            fecha: onDate
+            league:actualleague._id,
+            team_1: members1Id, 
+            team_2: members2Id, 
+            date: moment(onDate).format("DD-MM-YYYY"),
+            time: "16:45",
+            invitationText: description
          })
 
          setShowCard(true)
 
-         dispatch( resetTeams() )
+      }
+      else {
+         setNoPress(true)
+         setErrMessage("Ambos equipos deben tener igual numero de participantes")
+      }
    }
 
    const confirmHandler = () => {
@@ -115,33 +154,66 @@ const Match = ({navigation}) => {
       .post(`${uri}/api/match/newMatch`, match)
       .then(()=>{
          setShowCard(false)
-         dispatch(resetChecks())
+         dispatch( resetChecks() )
+         dispatch( resetTeams() )
+         setDescription("")
          navigation.navigate('Historial')
       })
    }
 
+   const pressHandler = id =>{
+      setSelectedValue(id)
+      setShowPicker(!showPicker)
+   }
+
    return (
       <SafeAreaView style={leagueStyles.back}>
+         <Modal
+            animationType="fade"
+            transparent={true}
+            visible={showPicker}
+         >
+            <Pressable onPress={() => { setShowPicker(false) }}
+               style={{
+                  height: "100%",  
+                  backgroundColor: 'rgba(30,30,50,0.85)',
+                  justifyContent: "center"}}>
+               
+               <View>
+                  <ScrollView>
+                     <View style={{
+                        flex: 1,
+                        marginHorizontal: 16,
+                        backgroundColor: "#0e0b29", 
+                        padding:10,
+                        borderRadius: 10 }}>
+                        <View style={{ flex: 1}} >
+                           <ScrollView >
+                              <View>
+                                 { leagueList.map( (item, i) => {
+                                    return (
+                                       <TouchableOpacity style={{margin: 7}} onPress={()=>pressHandler(item._id)} >
+                                          <Text style={{ color: "#FFFFFF", fontSize: 16, textAlign: 'center'}}>{item.name}</Text>
+                                       </TouchableOpacity>
+                                    )}
+                                 )}
+                              </View>
+                           </ScrollView>
+                        </View>
+                     </View>
+                  </ScrollView>
+               </View>
+            </Pressable>
+         </Modal>
          
          <View style={[matchStyles.head, {backgroundColor: actualleague.color}]}>
             <View style={matchStyles.info}>
                <Text style={matchStyles.title}>{actualleague.name}</Text>
             </View>
-            <View style={matchStyles.menu}>
-               <Picker
-                  selectedValue={selectedValue}
-                  style={{ height: 50, width: 40, alignSelf: "flex-end", color: actualleague.color}}
-                  itemStyle={{ height: 50 }}
-                  onValueChange={(itemValue, itemIndex) => {
-                     changeHandler(itemValue)
-                     setSelectedValue(itemValue)
-                  }}               
-               >
-                  {leagueList.map( (element, i) => 
-                     <Picker.Item label={element.name} value={element._id} key= {i}/> )}
-               </Picker>
-            </View>
             
+            <TouchableOpacity style={[leagueStyles.menu, {alignSelf: "flex-end", justifyContent:"center"}]} onPress={()=> setShowPicker(true)}>
+               <Icon name="caret-down-circle" type="ionicon" color="green" size = {32}/>
+            </TouchableOpacity>
          </View>
       
          <View style={leagueStyles.body}>
@@ -165,39 +237,34 @@ const Match = ({navigation}) => {
                <View style={[matchStyles.calendar]}>
                   <CalendarStrip
                      scrollable
+                     iconContainer={{flex: 0.1}}
+                     style={{height:110, paddingTop: 20, paddingBottom: 5}}
                      iconStyle={{backgroundColor: 'white'}}
                      highlightDateNameStyle={{color: 'red'}}
                      highlightDateNumberStyle={{color: 'red'}}
-                     minDate={"01-01-2022"}
-                     maxDate={"05-31-2022"}
-                     style={{height:100, paddingTop: 20, paddingBottom: 5}}
                      calendarHeaderStyle={{color: 'white'}}
                      dateNumberStyle={{color: 'white'}}
                      dateNameStyle={{color: 'white'}}
-                     iconContainer={{flex: 0.1}}
                      locale={ {name: "es", config: {
                         months: 'Enero_Febrero_Marzo_Abril_Mayo_Junio_Julio_Agosto_Septiembre_Octubre_Noviembre_Diciembre'.split('_'),
                         weekdaysShort: 'DOM_LUN_MAR_MIE_JUE_VIE_SAB'.split('_'),}}}
+                     minDate={moment("01-01-2022", "MM-DD-YYYY")}
+                     maxDate={moment().add(6, "M")}
                      selectedDate={onDate}
-                     onDateSelected={ selected => setOnDate(selected.format("YYYY-MM-DD"))}
+                     onDateSelected={ selected => 
+                        setOnDate(moment(selected, "YYYY-MM-DDTHH:mm:ss.SSSZ"))}
                   />
                </View>
 
                <View style={{marginHorizontal: 16, height: 84, marginTop: 16, borderRadius: 10}}>
-                  <ScrollView>
-                     <TextInput
-                        style={{backgroundColor:"white", paddingHorizontal: 8,borderRadius: 10}}
-                        multiline={true}
-                        numberOfLines={4}
-                        placeholder="Texto de invitacion"
-                        name="textArea"
-                        keyboardType="default"
-                        value={"1"}
-                     />
-                  </ScrollView>
+                  
                </View>
-      
-               <TouchableOpacity style={[leagueStyles.join, {backgroundColor:"#16a085"}]} 
+               {noPress 
+               ? <Text style={{color: "red", alignSelf: "center"}}>
+                     {errMessage}
+                  </Text>
+               : <></> }
+               <TouchableOpacity disabled={noPress} style={[leagueStyles.join, {backgroundColor:noPress ? "grey" : "#16a085"}]} 
                   onPress={createHandler}>
                   <Text style={leagueStyles.joinTxt}>Crear</Text>
                </TouchableOpacity>
@@ -212,37 +279,80 @@ const Match = ({navigation}) => {
             onRequestClose={() => { setShowCard(!showCard) }}
          >
             <View style={{
-               flex: 1,  
-               backgroundColor: 'rgba(0,0,0,0.8)',
+               height: "100%",  
+               backgroundColor: 'rgba(30,30,50,0.85)',
                justifyContent: "flex-end"}}>
-               <View style={{
-                  height: "70%",  
-                  marginHorizontal: 16,
-                  backgroundColor:"white", 
-                  paddingHorizontal: 8,
-                  borderTopRightRadius: 10,
-                  borderTopLeftRadius: 10 }}>
                
-                  <Pressable style={{marginTop: 10, alignItems: "flex-end"}} onPress={() => setShowCard(!showCard)} >
-                     <Icon name="close-circle" type="ionicon" color="red" />
-                  </Pressable>
+               <View>
+                  <ScrollView>
+                     <View style={{
+                        flex: 1,
+                        marginHorizontal: 16,
+                        backgroundColor: "#0e0b29", 
+                        paddingHorizontal: 8,
+                        borderTopRightRadius: 10,
+                        borderTopLeftRadius: 10 }}>
+               
+                        <Pressable style={{marginTop: 10, alignItems: "flex-end"}} onPress={() => setShowCard(!showCard)} >
+                           <Icon name="close-circle" type="ionicon" color="red" />
+                        </Pressable>
                   
-                  <View style={{ flex: 1, backgroundColor: "blue"}} >
-                     <View style={{ height: 50, backgroundColor: "green"}} >
-                     </View>
-                     <View style={{ flex: 1, backgroundColor: "yellow"}} >
-                        <Text>
-                           {match.fecha}
-                        </Text>
-                     </View>
-                     <View style={{ height: 115, backgroundColor: "red"}} >
-                        <TouchableOpacity style={[leagueStyles.join, {backgroundColor:"#16a085"}]} 
-                           onPress={confirmHandler}>
-                           <Text style={leagueStyles.joinTxt}>Confirmar</Text>
-                        </TouchableOpacity>
-                     </View>
-                  </View>
+                        <View style={{ flex: 1, /*backgroundColor: "blue"*/}} >
+                           <View style={{ height: 50, /*backgroundColor: "green",*/ alignItems: "center", justifyContent: "center"}} >
+                              <Text style={{ fontSize: 25, marginBottom: 8, color: 'white' }}>
+                                 Detalles del match
+                              </Text>
+                           </View>
+                           <View style={{ flex: 1, /*backgroundColor: "yellow"*/}} >
+                              <View style={{ flex: 1, /*backgroundColor: "blue",*/ flexDirection: "row"}} >
+                                 <View style={{ flex: 1, /*backgroundColor: "grey",*/ alignItems: "center"}} >
+                                    <Text style={{ marginVertical: 8, color: 'white'}}>Equipo A</Text>
+                                    <View style={{flex: 1, alignItems: "center"}}>
+                                       {nicks1.map( (nick, i) => {
+                                          return (
+                                             <Text style={{ color: 'white'}}>{nick}</Text>)
+                                       })}
+                                    </View>
+                                 </View>
+                                 <View style={{ flex: 1, /*backgroundColor: "red",*/ alignItems: "center"}} >
+                                    <Text style={{ marginVertical: 8, color: 'white'}}>Equipo B</Text>
+                                    <View style={{flex: 1, alignItems: "center"}}>
+                                       {nicks2.map( (nick, i) => {
+                                          return (
+                                             <Text style={{ color: 'white'}}>{nick}</Text>)
+                                       })}
+                                    </View>
+                                 </View>
+                              </View>
+
+                              <Text style={{paddingHorizontal: 8, marginTop: 12, color: 'white'}}>
+                                 El partido se disputara el {moment(match.date, "DD-MM-YYYY").format("DD [de] MMMM [de] YYYY")} a las {match.time}
+                              </Text>
+                              <View style={{ height: 84, marginTop: 16, borderRadius: 10}}>
+                                 <ScrollView>
+                                    <TextInput
+                                       style={{backgroundColor:"white", paddingHorizontal: 8,borderRadius: 10, }}
+                                       multiline={true}
+                                       numberOfLines={4}
+                                       placeholder="Texto de invitacion"
+                                       name="textArea"
+                                       keyboardType="default"
+                                       onChangeText={ text => setDescription(text)}
+                                       value={description}
+                                    />
+                                 </ScrollView>
+                              </View>
+                           </View>
+                           <View style={{ height: 115, /*backgroundColor: "red"*/}} >
+                              <TouchableOpacity  style={[leagueStyles.join, {backgroundColor:"#16a085"}]} 
+                                 onPress={confirmHandler}>
+                                 <Text style={leagueStyles.joinTxt}>Confirmar</Text>
+                              </TouchableOpacity>
+                           </View>
+                        </View>
             
+                     </View>
+                  </ScrollView>
                </View>
             </View>
          </Modal>

@@ -14,6 +14,7 @@ import League from "../components/League";
 import Match from "../components/Match";
 import Record from "../components/Record";
 import { Platform } from "react-native";
+// import League2 from "../components/league2";
 
 const AppNavigator = createBottomTabNavigator(
   {
@@ -96,7 +97,7 @@ export default createAppContainer(
     {
       initialRouteName: "AuthLoading",
       /* initialRouteName: 'Auth', */
-/*       initialRouteName: 'App', */
+      //initialRouteName: 'App',
     },
     {
       defaultNavigationOptions: {

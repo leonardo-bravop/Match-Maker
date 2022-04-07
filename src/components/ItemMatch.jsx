@@ -25,7 +25,7 @@ const ItemMatch = ({ item }) => {
          dispatch( removeTeam({ team: "teamA", id: item.id }))
       }
       else {
-         dispatch( setTeam({ team: "teamA", id: item.id }))
+         dispatch( setTeam({ team: "teamA", id: item.id, nick: item.nickname }))
       }
       setSelect(!select)
       setSelect2(false)
@@ -36,7 +36,7 @@ const ItemMatch = ({ item }) => {
          dispatch( removeTeam({ team: "teamB", id: item.id }))
       }
       else {
-         dispatch( setTeam({ team: "teamB", id: item.id }))
+         dispatch( setTeam({ team: "teamB", id: item.id, nick: item.nickname }))
       }
       setSelect2(!select2)
       setSelect(false)

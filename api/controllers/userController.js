@@ -181,8 +181,8 @@ exports.getMatchesByUserId = (req, res, next) => {
     .populate({
       path: "matches",
       populate: [
-        { path: "equipo_1", select: "nickname" },
-        { path: "equipo_2", select: "nickname" },
+        { path: "team_1", select: "nickname" },
+        { path: "team_2", select: "nickname" },
       ],
     })
     .then((user) => {

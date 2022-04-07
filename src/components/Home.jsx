@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   Image,
   ImageBackground,
-  ScrollView
+  ScrollView,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FlatGrid } from "react-native-super-grid";
@@ -23,6 +23,7 @@ import { setUserLeagues } from "../state/userLeague";
 import { setLeagues } from "../state/league";
 import { setLeague } from "../state/selectLeague";
 import { setMembers } from "../state/memberList";
+import { setLeagueId } from "../state/idLeague";
 
 const screen = Dimensions.get("screen");
 
@@ -42,7 +43,6 @@ const home = StyleSheet.create({
   },
   containerDos: {
     marginTop: 50,
-    flex: 1,
     alignItems: "center",
   },
   lastTittle: {
@@ -71,12 +71,18 @@ const home = StyleSheet.create({
     fontWeight: "bold",
     color: "#34495e",
   },
+  ligaContainer: {
+    flexDirection: "row",
+    width: "100%",
+    alignSelf: "center",
+  },
   ligaTittle: {
     fontStyle: "italic",
     fontWeight: "bold",
     fontSize: 25,
     color: "white",
     textAlign: "center",
+    width: "50%",
   },
   gridView: {
     flex: 1,
@@ -99,12 +105,16 @@ const home = StyleSheet.create({
   },
 });
 
+
+
 function Home({ navigation: { navigate } }) {
   const { manifest } = Constants;
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
   const userLeagues = useSelector((state) => state.userLeagues);
   const leagues = useSelector((state) => state.leagues);
+
+  const [privPress, setPrivPress] = useState(false)
 
   const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 
@@ -155,72 +165,78 @@ function Home({ navigation: { navigate } }) {
           </View>
         </TouchableOpacity>
       </View>
+             
 
-      <ScrollView horizontal={true}>
-      <View>
-        <Text style={home.ligaTittle}>──────── LIGAS ────────</Text>
-      <FlatGrid
-        style={home.gridView}
-        itemDimension={120}
-        data={leagues}
-        // staticDimension={300}
-        // fixed
-        spacing={10}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() => {
-              dispatch(setLeague(item));
-              dispatch(setMembers(item._id));
-              navigate("Liga", item);
-            }}
-            style={[home.itemContainer, { backgroundColor: item.color }]}
-          >
-            <View style={{ flex: 1, justifyContent: "flex-start" }}>
-              <Image
-                source={{ uri: item.img ? item.img : "https://trome.pe/resizer/G8-kkwwutkrNacKh5S6TJplAluU=/980x0/smart/filters:format(jpeg):quality(75)/cloudfront-us-east-1.images.arcpublishing.com/elcomercio/OXHJSIF4SZDAJP6F5PHFZTLRYI.jpg" }}
-                resizeMode="cover"
-                style={{ height: "100%" }}
-              />
-            </View>
-            <Text style={home.itemName}>{item.name}</Text>
-            <Text style={home.itemCode}>{item.color}</Text>
-          </TouchableOpacity>
-        )}
-      />
+      <View style={home.ligaContainer}>
+        <Text style={home.ligaTittle} onPress={() => setPrivPress(false)}>LIGAS</Text>
+        <Text style={home.ligaTittle} onPress={() => setPrivPress(true)}>PRIVS</Text>
       </View>
-      <View>
-      <Text style={home.ligaTittle}>──────── PRIV ────────</Text>
-      <FlatGrid
-        style={home.gridView}
-        itemDimension={120}
-        data={leagues}
-        // staticDimension={300}
-        // fixed
-        spacing={10}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() => {
-              dispatch(setLeague(item));
-              dispatch(setMembers(item._id));
-              navigate("Liga", item);
-            }}
-            style={[home.itemContainer, { backgroundColor: "red" }]}
-          >
-            <View style={{ flex: 1, justifyContent: "flex-start" }}>
-              <Image
-                source={{ uri: item.img ? item.img : "https://trome.pe/resizer/G8-kkwwutkrNacKh5S6TJplAluU=/980x0/smart/filters:format(jpeg):quality(75)/cloudfront-us-east-1.images.arcpublishing.com/elcomercio/OXHJSIF4SZDAJP6F5PHFZTLRYI.jpg" }}
-                resizeMode="cover"
-                style={{ height: "100%" }}
-              />
-            </View>
-            <Text style={home.itemName}>{item.name}</Text>
-            <Text style={home.itemCode}>{item.color}</Text>
-          </TouchableOpacity>
-        )}
-      />
-      </View>
-
-</ScrollView>
+      <Text style={{color: 'white', textAlign: 'center'}}>──────────────────────────────────────</Text>
+      {privPress ? <FlatGrid
+                style={home.gridView}
+                itemDimension={120}
+                data={leagues}
+                // staticDimension={300}
+                // fixed
+                spacing={10}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    onPress={() => {
+                      dispatch(setLeagueId(item._id));
+                      dispatch(setLeague(item));
+                      dispatch(setMembers(item._id));
+                      navigate("Liga", item);
+                    }}
+                    style={[home.itemContainer, { backgroundColor: "red" }]}
+                  >
+                    <View style={{ flex: 1, justifyContent: "flex-start" }}>
+                      <Image
+                        source={{
+                          uri: item.img
+                            ? item.img
+                            : "https://trome.pe/resizer/G8-kkwwutkrNacKh5S6TJplAluU=/980x0/smart/filters:format(jpeg):quality(75)/cloudfront-us-east-1.images.arcpublishing.com/elcomercio/OXHJSIF4SZDAJP6F5PHFZTLRYI.jpg",
+                        }}
+                        resizeMode="cover"
+                        style={{ height: "100%" }}
+                      />
+                    </View>
+                    <Text style={home.itemName}>{item.name}</Text>
+                    <Text style={home.itemCode}>{item.color}</Text>
+                  </TouchableOpacity>
+                )}
+              /> : <FlatGrid
+                style={home.gridView}
+                itemDimension={120}
+                data={leagues}
+                // staticDimension={300}
+                // fixed
+                spacing={10}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    onPress={() => {
+                      dispatch(setLeagueId(item._id));
+                      dispatch(setLeague(item));
+                      dispatch(setMembers(item._id));
+                      navigate("Liga", item);
+                    }}
+                    style={[home.itemContainer, { backgroundColor: item.color }]}
+                  >
+                    <View style={{ flex: 1, justifyContent: "flex-start" }}>
+                      <Image
+                        source={{
+                          uri: item.img
+                            ? item.img
+                            : "https://trome.pe/resizer/G8-kkwwutkrNacKh5S6TJplAluU=/980x0/smart/filters:format(jpeg):quality(75)/cloudfront-us-east-1.images.arcpublishing.com/elcomercio/OXHJSIF4SZDAJP6F5PHFZTLRYI.jpg",
+                        }}
+                        resizeMode="cover"
+                        style={{ height: "100%" }}
+                      />
+                    </View>
+                    <Text style={home.itemName}>{item.name}</Text>
+                    <Text style={home.itemCode}>{item.color}</Text>
+                  </TouchableOpacity>
+                )}
+              />}
     </View>
   );
 }

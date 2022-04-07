@@ -1,17 +1,18 @@
 import axios from "axios";
 import React, { useEffect } from "react";
 import { View, TouchableOpacity, Text } from "react-native";
+import { useDispatch } from "react-redux";
+import { setMatch } from "../state/record";
 
 import { record2Styles } from "../styles/record";
 
 const ItemRecord = ({ item }) => {
 
+   const dispatch = useDispatch();
+
    return (
       <View>
-      <TouchableOpacity style={[record2Styles.item] }>
-         <View style={[record2Styles.date, {backgroundColor: "grey"}]}>
-            <Text style={{color: '#FFFFFF'}}>{item.fecha} {item.status}</Text>
-         </View>
+      <TouchableOpacity style={[record2Styles.item]} onPress={() => dispatch(setMatch(item)) }>
          
          <View style={{flex:1, borderBottomRightRadius: 10, borderTopRightRadius: 10}}>
             {/* <View style={{ flexDirection: "row", height: 40, justifyContent: "center", alignItems: "center", borderTopRightRadius: 10}}>
@@ -27,7 +28,7 @@ const ItemRecord = ({ item }) => {
          
             <View style={{flex:1, flexDirection: "row", borderBottomRightRadius: 10 }}>
                <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
-                  {item.equipo_1.map( (user, i, arr) => {
+                  {item.team_1.map( (user, i, arr) => {
                      if (i>2) return (<></>)
                      return (
                      <Text style={{color: '#FFFFFF'}} key= {i}>
@@ -37,10 +38,14 @@ const ItemRecord = ({ item }) => {
                      </Text>)
                   })}
                </View>
-         
+
+               <View style={[record2Styles.date, {backgroundColor: "grey"}]}>
+                  <Text style={{color: '#FFFFFF'}}>{item.date} {item.status}</Text>
+               </View>
+               
                <View style={{flex: 1, justifyContent: "center", alignItems: "center" , borderBottomRightRadius: 10}}>
 
-                  {item.equipo_2.map( (user, i, arr) => {
+                  {item.team_2.map( (user, i, arr) => {
                      if (i>2) return (<></>)
                      return (
                      <Text style={{color: '#FFFFFF'}} key= {i}>

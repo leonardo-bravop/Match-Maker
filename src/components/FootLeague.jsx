@@ -13,50 +13,59 @@ const { manifest } = Constants;
 
 const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 
-const FootLigue = ({ ligueId, userData }) => {
+const FootLigue = ({ leagueId, user }) => {
    const dispatch = useDispatch()
-   const members = useSelector((state) => state.members)
-   const user = useSelector(state => state.user)
+   // const members = useSelector((state) => state.members)
+   const userData = useSelector(state => state.user)
    // if (!userData.rank) return <></>
 
 /*    const [buttonValue, setButtonValue] = useState(false) */
 
-   let member = members?.filter( (member) => member?.nickname == user.nickname)
+   // let member = members?.filter( (member) => member?.nickname == userData.nickname)
 
 
-   const buttonHandler = async () => {
-      try {
-         // const userString = await AsyncStorage.getItem("userInfo")
-            
-         // const result = await axios
-         // .post(`${uri}/api/user/me`, {}, 
-         //       { headers: { Authorization: `Bearer ${userString}` } } )
-
-         const res = await dispatch(addUserToLeague({ligueId: ligueId, userData: user}))
-         await dispatch(setUserLeagues({userId: user._id}))
-         setButtonValue(true)
-      } catch (err) { console.log(err); }
+   const buttonHandler = () => {
+      axios
+      .put(`${uri}/api/league/${leagueId}/addUser/${userData._id}`)
+      .then( () => {
+         user.rank = 20
+         dispatch( resetChecks() )
+      })
    }
+   
+   // async () => {
+   //    try {
+   //       // const userString = await AsyncStorage.getItem("userInfo")
+            
+   //       // const result = await axios
+   //       // .post(`${uri}/api/user/me`, {}, 
+   //       //       { headers: { Authorization: `Bearer ${userString}` } } )
 
-   useEffect(()=>{
-      member = members?.filter( (member) => member?.nickname == user.nickname)
-   }, [dispatch])
+   //       const res = await dispatch(addUserToLeague({ligueId: ligueId, userData: userData}))
+   //       await dispatch(setUserLeagues({userId: userData._id}))
+   //       // setButtonValue(true)
+   //    } catch (err) { console.log(err); }
+   // }
+
+   // useEffect(()=>{
+   //    member = members?.filter( (member) => member?.nickname == userData.nickname)
+   // }, [dispatch])
 
    return ( <>
-      { member[0] /* && buttonValue */ ?
-           ( userData.rank > 8 
+      { /*member[0] /* && buttonValue */ user.rank !== 0 ?
+           ( user.rank > 8 
             ? <View style={leagueStyles.foot}>
                <View style={leagueStyles.user}>
                   <View style={leagueStyles.rank}>
-                     <Text style={{color: '#FFFFFF'}}>{userData.rank}</Text>
+                     <Text style={{color: '#FFFFFF'}}>{user.rank}</Text>
                   </View>
-                  <View style={[leagueStyles.img, {backgroundColor: userData.color}]}>
+                  <View style={[leagueStyles.img, {backgroundColor: user.color}]}>
                   </View>
                   <View style={leagueStyles.nick}>
-                     <Text style={{color: '#FFFFFF'}}>{userData.nickname}</Text>
+                     <Text style={{color: '#FFFFFF'}}>{user.nickname}</Text>
                   </View>
                   <View style={leagueStyles.elo}>
-                     <Text style={{color: '#FFFFFF'}}>{userData.elo}</Text>
+                     <Text style={{color: '#FFFFFF'}}>{user.elo}</Text>
                   </View> 
                </View>
             </View>

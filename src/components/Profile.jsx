@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Icon } from "react-native-elements";
+/* import { Icon } from "react-native-elements"; */
 import { SafeAreaView } from "react-navigation";
 import { profile } from "../styles/profile";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -28,6 +28,17 @@ import { setLeague } from "../state/selectLeague";
 import { setMembers } from "../state/memberList";
 
 import { useDispatch, useSelector } from "react-redux";
+import { setLeagueId } from "../state/idLeague";
+
+import { FAB, Portal, Provider } from 'react-native-paper';
+
+const styles = StyleSheet.create({
+  actionButtonIcon: {
+    fontSize: 20,
+    height: 22,
+    color: "white",
+  },
+});
 
 const Profile = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -35,8 +46,41 @@ const Profile = ({ navigation }) => {
   const leagues = useSelector((state) => state.userLeagues);
   const [userData, setUserData] = useState({});
 
+  const [state, setState] = React.useState({ open: false });
+  const onStateChange = ({ open }) => setState({ open });
+
+  const { open } = state;
+
+
   const { manifest } = Constants;
   const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
+
+  const actions = [
+    {
+      text: "Accessibility",
+      icon: require("../assets/logo.png"),
+      name: "bt_accessibility",
+      position: 2,
+    },
+    {
+      text: "Language",
+      icon: require("../assets/logo.png"),
+      name: "bt_language",
+      position: 1,
+    },
+    {
+      text: "Location",
+      icon: require("../assets/logo.png"),
+      name: "bt_room",
+      position: 3,
+    },
+    {
+      text: "Video",
+      icon: require("../assets/logo.png"),
+      name: "bt_videocam",
+      position: 4,
+    },
+  ];
 
   // useEffect(async () => {
   //   try {
@@ -73,7 +117,7 @@ const Profile = ({ navigation }) => {
 
   return (
     <View style={profile.container}>
-      <TouchableOpacity style={profile.settingsIcon}>
+      {/*       <TouchableOpacity style={profile.settingsIcon}>
         <MenuProvider style={profile.settingsMenu}>
           <Menu>
             <MenuTrigger customStyles={profile.menu}>
@@ -86,8 +130,8 @@ const Profile = ({ navigation }) => {
             </MenuOptions>
           </Menu>
         </MenuProvider>
-      </TouchableOpacity>
-      <Image
+      </TouchableOpacity> */}
+   <Image
         style={profile.userImage}
         source={{
           uri: "https://cdn.pixabay.com/photo/2017/02/23/13/05/profile-2092113_960_720.png",
@@ -122,6 +166,7 @@ const Profile = ({ navigation }) => {
                     onPress={() => {
                       dispatch(setLeague(item));
                       dispatch(setMembers(item._id));
+                      dispatch(setLeagueId(item._id));
                       navigation.navigate("Liga", item);
                     }}
                   >
@@ -163,6 +208,42 @@ const Profile = ({ navigation }) => {
           </ScrollView>
         ) : null}
       </View>
+
+<Provider>
+      <Portal>
+        <FAB.Group
+          open={open}
+          icon={open ? 'close' : 'cog'}
+          actions={[
+            { icon: 'plus', onPress: () =>  {}},
+            {
+              icon: 'account-remove',
+              label: 'LOGOUT',
+              onPress: () => handleLogout(),
+            },
+            {
+              icon: 'email',
+              label: 'Email',
+              onPress: () => console.log('Pressed email'),
+            },
+            {
+              icon: 'bell',
+              label: 'Remind',
+              onPress: () => console.log('Pressed notifications'),
+              small: false,
+            },
+          ]}
+          onStateChange={onStateChange}
+          onPress={() => {
+            if (open) {
+              // do something if the speed dial is open
+            }
+          }}
+        />
+      </Portal>
+    </Provider>
+
+     
     </View>
   );
 };

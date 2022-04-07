@@ -101,8 +101,6 @@ export const record2Styles = StyleSheet.create({
       width: 125,
       justifyContent: "center",
       alignItems: "center", 
-      borderTopLeftRadius: 10, 
-      borderBottomLeftRadius: 10
    },
    elo:{
       width: 70,
