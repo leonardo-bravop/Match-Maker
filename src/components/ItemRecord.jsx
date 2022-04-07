@@ -28,7 +28,7 @@ const ItemRecord = ({ item }) => {
          
             <View style={{flex:1, flexDirection: "row", borderBottomRightRadius: 10 }}>
                <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
-                  {item.equipo_1.map( (user, i, arr) => {
+                  {item.team_1.map( (user, i, arr) => {
                      if (i>2) return (<></>)
                      return (
                      <Text style={{color: '#FFFFFF'}} key= {i}>
@@ -40,12 +40,12 @@ const ItemRecord = ({ item }) => {
                </View>
 
                <View style={[record2Styles.date, {backgroundColor: "grey"}]}>
-                  <Text style={{color: '#FFFFFF'}}>{item.fecha} {item.status}</Text>
+                  <Text style={{color: '#FFFFFF'}}>{item.date} {item.status}</Text>
                </View>
                
                <View style={{flex: 1, justifyContent: "center", alignItems: "center" , borderBottomRightRadius: 10}}>
 
-                  {item.equipo_2.map( (user, i, arr) => {
+                  {item.team_2.map( (user, i, arr) => {
                      if (i>2) return (<></>)
                      return (
                      <Text style={{color: '#FFFFFF'}} key= {i}>

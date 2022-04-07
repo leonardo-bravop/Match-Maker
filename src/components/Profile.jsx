@@ -28,6 +28,7 @@ import { setLeague } from "../state/selectLeague";
 import { setMembers } from "../state/memberList";
 
 import { useDispatch, useSelector } from "react-redux";
+import { setLeagueId } from "../state/idLeague";
 
 const Profile = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -122,6 +123,7 @@ const Profile = ({ navigation }) => {
                     onPress={() => {
                       dispatch(setLeague(item));
                       dispatch(setMembers(item._id));
+                      dispatch(setLeagueId(item._id));
                       navigation.navigate("Liga", item);
                     }}
                   >
