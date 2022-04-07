@@ -37,7 +37,7 @@ const userSchema = new Schema({
   },
   img: {
     type: String,
-    default: "https://static.vecteezy.com/system/resources/thumbnails/000/550/980/small/user_icon_001.jpg"
+    default: "https://cdn.pixabay.com/photo/2017/02/23/13/05/profile-2092113_960_720.png"
   },
   leagues: [
     {

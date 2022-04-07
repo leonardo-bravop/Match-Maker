@@ -1,13 +1,11 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
-const Invitation = require("../models/Invitation");
 
 const matchSchema = new Schema({
   league: {
     type: Schema.Types.ObjectId,
     ref: "league",
   },
-
   team_1: [
     {
       type: Schema.Types.ObjectId,
@@ -37,7 +35,6 @@ const matchSchema = new Schema({
   },
   date: {
     type: String,
-    // default: Date.now(),
   },
   time: {
     type: String,
@@ -46,12 +43,10 @@ const matchSchema = new Schema({
     type: String,
     default: "pending",
   },
-  result: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "result",
-    },
-  ],
+  result: {
+    type: Schema.Types.ObjectId,
+    ref: "result",
+  },
 });
 
 const Match = mongoose.model("match", matchSchema);

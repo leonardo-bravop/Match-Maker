@@ -12,8 +12,6 @@ router.put("/:leagueId/deleteUser/:userId", leagueController.deleteUser);
 
 router.get("/getUsers/:leagueId", leagueController.getUserByLeagueId)
 
-// router.post("/newLeague", leagueController.newLeague);
-
 router.delete("/deleteLeague/:id", leagueController.deleteLeague);
 
 router.get("/showLeague/:id", leagueController.findShowLeague);
