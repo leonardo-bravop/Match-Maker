@@ -115,12 +115,17 @@ function Home({ navigation: { navigate } }) {
   const leagues = useSelector((state) => state.leagues);
 
   const [search, setSearch] = useState("");
-  const [privPress, setPrivPress] = useState(false);
-  
+  const [meLeagues, setMeLeagues] = useState(false);
+  const [results, setResults] = useState({});
+
   const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 
   const updateSearch = (search) => {
     setSearch(search);
+    axios.get(`${uri}/api/league/findLeague/${search}`).then(({ data }) => {
+      setResults(data);
+      console.log(results);
+    });
   };
 
   useEffect(async () => {
@@ -176,24 +181,34 @@ function Home({ navigation: { navigate } }) {
           placeholder="Type Here..."
           onChangeText={updateSearch}
           value={search}
+          onClear={() => setResults({})}
         />
       </View>
+      {results[0] ? (
+        <View>
+          <Text style={home.ligaTittle}>
+            RESULTADO
+          </Text>
+        </View>
+      )
+        : null
+    }
       <View style={home.ligaContainer}>
-        <Text style={home.ligaTittle} onPress={() => setPrivPress(false)}>
+        <Text style={home.ligaTittle} onPress={() => setMeLeagues(false)}>
           LIGAS
         </Text>
-        <Text style={home.ligaTittle} onPress={() => setPrivPress(true)}>
-          PRIVS
+        <Text style={home.ligaTittle} onPress={() => setMeLeagues(true)}>
+          TUS LIGAS
         </Text>
       </View>
       <Text style={{ color: "white", textAlign: "center" }}>
         ──────────────────────────────────────
       </Text>
-      {privPress ? (
+      {meLeagues ? (
         <FlatGrid
           style={home.gridView}
           itemDimension={120}
-          data={leagues}
+          data={userLeagues}
           // staticDimension={300}
           // fixed
           spacing={10}
@@ -205,7 +220,7 @@ function Home({ navigation: { navigate } }) {
                 dispatch(setMembers(item._id));
                 navigate("Liga", item);
               }}
-              style={[home.itemContainer, { backgroundColor: "red" }]}
+              style={[home.itemContainer, { backgroundColor: item.color }]}
             >
               <View style={{ flex: 1, justifyContent: "flex-start" }}>
                 <Image
