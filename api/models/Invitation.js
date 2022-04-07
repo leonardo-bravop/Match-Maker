@@ -5,7 +5,6 @@ const inivitationSchema = new Schema({
   fromId:
     {
       matchId: { type: Schema.Types.ObjectId, ref: "match" },
-      leagueId: { type: Schema.Types.ObjectId, ref: "league" }
     },
   toId:
     {

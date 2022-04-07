@@ -67,7 +67,7 @@ const welcome = StyleSheet.create({
   info: {
     marginTop: 50,
     color: "white",
-    fontSize: 50,
+    fontSize: 48,
     textAlign: "center",
   },
   colorBtn: {
@@ -81,8 +81,11 @@ const welcome = StyleSheet.create({
   },
   colorTxtBtn: {
     color: "#FFFFFF",
-    fontSize: 20,
+    fontSize: 18,
     textAlign: "center",
+    textTransform: "uppercase",
+    fontWeight: "900",
+    fontFamily: "Roboto"
   },
   btnContainer: {
     backgroundColor: "#0e0b29",

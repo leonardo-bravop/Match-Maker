@@ -6,5 +6,4 @@ router.put("/updateResult/:resultId", resultController.updateResult)
 
 router.put("/confirmationTeam/:team/:resultId/:matchId", resultController.confirmResultTeam);
 
-
 module.exports = router;

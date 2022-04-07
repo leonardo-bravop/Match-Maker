@@ -3,10 +3,12 @@ const { Schema } = mongoose;
 const bcrypt = require("bcrypt");
 
 const leagueSchema = new Schema({
-  name: String,
-  sport: {
+  name: {
     type: String,
     required: true,
+  },
+  sport: {
+    type: String,
   },
   description: String,
   isPrivate: { type: Boolean, default: false },
@@ -30,6 +32,10 @@ const leagueSchema = new Schema({
   },
   img: {
     type: String,
+  },
+  admin: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "user",
   },
   matches: [
     {

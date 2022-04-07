@@ -50,7 +50,7 @@ export const form = StyleSheet.create({
   },
   colorTxtBtn: {
     color: '#FFFFFF',
-    fontSize: 20,
+    fontSize: 16,
     textAlign: 'center'
   }
 })
