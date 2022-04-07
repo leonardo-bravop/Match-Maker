@@ -152,6 +152,7 @@ exports.me = (req, res, next) => {
   });
 };
 
+//add rank to league info
 exports.getLeaguesByUserId = (req, res, next) => {
   const { userId } = req.params;
   User.findById(userId)
@@ -193,25 +194,24 @@ exports.getMatchesByUserId = (req, res, next) => {
     });
 };
 
-//update get matches by date
-// exports.getMatchesByUserId = (req, res, next) => {
-//   const { userId } = req.params;
-//   User.findById(userId)
-//     .populate({
-//       path: "matches",
-//       populate: [
-//         { path: "equipo_1", select: "nickname" },
-//         { path: "equipo_2", select: "nickname" },
-//       ],
-//     })
-//     .then((user) => {
-//       res.send(user.matches);
-//     })
-//     .catch((error) => {
-//       res.status(400);
-//       next(new Error(error));
-//     });
-// };
+exports.getMatchesByUserId = (req, res, next) => {
+  const { userId } = req.params;
+  User.findById(userId)
+    .populate({
+      path: "matches",
+      populate: [
+        { path: "equipo_1", select: "nickname" },
+        { path: "equipo_2", select: "nickname" },
+      ],
+    })
+    .then((user) => {
+      res.send(user.matches);
+    })
+    .catch((error) => {
+      res.status(400);
+      next(new Error(error));
+    });
+};
 
 exports.getUserMatchesByDate = (req, res, next) => {
   const { userId, date } = req.params;

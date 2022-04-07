@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const leagueController = require("../controllers/leagueController")
 
-router.get("/getAll", leagueController.getAll)
+router.get("/getAll/private/:isPrivate", leagueController.getAll)
 
 router.post("/new", leagueController.new);
 
