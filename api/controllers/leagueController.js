@@ -249,7 +249,7 @@ exports.showHistoryLeague = (req, res, next) => {
 };
 
 exports.findLeagueByName = (req, res, next) => {
-  const { leagueName } = req.body;
+  const { leagueName } = req.params;
   if (leagueName) {
     const cleanedName = leagueName
       .trim()
@@ -264,7 +264,7 @@ exports.findLeagueByName = (req, res, next) => {
     }
     const searchReg = new RegExp(reg, "i");
     League.find({ name: { $regex: searchReg } })
-      .select("name")
+      /* .select("name") */
       .then((leagues) => {
         res.send(leagues);
       })
