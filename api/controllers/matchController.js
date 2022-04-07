@@ -80,29 +80,41 @@ exports.newMatch = (req, res, next) => {
   );
 };
 
-//falta terminar de borrar matchId de todos los documentos que tienen guardado matchId
 exports.deleteMatch = (req, res, next) => {
   const { id } = req.params;
-  let matchDirection;
+  let matchReference;
+  let canDelete;
   Match.findById(id)
     .then((match) => {
-      matchDirection = match;
-      console.log("Match es", match);
-      const promisesArray = match.team_1.map((userId) => {
-        return User.findById(userId).then((user) => {
-          const filteredMatches = user.matches.filter(
-            (matchId) => matchId !== id
-          );
-          user.matches = filteredMatches
-          console.log(`user updated es`, user)
-          return user.save()
+      if (match.status !== "confirmed") {
+        canDelete = true;
+        matchReference = match;
+        console.log("Match es", match);
+        const usersArray = match.team_1.concat(match.team_2);
+        const promisesArray = usersArray.map((userId) => {
+          return User.findByIdAndUpdate(userId, { $pull: { matches: id } });
         });
-      })
-      return Promise.all(promisesArray)
+        return Promise.all(promisesArray);
+      }
     })
     .then(() => {
-      res.send(matchDirection);
+      if (canDelete) return Invitation.deleteMany({ "fromId.matchId": id });
     })
+    .then(() => {
+      if (canDelete)
+        return League.findByIdAndUpdate(matchReference.league, {
+          $pull: { matches: id },
+        });
+    })
+    .then(() => {
+      if (canDelete)
+      return Match.findByIdAndDelete(id);
+      else {
+        res.status(400);
+      next(new Error("Can't delete a confirmed Match"))
+      }
+    })
+    .then((result) => res.send(result))
     .catch((error) => {
       res.status(400);
       next(new Error(error));

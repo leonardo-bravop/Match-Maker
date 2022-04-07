@@ -194,7 +194,6 @@ exports.getMatchesByUserId = (req, res, next) => {
     });
 };
 
-//update get matches by date
 exports.getMatchesByUserId = (req, res, next) => {
   const { userId } = req.params;
   User.findById(userId)
