@@ -44,14 +44,16 @@ const home = StyleSheet.create({
   },
   containerDos: {
     marginTop: 50,
-    alignItems: "center",
+    height: "25%",
   },
   lastTittle: {
+    textAlign: "center",
     fontStyle: "italic",
     fontSize: 20,
     color: "white",
   },
   lastContainer: {
+    alignSelf: "center",
     flexDirection: "row",
     width: "80%",
     height: "30%",
@@ -116,7 +118,7 @@ function Home({ navigation: { navigate } }) {
 
   const [search, setSearch] = useState("");
   const [privPress, setPrivPress] = useState(false);
-  
+
   const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 
   const updateSearch = (search) => {
@@ -169,15 +171,24 @@ function Home({ navigation: { navigate } }) {
             <Text style={home.lastText}>Taserface</Text>
           </View>
         </TouchableOpacity>
+
+        <View style={{ marginTop: 10}}>
+          <SearchBar
+            placeholder="Type Here..."
+            onChangeText={updateSearch}
+            value={search}
+            lightTheme={true}
+            containerStyle={{
+              backgroundColor: "#0e0b29",
+              borderBottomColor: "transparent",
+              borderTopColor: "transparent",
+            }}
+            round={true}
+            showLoading={true}
+          />
+        </View>
       </View>
 
-      <View>
-        <SearchBar
-          placeholder="Type Here..."
-          onChangeText={updateSearch}
-          value={search}
-        />
-      </View>
       <View style={home.ligaContainer}>
         <Text style={home.ligaTittle} onPress={() => setPrivPress(false)}>
           LIGAS
