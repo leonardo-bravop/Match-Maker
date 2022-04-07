@@ -9,6 +9,7 @@ import Constants from "expo-constants";
 import { useDispatch, useSelector } from "react-redux";
 import { addUserToLeague } from "../state/memberList";
 import { setUserLeagues } from "../state/userLeague";
+import { resetChecks } from "../state/checks";
 const { manifest } = Constants;
 
 const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
@@ -52,7 +53,7 @@ const FootLigue = ({ leagueId, user }) => {
    // }, [dispatch])
 
    return ( <>
-      { /*member[0] /* && buttonValue */ user.rank !== 0 ?
+      { /*member[0] /* && buttonValue */false && user.rank !== 0 ?
            ( user.rank > 8 
             ? <View style={leagueStyles.foot}>
                <View style={leagueStyles.user}>

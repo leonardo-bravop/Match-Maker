@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { 
-   View, 
-   Text, 
-   SafeAreaView, 
-   TouchableOpacity, 
-   ImageBackground,
-   ScrollView, Pressable,
-   Modal 
+import {
+  View,
+  Text,
+  SafeAreaView,
+  TouchableOpacity,
+  ImageBackground,
+  ScrollView,
+  Pressable,
+  Modal,
 } from "react-native";
 
 import axios from "axios";
 import Constants from "expo-constants";
 
-import 'moment/locale/es'
+import "moment/locale/es";
 import { Icon } from "react-native-elements";
 
 import { leagueStyles } from "../styles/league";
@@ -23,159 +24,191 @@ import ItemLeague from "./ItemLeague";
 import FootLigue from "./FootLeague";
 import { setLeagueId } from "../state/idLeague";
 
+const League = ({ navigation }) => {
+  const { manifest } = Constants;
+  const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 
-const League = ({navigation}) => {
+  let [memberList, setMemberList] = useState([]);
+  let [leagueList, setLeagueList] = useState([]);
+  let [actualleague, setActualLeague] = useState({});
+  let [user, setUser] = useState({});
+  let [showCard, setShowCard] = useState(false);
 
-   const { manifest } = Constants;
-   const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
+  const dispatch = useDispatch();
 
-   let [memberList, setMemberList] = useState([])
-   let [leagueList, setLeagueList] = useState([])
-   let [actualleague, setActualLeague] = useState({})
-   let [user, setUser] = useState({})
-   let [showCard, setShowCard] = useState(false)
+  const userData = useSelector((state) => state.user);
 
-   const dispatch = useDispatch();
+  const leagueId = useSelector((state) => state.leagueId);
 
-   const userData = useSelector( state => state.user)
+  const resetData = useSelector((state) => state.checks);
 
-   const leagueId = useSelector( state => state.leagueId)
+  useEffect(() => {
+    let rank = 0;
 
-   const resetData = useSelector( state => state.checks )
+    axios.get(`${uri}/api/user/getLeagues/${userData._id}`).then(({ data }) => {
+      setLeagueList(data);
+      if (leagueId === "") dispatch(setLeagueId(data[0]._id));
+    });
 
-   useEffect(() => {
-
-      let rank = 0
-
-      axios
-      .get(`${uri}/api/user/getLeagues/${userData._id}`)
-      .then(({data})=>{
-         setLeagueList(data)
-         if (leagueId === "") 
-            dispatch(setLeagueId(data[0]._id));
-      })
-
-      axios
+    axios
       .get(`${uri}/api/league/getUsers/${leagueId}`)
-      .then(({ data })=>{
-         setMemberList( data.map( (element, i) =>{
-            if ( userData._id === element._id) 
-                  rank = i+1
+      .then(({ data }) => {
+        setMemberList(
+          data.rankedUsers.map((element, i) => {
+            if (userData._id === element._id) rank = i + 1;
             return {
-               id: element._id,
-               rank: i+1,
-               color:"blue",
-               nickname: element.nickname,
-               elo: 2931,
-            }
-         }))
+              id: element._id,
+              rank: i + 1,
+              color: "blue",
+              nickname: element.nickname,
+              elo: 2931,
+            };
+          })
+        );
       })
-      .then(()=>{
-         setUser({
-            id: userData._id,
-            rank: rank,
-            color:"red",
-            nickname: userData.nickname,
-            elo: 2931,
-         })
-      })
+      .then(() => {
+        setUser({
+          id: userData._id,
+          rank: rank,
+          color: "red",
+          nickname: userData.nickname,
+          elo: 2931,
+        });
+      });
 
-      axios
-      .get(`${uri}/api/league/showLeague/${leagueId}`)
-      .then( ({ data }) => {
-         setActualLeague(data)
-      })
-      
-   },[leagueId, resetData])
+    axios.get(`${uri}/api/league/showLeague/${leagueId}`).then(({ data }) => {
+      setActualLeague(data);
+    });
+  }, [leagueId, resetData]);
 
-   const pressHandler = id =>{
-      dispatch(setLeagueId(id));
-      setShowCard(!showCard)
-   }
+  const pressHandler = (id) => {
+    dispatch(setLeagueId(id));
+    setShowCard(!showCard);
+  };
 
-   return (
-      <SafeAreaView style={leagueStyles.back}>
-         <Modal
-            animationType="fade"
-            transparent={true}
-            visible={showCard}
-         >
-            <Pressable onPress={() => { setShowCard(false) }}
-               style={{
-                  height: "100%",  
-                  backgroundColor: 'rgba(30,30,50,0.85)',
-                  justifyContent: "center"}}>
-               
-               <View>
+  return (
+    <SafeAreaView style={leagueStyles.back}>
+      <Modal animationType="fade" transparent={true} visible={showCard}>
+        <Pressable
+          onPress={() => {
+            setShowCard(false);
+          }}
+          style={{
+            height: "100%",
+            backgroundColor: "rgba(30,30,50,0.85)",
+            justifyContent: "center",
+          }}
+        >
+          <View>
+            <ScrollView>
+              <View
+                style={{
+                  flex: 1,
+                  marginHorizontal: 16,
+                  backgroundColor: "#0e0b29",
+                  padding: 10,
+                  borderRadius: 10,
+                }}
+              >
+                <View style={{ flex: 1 }}>
                   <ScrollView>
-                     <View style={{
-                        flex: 1,
-                        marginHorizontal: 16,
-                        backgroundColor: "#0e0b29", 
-                        padding:10,
-                        borderRadius: 10 }}>
-                        <View style={{ flex: 1}} >
-                           <ScrollView >
-                              <View>
-                                 { (leagueList[0]) ?
-                                 leagueList.map( (item, i) => {
-                                    return (
-                                       <TouchableOpacity style={{margin: 7}} onPress={()=>pressHandler(item._id)} >
-                                          <Text style={{ color: "#FFFFFF", fontSize: 16, textAlign: 'center'}}>{item.name}</Text>
-                                       </TouchableOpacity>
-                                    )}
-                                 ): <Text style={{ color: "#FFFFFF", fontSize: 16, textAlign: 'center'}}>"Acá aparecerán tus ligas, cuando te unas a alguna"</Text>}
-                              </View>
-                           </ScrollView>
-                        </View>
-                     </View>
+                    <View>
+                      {leagueList.map((item, i) => {
+                        return (
+                          <TouchableOpacity
+                            style={{ margin: 7 }}
+                            onPress={() => pressHandler(item._id)}
+                          >
+                            <Text
+                              style={{
+                                color: "#FFFFFF",
+                                fontSize: 16,
+                                textAlign: "center",
+                              }}
+                            >
+                              {item.name}
+                            </Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
                   </ScrollView>
-               </View>
-            </Pressable>
-         </Modal>
+                </View>
+              </View>
+            </ScrollView>
+          </View>
+        </Pressable>
+      </Modal>
 
+      <View
+        style={[leagueStyles.head, { backgroundColor: actualleague.color }]}
+      >
+        <ImageBackground
+          resizeMode="cover"
+          source={{ uri: actualleague.img }}
+          style={{ flex: 1 }}
+        >
+          <TouchableOpacity
+            style={[
+              leagueStyles.menu,
+              { alignSelf: "flex-end", justifyContent: "center" },
+            ]}
+            onPress={() => setShowCard(true)}
+          >
+            <Icon
+              name="caret-down-circle"
+              type="ionicon"
+              color="green"
+              size={32}
+            />
+          </TouchableOpacity>
 
-         <View style={[leagueStyles.head, { backgroundColor: actualleague.color }]} >
-            <ImageBackground resizeMode="cover" source={{uri: actualleague.img}} style={{flex: 1}}>
-               <TouchableOpacity style={[leagueStyles.menu, {alignSelf: "flex-end", justifyContent:"center"}]} onPress={()=> setShowCard(true)}>
-                  <Icon name="caret-down-circle" type="ionicon" color="green" size = {32}/>
-               </TouchableOpacity>
-               
-               <View style={leagueStyles.info}>
-                  <Text style={leagueStyles.title}>
-                     {actualleague.name}
-                  </Text>
-               </View>
-            </ImageBackground>
-         </View>
+          <View style={leagueStyles.info}>
+            <Text style={leagueStyles.title}>{actualleague.name}</Text>
+          </View>
+        </ImageBackground>
+      </View>
 
-
-         <View style={leagueStyles.body}>
-            <View style={leagueStyles.listHead}>
-               <View style={leagueStyles.enum}>
-                  <View style={{ width: 50, alignItems: "center", marginVertical: 5 }} >
-                     <Text style={{ color: "#FFFFFF" }}>Rank</Text>
-                  </View>
-                  
-                  <View style={{ width: 50, alignItems: "center", marginVertical: 5 }} >
-                     <Text style={{ color: "#FFFFFF" }}></Text>
-                  </View>
-                  
-                  <View style={{ flex: 1, width: "auto", alignItems: "center", marginVertical: 5 }} >
-                     <Text style={{ color: "#FFFFFF" }}>Nick</Text>
-                  </View>
-                  
-                  <View style={{ width: 100, alignItems: "center", marginVertical: 5 }} >
-                     <Text style={{ color: "#FFFFFF" }}>ELO</Text>
-                  </View>
-               </View>
+      <View style={leagueStyles.body}>
+        <View style={leagueStyles.listHead}>
+          <View style={leagueStyles.enum}>
+            <View
+              style={{ width: 50, alignItems: "center", marginVertical: 5 }}
+            >
+              <Text style={{ color: "#FFFFFF" }}>Rank</Text>
             </View>
 
-            <List list={memberList} Element={ItemLeague} />
-            
-            <FootLigue leagueId={actualleague._id} user={user} />
-         </View>
+            <View
+              style={{ width: 50, alignItems: "center", marginVertical: 5 }}
+            >
+              <Text style={{ color: "#FFFFFF" }}></Text>
+            </View>
+
+            <View
+              style={{
+                flex: 1,
+                width: "auto",
+                alignItems: "center",
+                marginVertical: 5,
+              }}
+            >
+              <Text style={{ color: "#FFFFFF" }}>Nick</Text>
+            </View>
+
+            <View
+              style={{ width: 100, alignItems: "center", marginVertical: 5 }}
+            >
+              <Text style={{ color: "#FFFFFF" }}>ELO</Text>
+            </View>
+          </View>
+        </View>
+
+        <List list={memberList} Element={ItemLeague} />
+
+        <FootLigue leagueId={actualleague._id} user={user} />
+      </View>
     </SafeAreaView>
-) }
+  );
+};
 
 export default League;
