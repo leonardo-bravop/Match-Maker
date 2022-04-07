@@ -146,38 +146,44 @@ exports.deleteUser = (req, res, next) => {
 
 exports.getUserByLeagueId = (req, res, next) => {
   const { leagueId } = req.params;
-  League.findById(leagueId)
-    .populate({
-      path: "users",
-      select: "nickname img elo",
-      populate: { path: "elo", match: { league: leagueId }, select: "value" },
-    })
-    .then(({ users }) => {
-      if (users) {
-        users.sort((a, b) => {
-          if (a["elo"][0] && b["elo"][0]) {
-            console.log(`a elo value es`, a["elo"]["0"]["value"]);
-            return a["elo"]["0"]["value"] > b["elo"]["0"]["value"]
-              ? -1
-              : b["elo"]["0"]["value"] > a["elo"]["0"]["value"]
-              ? 1
-              : 0;
-          } else if (!a["elo"][0] && b["elo"][0]) return 1;
-          else if (!b["elo"][0] && a["elo"][0]) return -1;
-        });
-        const rankedUsers = users.map((user, i) => {
-          return { rank: i + 1, ...user._doc };
-        });
-        res.send(rankedUsers);
-      } else {
+  if (leagueId) {
+    League.findById(leagueId)
+      .populate({
+        path: "users",
+        select: "nickname img elo",
+        populate: { path: "elo", match: { league: leagueId }, select: "value" },
+      })
+      .then(({ users }) => {
+        if (users) {
+          users.sort((a, b) => {
+            if (a["elo"][0] && b["elo"][0]) {
+              console.log(`a elo value es`, a["elo"]["0"]["value"]);
+              return a["elo"]["0"]["value"] > b["elo"]["0"]["value"]
+                ? -1
+                : b["elo"]["0"]["value"] > a["elo"]["0"]["value"]
+                ? 1
+                : 0;
+            } else if (!a["elo"][0] && b["elo"][0]) return 1;
+            else if (!b["elo"][0] && a["elo"][0]) return -1;
+          });
+          const rankedUsers = users.map((user, i) => {
+            return { rank: i + 1, ...user._doc };
+          });
+          res.send(rankedUsers);
+        } else {
+          res.status(400);
+          next(new Error("Invalid league id"));
+        }
+      })
+      .catch((error) => {
         res.status(400);
-        next(new Error("Invalid league id"));
-      }
-    })
-    .catch((error) => {
-      res.status(400);
-      next(new Error("An error ocurred"));
-    });
+        next(new Error("An error ocurred"));
+      });
+  }
+  else {
+    res.status(400);
+        next(new Error("Please enter a league id"));
+  }
 };
 
 exports.deleteLeague = (req, res, next) => {
@@ -195,7 +201,8 @@ exports.deleteLeague = (req, res, next) => {
 //get league by id
 exports.findShowLeague = (req, res, next) => {
   const { id } = req.params;
-  League.findById(id)
+  if (id) {
+    League.findById(id)
     .then((data) => {
       res.send(data);
     })
@@ -203,12 +210,17 @@ exports.findShowLeague = (req, res, next) => {
       res.status(400);
       next(new Error(error));
     });
+  }
+  else {
+    res.status(400);
+      next(new Error("Please enter a league id"));
+  }
 };
 
 //dividir get all en privadas y publicas
 exports.getAll = (req, res, next) => {
-  const{isPrivate} = req.params
-  League.find({isPrivate: (isPrivate==="true")})
+  const { isPrivate } = req.params;
+  League.find({ isPrivate: isPrivate === "true" })
     .then((data) => {
       res.send(data);
     })

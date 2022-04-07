@@ -117,13 +117,14 @@ const League = ({navigation}) => {
                         <View style={{ flex: 1}} >
                            <ScrollView >
                               <View>
-                                 { leagueList.map( (item, i) => {
+                                 { (leagueList[0]) ?
+                                 leagueList.map( (item, i) => {
                                     return (
                                        <TouchableOpacity style={{margin: 7}} onPress={()=>pressHandler(item._id)} >
                                           <Text style={{ color: "#FFFFFF", fontSize: 16, textAlign: 'center'}}>{item.name}</Text>
                                        </TouchableOpacity>
                                     )}
-                                 )}
+                                 ): <Text style={{ color: "#FFFFFF", fontSize: 16, textAlign: 'center'}}>"Acá aparecerán tus ligas, cuando te unas a alguna"</Text>}
                               </View>
                            </ScrollView>
                         </View>
