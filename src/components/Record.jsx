@@ -8,7 +8,8 @@ import {
   Text, 
   TouchableOpacity, 
   Modal,
-  Pressable  
+  Pressable,
+  ScrollView  
 } from "react-native";
 import CalendarStrip from 'react-native-calendar-strip'
 import { Icon } from "react-native-elements";
@@ -27,6 +28,7 @@ import { setMatch } from '../state/record';
 const Record = () => {
     let [recordList, setRecordList] = useState([])
     let [onDate, setOnDate] = useState(moment())
+    let [showAll, setShowAll] = useState(false)
 
     const { manifest } = Constants
     const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`      
@@ -40,10 +42,17 @@ const Record = () => {
     useEffect(()=>{
       axios.get(`${uri}/api/user/getMatches/${user._id}`)
       .then(({data}) => {
-          setRecordList(data)
+          setRecordList(data.reverse())
       })
       
-    },[])
+    },[showAll])
+
+    const matchDateHandler = matchDate => {
+      axios.get(`${uri}/api/user/${user._id}/getMatchesByDate/${matchDate}`)
+      .then(({data}) => {
+          setRecordList(data.reverse())
+      })
+    }
     
     return (
       <SafeAreaView style= {recordStyles.back}>
@@ -70,12 +79,21 @@ const Record = () => {
                      minDate={moment("01-01-2022", "MM-DD-YYYY")}
                      maxDate={moment().add(6, "M")}
                      selectedDate={onDate}
-                     onDateSelected={ selected => 
-                        setOnDate(moment(selected, "YYYY-MM-DDTHH:mm:ss.SSSZ"))}
+                     onDateSelected={ selected => {
+                        matchDateHandler(moment(selected, "YYYY-MM-DDTHH:mm:ss.SSSZ").format("DD-MM-YYYY"))
+                        setOnDate(moment(selected, "YYYY-MM-DDTHH:mm:ss.SSSZ"))
+                     } }
+                     markedDates = 
+                     {recordList.map( item =>{
+                      return {
+                        date: moment(item.date, "DD-MM-YYYY"),
+                        lines: [ { color: "red" } ]
+                      }
+                     })}
                   />
             </View>
 
-            <TouchableOpacity  style={{ height: 50, alignItems: "center", justifyContent: "center"}}>
+            <TouchableOpacity  onPress={()=> setShowAll(!showAll)} style={{ height: 50, alignItems: "center", justifyContent: "center"}}>
               <Text style={{ color: "#FFFFFF" }}>Mostrar todo</Text>
             </TouchableOpacity>
          </View>
@@ -104,7 +122,7 @@ const Record = () => {
         </View>
 
 
-        <Modal
+       {/*  <Modal
             animationType="fade"
             transparent={true}
             visible={match && match.id}
@@ -133,9 +151,47 @@ const Record = () => {
 
                </View>
             </View>
+         </Modal> */}
+
+         <Modal
+            animationType="fade"
+            transparent={true}
+            visible={match && match.id}
+            onRequestClose={() => {
+              dispatch(setMatch(null)) 
+            }}
+         >
+            <View style={{
+               height: "100%",  
+               backgroundColor: 'rgba(30,30,50,0.85)',
+               justifyContent: "flex-end"}}>
+               
+               <View>
+                  <ScrollView>
+                     <View style={{
+                        flex: 1,
+                        marginHorizontal: 16,
+                        backgroundColor: "#0e0b29", 
+                        paddingHorizontal: 8,
+                        borderTopRightRadius: 10,
+                        borderTopLeftRadius: 10 }}>
+               
+                      <Pressable style={{marginTop: 10, alignItems: "flex-end"}} 
+                        onPress={() => {
+                          dispatch(setMatch(null)) 
+                        }} >
+                        <Icon name="close-circle" type="ionicon" color="red" />
+                      </Pressable>
+
+                      <ConfirmCard/>
+                  
+                        
+            
+                     </View>
+                  </ScrollView>
+               </View>
+            </View>
          </Modal>
-
-
 
 
 

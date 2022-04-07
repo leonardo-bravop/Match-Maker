@@ -23,6 +23,7 @@ import { setUserLeagues } from "../state/userLeague";
 import { setLeagues } from "../state/league";
 import { setLeague } from "../state/selectLeague";
 import { setMembers } from "../state/memberList";
+import { setLeagueId } from "../state/idLeague";
 
 const screen = Dimensions.get("screen");
 
@@ -181,6 +182,7 @@ function Home({ navigation: { navigate } }) {
                 renderItem={({ item }) => (
                   <TouchableOpacity
                     onPress={() => {
+                      dispatch(setLeagueId(item._id));
                       dispatch(setLeague(item));
                       dispatch(setMembers(item._id));
                       navigate("Liga", item);
@@ -212,6 +214,7 @@ function Home({ navigation: { navigate } }) {
                 renderItem={({ item }) => (
                   <TouchableOpacity
                     onPress={() => {
+                      dispatch(setLeagueId(item._id));
                       dispatch(setLeague(item));
                       dispatch(setMembers(item._id));
                       navigate("Liga", item);

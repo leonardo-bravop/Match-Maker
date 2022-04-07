@@ -180,8 +180,8 @@ exports.getMatchesByUserId = (req, res, next) => {
     .populate({
       path: "matches",
       populate: [
-        { path: "equipo_1", select: "nickname" },
-        { path: "equipo_2", select: "nickname" },
+        { path: "team_1", select: "nickname" },
+        { path: "team_2", select: "nickname" },
       ],
     })
     .then((user) => {
@@ -194,24 +194,24 @@ exports.getMatchesByUserId = (req, res, next) => {
 };
 
 //update get matches by date
-exports.getMatchesByUserId = (req, res, next) => {
-  const { userId } = req.params;
-  User.findById(userId)
-    .populate({
-      path: "matches",
-      populate: [
-        { path: "equipo_1", select: "nickname" },
-        { path: "equipo_2", select: "nickname" },
-      ],
-    })
-    .then((user) => {
-      res.send(user.matches);
-    })
-    .catch((error) => {
-      res.status(400);
-      next(new Error(error));
-    });
-};
+// exports.getMatchesByUserId = (req, res, next) => {
+//   const { userId } = req.params;
+//   User.findById(userId)
+//     .populate({
+//       path: "matches",
+//       populate: [
+//         { path: "equipo_1", select: "nickname" },
+//         { path: "equipo_2", select: "nickname" },
+//       ],
+//     })
+//     .then((user) => {
+//       res.send(user.matches);
+//     })
+//     .catch((error) => {
+//       res.status(400);
+//       next(new Error(error));
+//     });
+// };
 
 exports.getUserMatchesByDate = (req, res, next) => {
   const { userId, date } = req.params;
