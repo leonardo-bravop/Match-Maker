@@ -111,19 +111,19 @@ const home = StyleSheet.create({
 
 function Home({ navigation: { navigate } }) {
   const { manifest } = Constants;
+  const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
-  const user = useSelector((state) => state.user);
   const userLeagues = useSelector((state) => state.userLeagues);
   const leagues = useSelector((state) => state.leagues);
 
   const [search, setSearch] = useState("");
   const [meLeagues, setMeLeagues] = useState(false);
   const [results, setResults] = useState({});
-  const [matches, setMatches] = useState([])
+  const [matches, setMatches] = useState([]);
 
   const [select, setSelect] = useState();
-  const [selectMeLeagues, setSelectMeLeagues] = useState({color : "#39424d"});
+  const [selectMeLeagues, setSelectMeLeagues] = useState({ color: "#39424d" });
 
   const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 
@@ -138,16 +138,20 @@ function Home({ navigation: { navigate } }) {
   useEffect(async () => {
     try {
       const userString = await AsyncStorage.getItem("userInfo");
-      if (userString) {
-        const result = await dispatch(setUserMe(userString));
-        const userLeagues = await dispatch(
-          setUserLeagues({ userId: result.payload._id })
-        );
-      }
+      console.log(`userString es`, userString);
+      if (!userString) return;
+      const result = await dispatch(setUserMe(userString));
+      const userLeagues = await dispatch(
+        setUserLeagues({ userId: result.payload._id })
+      );
+
       const { payload } = await dispatch(setLeagues(false));
-      const {data} = await axios.get(`${uri}/api/league/findLeague/${user._id}`)
-      console.log('DATA ===> ',data)
-      setMatches(data)
+      console.log(`result es`, result);
+      const { data } = await axios.get(
+        `${uri}/api/user/getMatches/${result.payload._id}`
+      );
+      console.log("DATA ===> ", data);
+      setMatches(data);
     } catch (err) {
       console.log(err);
     }
@@ -160,33 +164,35 @@ function Home({ navigation: { navigate } }) {
       </View>
       <View style={home.containerDos}>
         <Text style={home.lastTittle}>Ultima partida</Text>
-        {matches[0] ? 
-        <TouchableOpacity
-          style={home.lastContainer}
-          onPress={() => {
-            navigate("Historial");
-          }}
-        >
-          <View style={home.lastItem}>
-            <Text style={home.lastText}>{user.nickname}</Text>
-          </View>
-          <View style={home.lastItem}>
-            <Text
-              style={[
-                home.lastText,
-                { fontSize: 30, color: "#3498db", fontWeight: "normal" },
-              ]}
-            >
-              21-3
-            </Text>
-          </View>
-          <View style={home.lastItem}>
-            <Text style={home.lastText}>Taserface</Text>
-          </View>
-        </TouchableOpacity>
-        :
-        <Text style={{color: 'white', fontSize: 16, alignSelf: 'center'}}>Aun no tienes matches registradas</Text>
-      }
+        {matches[0] ? (
+          <TouchableOpacity
+            style={home.lastContainer}
+            onPress={() => {
+              navigate("Historial");
+            }}
+          >
+            <View style={home.lastItem}>
+              <Text style={home.lastText}>{matches.reverse()[0].team_1[0].nickname}</Text>
+            </View>
+            <View style={home.lastItem}>
+              <Text
+                style={[
+                  home.lastText,
+                  { fontSize: 24, color: "#3498db", fontWeight: "normal" },
+                ]}
+              >
+                {matches[0].status}
+              </Text>
+            </View>
+            <View style={home.lastItem}>
+              <Text style={home.lastText}>{matches.reverse()[0].team_2[0].nickname}</Text>
+            </View>
+          </TouchableOpacity>
+        ) : (
+          <Text style={{ color: "white", fontSize: 16, alignSelf: "center" }}>
+            Aun no tienes matches registradas
+          </Text>
+        )}
         <View style={{ marginTop: 10 }}>
           <SearchBar
             placeholder="Escribe aca..."
@@ -205,106 +211,111 @@ function Home({ navigation: { navigate } }) {
         </View>
       </View>
 
-        {results[0] ? (
-          <>
-            <View style={[home.ligaContainer, {marginTop: 20}]}>
-              <Text style={[home.ligaTittle, {width: "100%",}]}>RESULTADO</Text>
-            </View>
-            <Text style={{ color: "white", textAlign: "center" }}>
-              ──────────────────────────────────────
+      {results[0] ? (
+        <>
+          <View style={[home.ligaContainer, { marginTop: 20 }]}>
+            <Text style={[home.ligaTittle, { width: "100%" }]}>RESULTADO</Text>
+          </View>
+          <Text style={{ color: "white", textAlign: "center" }}>
+            ──────────────────────────────────────
+          </Text>
+          <FlatGrid
+            style={home.gridView}
+            itemDimension={120}
+            data={results}
+            // staticDimension={300}
+            // fixed
+            spacing={10}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                onPress={() => {
+                  dispatch(setLeagueId(item._id));
+                  dispatch(setLeague(item));
+                  dispatch(setMembers(item._id));
+                  navigate("Liga", item);
+                }}
+                style={[home.itemContainer, { backgroundColor: item.color }]}
+              >
+                <View style={{ flex: 1, justifyContent: "flex-start" }}>
+                  <Image
+                    source={{
+                      uri: item.img
+                        ? item.img
+                        : "https://trome.pe/resizer/G8-kkwwutkrNacKh5S6TJplAluU=/980x0/smart/filters:format(jpeg):quality(75)/cloudfront-us-east-1.images.arcpublishing.com/elcomercio/OXHJSIF4SZDAJP6F5PHFZTLRYI.jpg",
+                    }}
+                    resizeMode="cover"
+                    style={{ height: "100%" }}
+                  />
+                </View>
+                <Text style={home.itemName}>{item.name}</Text>
+                <Text style={home.itemCode}>{item.color}</Text>
+              </TouchableOpacity>
+            )}
+          />
+        </>
+      ) : (
+        <>
+          <View style={[home.ligaContainer, { marginTop: 20 }]}>
+            <Text
+              style={[home.ligaTittle, select]}
+              onPress={() => {
+                setSelect({ color: "white" });
+                setSelectMeLeagues({ color: "#39424d" });
+                setMeLeagues(false);
+              }}
+            >
+              LIGAS
             </Text>
-            <FlatGrid
-              style={home.gridView}
-              itemDimension={120}
-              data={results}
-              // staticDimension={300}
-              // fixed
-              spacing={10}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  onPress={() => {
-                    dispatch(setLeagueId(item._id));
-                    dispatch(setLeague(item));
-                    dispatch(setMembers(item._id));
-                    navigate("Liga", item);
-                  }}
-                  style={[home.itemContainer, { backgroundColor: item.color }]}
-                >
-                  <View style={{ flex: 1, justifyContent: "flex-start" }}>
-                    <Image
-                      source={{
-                        uri: item.img
-                          ? item.img
-                          : "https://trome.pe/resizer/G8-kkwwutkrNacKh5S6TJplAluU=/980x0/smart/filters:format(jpeg):quality(75)/cloudfront-us-east-1.images.arcpublishing.com/elcomercio/OXHJSIF4SZDAJP6F5PHFZTLRYI.jpg",
-                      }}
-                      resizeMode="cover"
-                      style={{ height: "100%" }}
-                    />
-                  </View>
-                  <Text style={home.itemName}>{item.name}</Text>
-                  <Text style={home.itemCode}>{item.color}</Text>
-                </TouchableOpacity>
-              )}
-            />
-          </>
-        ) : (
-          <>
-            <View style={[home.ligaContainer, {marginTop: 20}]}>
-              <Text style={[home.ligaTittle, select]} onPress={() => {
-                setSelect({color : "white"})
-                setSelectMeLeagues({color : "#39424d"})
-                setMeLeagues(false)
-              }
-            }>
-                LIGAS
-              </Text>
-              <Text style={[home.ligaTittle, selectMeLeagues]} onPress={() =>{
-                setSelectMeLeagues({color : "white"})
-                setSelect({color : "#39424d"})
-                setMeLeagues(true)
-              }}>
-                TUS LIGAS
-              </Text>
-            </View>
-            <Text style={{ color: "white", textAlign: "center" }}>
-              ──────────────────────────────────────
+            <Text
+              style={[home.ligaTittle, selectMeLeagues]}
+              onPress={() => {
+                setSelectMeLeagues({ color: "white" });
+                setSelect({ color: "#39424d" });
+                setMeLeagues(true);
+              }}
+            >
+              TUS LIGAS
             </Text>
+          </View>
+          <Text style={{ color: "white", textAlign: "center" }}>
+            ──────────────────────────────────────
+          </Text>
 
-            <FlatGrid
-              style={home.gridView}
-              itemDimension={120}
-              data={meLeagues ? userLeagues : leagues}
-              // staticDimension={300}
-              // fixed
-              spacing={10}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  onPress={() => {
-                    dispatch(setLeagueId(item._id));
-                    dispatch(setLeague(item));
-                    dispatch(setMembers(item._id));
-                    navigate("Liga", item);
-                  }}
-                  style={[home.itemContainer, { backgroundColor: item.color }]}
-                >
-                  <View style={{ flex: 1, justifyContent: "flex-start" }}>
-                    <Image
-                      source={{
-                        uri: item.img
-                          ? item.img
-                          : "https://trome.pe/resizer/G8-kkwwutkrNacKh5S6TJplAluU=/980x0/smart/filters:format(jpeg):quality(75)/cloudfront-us-east-1.images.arcpublishing.com/elcomercio/OXHJSIF4SZDAJP6F5PHFZTLRYI.jpg",
-                      }}
-                      resizeMode="cover"
-                      style={{ height: "100%" }}
-                    />
-                  </View>
-                  <Text style={home.itemName}>{item.name}</Text>
-                  <Text style={home.itemCode}>{item.color}</Text>
-                </TouchableOpacity>
-              )}
-            />
-          </>
-        )}
+          <FlatGrid
+            style={home.gridView}
+            itemDimension={120}
+            data={meLeagues ? userLeagues : leagues}
+            // staticDimension={300}
+            // fixed
+            spacing={10}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                onPress={() => {
+                  dispatch(setLeagueId(item._id));
+                  dispatch(setLeague(item));
+                  dispatch(setMembers(item._id));
+                  navigate("Liga", item);
+                }}
+                style={[home.itemContainer, { backgroundColor: item.color }]}
+              >
+                <View style={{ flex: 1, justifyContent: "flex-start" }}>
+                  <Image
+                    source={{
+                      uri: item.img
+                        ? item.img
+                        : "https://trome.pe/resizer/G8-kkwwutkrNacKh5S6TJplAluU=/980x0/smart/filters:format(jpeg):quality(75)/cloudfront-us-east-1.images.arcpublishing.com/elcomercio/OXHJSIF4SZDAJP6F5PHFZTLRYI.jpg",
+                    }}
+                    resizeMode="cover"
+                    style={{ height: "100%" }}
+                  />
+                </View>
+                <Text style={home.itemName}>{item.name}</Text>
+                <Text style={home.itemCode}>{item.color}</Text>
+              </TouchableOpacity>
+            )}
+          />
+        </>
+      )}
     </View>
   );
 }
