@@ -26,6 +26,8 @@ import ItemMatch from "./ItemMatch";
 import { useDispatch, useSelector } from "react-redux";
 import { resetTeams } from "../state/teams";
 import { resetChecks } from "../state/checks";
+import { setMembers } from "../state/memberList";
+import { setUserLeagues } from "../state/userLeague";
 
 
 const Match = ({navigation}) => {
@@ -34,26 +36,27 @@ const Match = ({navigation}) => {
    const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 
    let [memberList, setMemberList] = useState([])
-   let [leagueList, setLeagueList] = useState([])
    let [actualleague, setActualLeague] = useState({})
-   let [user, setUser] = useState({})
-   let [match, setMatch] = useState({})
    let [selectedValue, setSelectedValue] = useState("")
-   let [showCard, setShowCard] = useState(false)
-   let [showPicker, setShowPicker] = useState(false)
+   let [match, setMatch] = useState({})
+
    let [onDate, setOnDate] = useState(moment())
    let [nicks1, setNicks1] = useState([])
    let [nicks2, setNicks2] = useState([])
    let [description, setDescription] = useState("")
+
    let [noPress, setNoPress] = useState(false)
+   let [showCard, setShowCard] = useState(false)
+   let [showPicker, setShowPicker] = useState(false)
+
    let [errMessage, setErrMessage] = useState("No ha seleccionado ningun participante")
-   
-   
 
    const dispatch = useDispatch();
 
    const userData = useSelector( state => state.user)
+   const leagueList = useSelector( state => state.userLeagues)
    const teams = useSelector( state => state.teams )
+
 
    useEffect(()=>{
       setNoPress(false)
@@ -61,50 +64,27 @@ const Match = ({navigation}) => {
 
    useEffect(() => {
 
-      let rank = 0
-      
-      axios
-      .get(`${uri}/api/user/getLeagues/${userData._id}`)
-      .then(({data})=>{
-         setLeagueList(data)
+      const loadData = async () => {
+
+         const resData = await dispatch(setUserLeagues({ userId: userData._id }))
+
          if (selectedValue === "") 
-            setSelectedValue(data[0]._id)
-      })
+            setSelectedValue(resData.payload[0]._id)
 
-      axios
-      .get(`${uri}/api/league/getUsers/${selectedValue}`)
-      .then(({ data })=>{
-         setMemberList( data.map( (element, i) =>{
-            if ( userData._id === element._id) 
-                  rank = i+1
-            return {
-               id: element._id,
-               rank: i+1,
-               color:"blue",
-               nickname: element.nickname,
-               elo: 2931,
-            }
-         }))
-      })
-      .then(()=>{
-         setUser({
-            id: userData._id,
-            rank: rank,
-            color:"red",
-            nickname: userData.nickname,
-            elo: 2931,
-         })
-      })
+         const {payload} = await dispatch(setMembers(selectedValue === "" ? resData.payload[0]._id : selectedValue ))
 
-      
-      axios
-      .get(`${uri}/api/league/showLeague/${selectedValue}`)
-      .then( ({ data }) => {
+         setMemberList(payload)
+
+         const {data} = await axios.get(`${uri}/api/league/showLeague/${selectedValue}`)
+            
          setActualLeague(data)
+         setDescription("")
+         
          dispatch( resetChecks() )
          dispatch( resetTeams() )
-         setDescription("")
-      })
+      }
+
+      loadData()
 
    },[selectedValue])   
 
@@ -136,7 +116,7 @@ const Match = ({navigation}) => {
             team_2: members2Id, 
             date: moment(onDate).format("DD-MM-YYYY"),
             time: "16:45",
-            invitationText: description
+            invitationText: ""
          })
 
          setShowCard(true)
@@ -149,7 +129,7 @@ const Match = ({navigation}) => {
    }
 
    const confirmHandler = () => {
-
+      match.invitationText = description
       axios
       .post(`${uri}/api/match/newMatch`, match)
       .then(()=>{
@@ -335,7 +315,7 @@ const Match = ({navigation}) => {
                                        multiline={true}
                                        numberOfLines={4}
                                        placeholder="Texto de invitacion"
-                                       name="textArea"
+                                       name="text"
                                        keyboardType="default"
                                        onChangeText={ text => setDescription(text)}
                                        value={description}
