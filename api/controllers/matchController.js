@@ -5,6 +5,7 @@ const League = require("../models/League");
 const Result = require("../models/Result");
 
 //falta verificar que la longitud de team_1 sea igual a la de team_2
+//verificar que un usuario no este en los dos teams
 //actualizar invitations para que sean globales, no team 1, team 2
 exports.newMatch = (req, res, next) => {
   const { team_1, team_2, league, invitationText, date, time } = req.body;

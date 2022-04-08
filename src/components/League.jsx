@@ -228,6 +228,7 @@ const LeagueHome = ({ navigation }) => {
 
         <TouchableOpacity
           style={{
+            marginTop: 20,
             height: 50,
             borderRadius: 10,
             justifyContent: "center",

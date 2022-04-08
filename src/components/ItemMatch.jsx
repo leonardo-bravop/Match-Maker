@@ -52,8 +52,8 @@ const ItemMatch = ({ item }) => {
                   iconType="ionicon"
                   uncheckedIcon="checkbox-outline"
                   checkedIcon="checkbox"
-                  uncheckedColor='green'
-                  checkedColor="green"
+                  uncheckedColor='white'
+                  checkedColor="#45fc03"
                />
             </View>
          </View>
@@ -73,8 +73,8 @@ const ItemMatch = ({ item }) => {
                   iconType="ionicon"
                   uncheckedIcon="checkbox-outline"
                   checkedIcon="checkbox"
-                  uncheckedColor='green'
-                  checkedColor="green"
+                  uncheckedColor='white'
+                  checkedColor="#45fc03"
                />
             </View>
          </View>
