@@ -11,6 +11,7 @@ import {
   Button,
   TextInput,
   ActivityIndicator,
+  Image,
 } from "react-native";
 
 import axios from "axios";
@@ -233,7 +234,7 @@ const LeagueHome = ({ navigation }) => {
           }}
           onPress={() => navigation.navigate("Create a league")}
         >
-          <Text style={{ fontSize: 24, color: "white" }}>Crear liga</Text>
+          <Text style={{ fontSize: 18, color: "white" }}>CREAR LIGA</Text>
         </TouchableOpacity>
         <FootLigue leagueId={actualleague._id} user={user} />
       </View>
@@ -249,25 +250,27 @@ const HomeScreen = ({ navigation }) => {
 
   const handleRegister = (values) => {
     console.log("values son", values);
-    if(values.isPrivate.toLowerCase()!=="no") {
+    if (values.isPrivate.toLowerCase() !== "no") {
       values.isPrivate = !!values.isPrivate;
+    } else {
+      values.isPrivate = false;
     }
-    else {
-      values.isPrivate = false
-    }
-    if (values.secretKey === "") delete values.secretKey
+    if (values.secretKey === "") delete values.secretKey;
     console.log("values son", values);
     setIsLoading(true);
-    axios.post(`${uri}/api/league/new`, values).then((res) => {
-      setIsLoading(false);
-      console.log("====================================");
-      console.log("antes de navigate");
-      console.log("====================================");
-      res.status == 201 ? navigation.navigate("Leagues") : null;
-    }).catch(error=>{
-      setIsLoading(false);
-      console.log("error es", error);
-    })
+    axios
+      .post(`${uri}/api/league/new`, values)
+      .then((res) => {
+        setIsLoading(false);
+        console.log("====================================");
+        console.log("antes de navigate");
+        console.log("====================================");
+        res.status == 201 ? navigation.navigate("Leagues") : null;
+      })
+      .catch((error) => {
+        setIsLoading(false);
+        console.log("error es", error);
+      });
   };
 
   const validationSchema = yup.object().shape({
@@ -326,7 +329,7 @@ const HomeScreen = ({ navigation }) => {
 
             <View style={formR.inputContainer}>
               <TextInput
-                style={formR.inputs}
+                style={[formR.inputs, { marginTop: 40 }]}
                 onChangeText={handleChange("name")}
                 onBlur={handleBlur("name")}
                 value={values.name}
@@ -378,7 +381,8 @@ const HomeScreen = ({ navigation }) => {
                 name="secretKey"
               />
 
-              {values.isPrivate && values.isPrivate.toString().toLowerCase() !== "no" ? (
+              {values.isPrivate &&
+              values.isPrivate.toString().toLowerCase() !== "no" ? (
                 <Text>Ingrese una clave secreta</Text>
               ) : null}
 
@@ -401,24 +405,24 @@ const HomeScreen = ({ navigation }) => {
                 placeholder="Imagen (opcional)"
                 name="img"
               />
+              <Image
+                style={{
+                  marginTop: 20,
+                  height: "15%",
+                  backgroundColor: "transparent",
+                  resizeMode: "center",
+                }}
+                source={{ uri: values.img }}
+              />
             </View>
             <View style={{ display: "flex", flexDirection: "row" }}>
               <TouchableOpacity
-                style={{
-                  alignSelf: "center",
-                  borderWidth: 1,
-                  borderColor: "#f27e18",
-                  padding: 15,
-                  marginTop: 20,
-                  marginLeft: 20,
-                  marginRight: 20,
-                  borderRadius: 7,
-                }}
+                style={formR.leagueFormBtn}
                 onPress={() => navigation.goBack()}
               >
                 <Text style={formR.colorTxtBtn}>CANCELAR</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={formR.colorBtn} onPress={handleSubmit}>
+              <TouchableOpacity style={[formR.leagueFormBtn, {backgroundColor: "#e69249"}]} onPress={handleSubmit}>
                 <Text style={formR.colorTxtBtn}>CREAR</Text>
               </TouchableOpacity>
             </View>
