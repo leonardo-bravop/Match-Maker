@@ -148,7 +148,7 @@ function Register({ navigation }) {
             </View>
 
             <TouchableOpacity style={formR.colorBtn} onPress={handleSubmit}>
-              <Text style={formR.colorTxtBtn}>Registrarse</Text>
+              <Text style={formR.colorTxtBtn}>REGISTRARSE</Text>
             </TouchableOpacity>
           </>
         )}
@@ -157,7 +157,7 @@ function Register({ navigation }) {
         style={formR.colorTxtBtn}
         onPress={() => navigation.navigate("Login")}
       >
-        Login
+        LOGIN
       </Text>
       {isLoading ? <ActivityIndicator size="large" color="#00ff00" /> : null}
     </SafeAreaView>

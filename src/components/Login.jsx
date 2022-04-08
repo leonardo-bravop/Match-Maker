@@ -35,6 +35,7 @@ function Login({ navigation }) {
       // const returnedUser = await AsyncStorage.getItem('userInfo')
       // console.log(`STORED USER ES`, returnedUser)
       result.status == 200 ? navigation.navigate("Home") : null;
+      resetForm()
     } catch (err) {
       setIsLoading(false)
       setErrorMessage(true)
@@ -59,7 +60,8 @@ function Login({ navigation }) {
         validateOnMount={true}
         validationSchema={validationSchema}
         initialValues={{ email: "", password: "" }}
-        onSubmit={(values) => handleLogin(values)}
+        onSubmit={(values, {resetForm}) => {
+          handleLogin(values, resetForm)}}
       >
         {({
           handleChange,
@@ -101,17 +103,18 @@ function Login({ navigation }) {
             </View>
 
             <TouchableOpacity disable style={form.colorBtn} onPress={handleSubmit}>
-              <Text style={form.colorTxtBtn}>Aceptar</Text>
+              <Text style={form.colorTxtBtn}>ACEPTAR</Text>
             </TouchableOpacity>
           </>
         )}
       </Formik>
-      {errorMessage ? <Text style={{color : "white", fontSize : 18, textAlign : "center", backgroundColor : "pink", marginTop: 20}}>El email o la contraseña ingresado no coniceden con ningun usuario registrado</Text> : null}
+      {errorMessage ? <Text style={{color : "white", fontSize : 18, textAlign : "center", backgroundColor: "red", marginTop: 20, borderRadius: 20}}>El email o la contraseña ingresado no coinceden con ningun usuario registrado</Text> : null}
       <Text
         style={form.colorTxtBtn}
-        onPress={() => navigation.navigate("Register")}
+        onPress={() => {setErrorMessage(false)
+          navigation.navigate("Register")}}
       >
-        registro
+        No tenes usuario? Registrate!
       </Text>
       {isLoading ? <ActivityIndicator size="large" color="#00ff00" /> : null}
     </SafeAreaView>

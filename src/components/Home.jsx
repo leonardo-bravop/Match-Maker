@@ -120,6 +120,7 @@ function Home({ navigation: { navigate } }) {
   const [search, setSearch] = useState("");
   const [meLeagues, setMeLeagues] = useState(false);
   const [results, setResults] = useState({});
+  const [matches, setMatches] = useState([])
 
   const [select, setSelect] = useState();
   const [selectMeLeagues, setSelectMeLeagues] = useState({color : "#39424d"});
@@ -144,6 +145,9 @@ function Home({ navigation: { navigate } }) {
         );
       }
       const { payload } = await dispatch(setLeagues(false));
+      const {data} = await axios.get(`${uri}/api/league/findLeague/${user._id}`)
+      console.log('DATA ===> ',data)
+      setMatches(data)
     } catch (err) {
       console.log(err);
     }
@@ -156,7 +160,7 @@ function Home({ navigation: { navigate } }) {
       </View>
       <View style={home.containerDos}>
         <Text style={home.lastTittle}>Ultima partida</Text>
-
+        {matches[0] ? 
         <TouchableOpacity
           style={home.lastContainer}
           onPress={() => {
@@ -180,9 +184,12 @@ function Home({ navigation: { navigate } }) {
             <Text style={home.lastText}>Taserface</Text>
           </View>
         </TouchableOpacity>
+        :
+        <Text style={{color: 'white', fontSize: 16, alignSelf: 'center'}}>Aun no tienes matches registradas</Text>
+      }
         <View style={{ marginTop: 10 }}>
           <SearchBar
-            placeholder="Type Here..."
+            placeholder="Escribe aca..."
             onChangeText={updateSearch}
             value={search}
             lightTheme={true}

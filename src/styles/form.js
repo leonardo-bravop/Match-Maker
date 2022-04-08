@@ -104,7 +104,7 @@ export const formR = StyleSheet.create({
   },
   colorTxtBtn: {
     color: '#FFFFFF',
-    fontSize: 20,
+    fontSize: 18,
     textAlign: 'center'
   }
 })
