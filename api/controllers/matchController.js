@@ -15,7 +15,7 @@ exports.newMatch = (req, res, next) => {
       Result.create({ match: matchId })
         .then((result) => {
           const resultId = result._id.toString();
-          match.result[0] = resultId;
+          match.result = resultId;
           return match.save();
         })
         .then((updatedMatch) => {
@@ -90,7 +90,6 @@ exports.deleteMatch = (req, res, next) => {
       if (match.status !== "confirmed") {
         canDelete = true;
         matchReference = match;
-        console.log("Match es", match);
         const usersArray = match.team_1.concat(match.team_2);
         const promisesArray = usersArray.map((userId) => {
           return User.findByIdAndUpdate(userId, { $pull: { matches: id } });
@@ -108,11 +107,10 @@ exports.deleteMatch = (req, res, next) => {
         });
     })
     .then(() => {
-      if (canDelete)
-      return Match.findByIdAndDelete(id);
+      if (canDelete) return Match.findByIdAndDelete(id);
       else {
         res.status(400);
-      next(new Error("Can't delete a confirmed Match"))
+        next(new Error("Can't delete a confirmed Match"));
       }
     })
     .then((result) => res.send(result))
@@ -125,7 +123,11 @@ exports.deleteMatch = (req, res, next) => {
 exports.findMatch = (req, res, next) => {
   const { id } = req.params;
   Match.findById(id)
-    .populate({ path: "league", select: "name sport description color img" })
+    .populate(
+      { path: "league", select: "name sport description color img" },
+      { path: "invitations_team1" },
+      { path: "invitations_team2" }
+    )
     .then((data) => {
       res.send(data);
     })

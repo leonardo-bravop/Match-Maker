@@ -9,7 +9,7 @@ const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 export const setMembers = createAsyncThunk("SET_MEMBERS", (leagueid) => {
   return axios
     .get(`${uri}/api/league/getUsers/${leagueid}`)
-    .then((res) => res.data);
+    .then((res) => res.data.rankedUsers);
 });
 
 export const addUserToLeague = createAsyncThunk(

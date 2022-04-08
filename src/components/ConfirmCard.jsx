@@ -1,19 +1,30 @@
 import { View, Text, TouchableOpacity } from "react-native";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { leagueStyles } from "../styles/league";
-import axios, { Axios } from "axios";
+import axios from "axios";
 import moment from "moment";
 import { useDispatch, useSelector } from "react-redux";
+import Constants from "expo-constants";
 
 const ConfirmCard = () => {
   const match = useSelector((state) => state.match);
+  const user = useSelector((state) => state.user);
+  const [isAccepted, setIsAccepted] = useState(true)
+
+  const { manifest } = Constants;
+  const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
+
+  useEffect(()=>{
+    const equipos = match.invitations_team1.concat(match.invitations_team2)
+    const arrayInvit = equipos.filter(invitation=>invitation.toId===user._id)
+    if (!arrayInvit[0]) return
+    if(arrayInvit[0].status==="accepted") setIsAccepted(false)
+  }, [match])
 
   const acceptHandler = () => {
-    Axios.get(
-      `${uri}/api/invitation/invitAcepted/${match.id}/user/${user._id}`
-    ).then(({ data }) => {
-      console.log("Invitacion aceptada con exito", data);
-    });
+    axios
+      .put(`${uri}/api/invitation/invitAcepted/${match._id}/user/${user._id}`)
+      .then(({ data }) => {setIsAccepted(false)});
   };
 
   return (
@@ -77,12 +88,18 @@ const ConfirmCard = () => {
         </View>
       </View>
       <View style={{ height: 115 }}>
-        <TouchableOpacity
-          style={[leagueStyles.join, { backgroundColor: "#16a085" }]}
-          onPress={acceptHandler}
-        >
-          <Text style={leagueStyles.joinTxt}>Boton confirm ocultable</Text>
-        </TouchableOpacity>
+        {isAccepted ? (
+          <TouchableOpacity
+            style={[leagueStyles.join, { backgroundColor: "#16a085" }]}
+            onPress={acceptHandler}
+          >
+            <Text style={leagueStyles.joinTxt}>Confirmar participación</Text>
+          </TouchableOpacity>
+        ) : (
+          <Text style={leagueStyles.joinTxt}>
+            Ya has confirmado tu participación
+          </Text>
+        )}
       </View>
     </View>
   );
