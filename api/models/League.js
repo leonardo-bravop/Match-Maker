@@ -11,7 +11,10 @@ const leagueSchema = new Schema({
     type: String,
   },
   description: String,
-  isPrivate: { type: Boolean, default: false },
+  isPrivate: {
+    type: Boolean,
+    default: false,
+  },
   secretKey: {
     type: String,
     match: [

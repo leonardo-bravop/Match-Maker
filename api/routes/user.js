@@ -14,6 +14,8 @@ router.post("/logout", userController.logOut)
 
 router.get("/getLeagues/:userId", userController.getLeaguesByUserId)
 
+router.get("/getLeaguesAndRank/:userId", userController.getLeaguesAndRankByUserId)
+
 router.get("/getMatches/:userId", userController.getMatchesByUserId)
 
 // router.post("/check", verifyToken, (req, res) => {
