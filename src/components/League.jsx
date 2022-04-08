@@ -8,6 +8,9 @@ import {
   ScrollView,
   Pressable,
   Modal,
+  Button,
+  TextInput,
+  ActivityIndicator,
 } from "react-native";
 
 import axios from "axios";
@@ -24,7 +27,14 @@ import ItemLeague from "./ItemLeague";
 import FootLigue from "./FootLeague";
 import { setLeagueId } from "../state/idLeague";
 
-const League = ({ navigation }) => {
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+
+import { Formik } from "formik";
+import * as yup from "yup";
+import { formR } from "../styles/form";
+
+const LeagueHome = ({ navigation }) => {
   const { manifest } = Constants;
   const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 
@@ -87,7 +97,7 @@ const League = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={leagueStyles.back}>
+    <View style={leagueStyles.back}>
       <Modal animationType="fade" transparent={true} visible={showCard}>
         <Pressable
           onPress={() => {
@@ -139,7 +149,9 @@ const League = ({ navigation }) => {
           </View>
         </Pressable>
       </Modal>
+      {/* <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}> */}
 
+      {/* </View> */}
       <View
         style={[leagueStyles.head, { backgroundColor: actualleague.color }]}
       >
@@ -204,10 +216,240 @@ const League = ({ navigation }) => {
         </View>
 
         <List list={memberList} Element={ItemLeague} />
+        <TouchableOpacity
+          style={{
+            height: 50,
+            borderRadius: 10,
+            justifyContent: "center",
+            alignItems: "center",
+            borderWidth: 2,
+            borderColor: "#16a085",
+            alignSelf: "center",
+            paddingHorizontal: 20,
+            position: "relative",
 
+            // left: 10,
+            // top: 10,
+          }}
+          onPress={() => navigation.navigate("Create a league")}
+        >
+          <Text style={{ fontSize: 24, color: "white" }}>Crear liga</Text>
+        </TouchableOpacity>
         <FootLigue leagueId={actualleague._id} user={user} />
       </View>
-    </SafeAreaView>
+    </View>
+  );
+};
+
+const HomeScreen = ({ navigation }) => {
+  const { manifest } = Constants;
+  const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleRegister = (values) => {
+    console.log("values son", values);
+    if(values.isPrivate.toLowerCase()!=="no") {
+      values.isPrivate = !!values.isPrivate;
+    }
+    else {
+      values.isPrivate = false
+    }
+    if (values.secretKey === "") delete values.secretKey
+    console.log("values son", values);
+    setIsLoading(true);
+    axios.post(`${uri}/api/league/new`, values).then((res) => {
+      setIsLoading(false);
+      console.log("====================================");
+      console.log("antes de navigate");
+      console.log("====================================");
+      res.status == 201 ? navigation.navigate("Leagues") : null;
+    }).catch(error=>{
+      setIsLoading(false);
+      console.log("error es", error);
+    })
+  };
+
+  const validationSchema = yup.object().shape({
+    name: yup.string("Ingresa tu nombre").required("*Campo requerido"),
+    // surname: yup.string("Ingresa tu apellido").required("*Campo requerido"),
+
+    // nickname: yup
+    //   .string("Ingresa tu nickname")
+    //   .required("*Campo requerido")
+    //   .max(10, "El nickname debe tener un maximo de 10 caracteres"),
+
+    // password: yup
+    //   .string("Ingresa tu eontraseña")
+    //   .min(8, "La contraseña debe tener al menos 8 caracteres")
+    //   .required("*Campo requerido")
+    //   .matches(
+    //     /^(?=(.*[A-Z]){1,})(?=(.*[0-9]){1,}).{8,}$/,
+    //     "La contraseña debe tener al menos una mayúscula y un número"
+    //   ),
+  });
+
+  return (
+    <View
+      style={{
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "#090717",
+      }}
+    >
+      <Formik
+        validateOnMount={true}
+        validationSchema={validationSchema}
+        initialValues={{
+          name: "",
+          sport: "",
+          description: "",
+          isPrivate: "",
+          secretKey: "",
+          color: "",
+          img: "",
+        }}
+        onSubmit={(values) => handleRegister(values)}
+      >
+        {({
+          handleChange,
+          handleBlur,
+          handleSubmit,
+          values,
+          errors,
+          touched,
+          isValid,
+        }) => (
+          <>
+            <Text style={formR.formTittle}>Nueva Liga</Text>
+
+            <View style={formR.inputContainer}>
+              <TextInput
+                style={formR.inputs}
+                onChangeText={handleChange("name")}
+                onBlur={handleBlur("name")}
+                value={values.name}
+                keyboardType="default"
+                placeholder="Nombre de la liga"
+                name="name"
+              />
+
+              {errors.name && touched.name && <Text>{errors.name}</Text>}
+
+              <TextInput
+                style={formR.inputs}
+                onChangeText={handleChange("sport")}
+                onBlur={handleBlur("sport")}
+                value={values.sport}
+                keyboardType="default"
+                placeholder="Deporte"
+                name="sport"
+              />
+
+              <TextInput
+                style={formR.inputs}
+                onChangeText={handleChange("description")}
+                onBlur={handleBlur("description")}
+                value={values.description}
+                keyboardType="default"
+                placeholder="Descripción"
+                name="description"
+              />
+
+              <TextInput
+                style={formR.inputs}
+                placeholder="¿Es privada?"
+                name="email"
+                onChangeText={handleChange("isPrivate")}
+                onBlur={handleBlur("isPrivate")}
+                value={values.isPrivate}
+                keyboardType="default"
+              />
+
+              <TextInput
+                style={formR.inputs}
+                onChangeText={handleChange("secretKey")}
+                onBlur={handleBlur("secretKey")}
+                value={values.secretKey}
+                keyboardType="default"
+                secureTextEntry={true}
+                placeholder="Clave Secreta"
+                name="secretKey"
+              />
+
+              {values.isPrivate && values.isPrivate.toString().toLowerCase() !== "no" ? (
+                <Text>Ingrese una clave secreta</Text>
+              ) : null}
+
+              <TextInput
+                style={formR.inputs}
+                onChangeText={handleChange("color")}
+                onBlur={handleBlur("color")}
+                value={values.color}
+                keyboardType="default"
+                placeholder="Color en formato: #FFFFFF"
+                name="color"
+              />
+
+              <TextInput
+                style={formR.inputs}
+                onChangeText={handleChange("img")}
+                onBlur={handleBlur("img")}
+                value={values.img}
+                keyboardType="default"
+                placeholder="Imagen (opcional)"
+                name="img"
+              />
+            </View>
+            <View style={{ display: "flex", flexDirection: "row" }}>
+              <TouchableOpacity
+                style={{
+                  alignSelf: "center",
+                  borderWidth: 1,
+                  borderColor: "#f27e18",
+                  padding: 15,
+                  marginTop: 20,
+                  marginLeft: 20,
+                  marginRight: 20,
+                  borderRadius: 7,
+                }}
+                onPress={() => navigation.goBack()}
+              >
+                <Text style={formR.colorTxtBtn}>CANCELAR</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={formR.colorBtn} onPress={handleSubmit}>
+                <Text style={formR.colorTxtBtn}>CREAR</Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
+      </Formik>
+
+      {isLoading ? <ActivityIndicator size="large" color="#00ff00" /> : null}
+      {/* <Button title="Cancelar" onPress={() => navigation.goBack()} /> */}
+    </View>
+  );
+};
+
+const Stack = createStackNavigator();
+
+function MyStack() {
+  return (
+    <Stack.Navigator
+      screenOptions={{ headerShown: false, animationEnabled: false }}
+    >
+      <Stack.Screen name="Leagues" component={LeagueHome} />
+      <Stack.Screen name="Create a league" component={HomeScreen} />
+    </Stack.Navigator>
+  );
+}
+
+const League = () => {
+  return (
+    <NavigationContainer>
+      <MyStack />
+    </NavigationContainer>
   );
 };
 

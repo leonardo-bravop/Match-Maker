@@ -6,32 +6,38 @@ const Elo = require("../models/Elo");
 exports.new = (req, res, next) => {
   const { name, sport, description, isPrivate, secretKey, color, img } =
     req.body;
-  League.findOne({ name })
-    .then((league) => {
-      if (league) {
-        res.status(400);
-        next(new Error("League Already Exists"));
-      } else {
-        League.create({
-          name,
-          sport,
-          description,
-          isPrivate,
-          secretKey,
-          color,
-          img,
-        })
-          .then((league) => {
-            res.status(201).send(league);
+    console.log(`req body es`, req.body);
+  if (isPrivate && !secretKey) {
+    res.status(400);
+    next(new Error("A private league must have a secret key"));
+  } else {
+    League.findOne({ name })
+      .then((league) => {
+        if (league) {
+          res.status(400);
+          next(new Error("League Already Exists"));
+        } else {
+          League.create({
+            name,
+            sport,
+            description,
+            isPrivate,
+            secretKey,
+            color,
+            img,
           })
-          .catch((error) => {
-            next(new Error(error));
-          });
-      }
-    })
-    .catch((error) => {
-      next(new Error(error));
-    });
+            .then((league) => {
+              res.status(201).send(league);
+            })
+            .catch((error) => {
+              next(new Error(error));
+            });
+        }
+      })
+      .catch((error) => {
+        next(new Error(error));
+      });
+  }
 };
 
 exports.addUser = (req, res, next) => {
@@ -153,9 +159,9 @@ exports.getUserByLeagueId = (req, res, next) => {
         select: "nickname img elo",
         populate: { path: "elo", match: { league: leagueId }, select: "value" },
       })
-      .then(league => {
+      .then((league) => {
         if (league.users) {
-          const leagueUsers = league.users
+          const leagueUsers = league.users;
           console.log(`pedido a league users`);
           console.log(`league es`, league);
           leagueUsers.sort((a, b) => {
@@ -171,7 +177,7 @@ exports.getUserByLeagueId = (req, res, next) => {
           const rankedUsers = leagueUsers.map((user, i) => {
             return { rank: i + 1, ...user._doc };
           });
-          res.send({league, rankedUsers});
+          res.send({ league, rankedUsers });
         } else {
           res.status(400);
           next(new Error("Invalid league id"));
@@ -181,10 +187,9 @@ exports.getUserByLeagueId = (req, res, next) => {
         res.status(400);
         next(new Error("An error ocurred"));
       });
-  }
-  else {
+  } else {
     res.status(400);
-        next(new Error("Please enter a league id"));
+    next(new Error("Please enter a league id"));
   }
 };
 
@@ -205,17 +210,16 @@ exports.findShowLeague = (req, res, next) => {
   const { id } = req.params;
   if (id) {
     League.findById(id)
-    .then((data) => {
-      res.send(data);
-    })
-    .catch((error) => {
-      res.status(400);
-      next(new Error(error));
-    });
-  }
-  else {
+      .then((data) => {
+        res.send(data);
+      })
+      .catch((error) => {
+        res.status(400);
+        next(new Error(error));
+      });
+  } else {
     res.status(400);
-      next(new Error("Please enter a league id"));
+    next(new Error("Please enter a league id"));
   }
 };
 
