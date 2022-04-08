@@ -1,112 +1,160 @@
-import { 
-   View, 
-   Text,
-   TouchableOpacity  
-} from "react-native";
-import React, { useEffect } from "react";
+import { View, Text, TouchableOpacity } from "react-native";
+import React, { useEffect, useState } from "react";
 import { leagueStyles } from "../styles/league";
 import axios from "axios";
-import moment from 'moment';
+import moment from "moment";
 import { useDispatch, useSelector } from "react-redux";
+import Constants from "expo-constants";
 
 const ConfirmCard = () => {
+  const match = useSelector((state) => state.match);
+  const user = useSelector((state) => state.user);
+  const [isAccepted, setIsAccepted] = useState(true)
 
-   const match = useSelector( state => state.match)
+  const { manifest } = Constants;
+  const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 
-   return (<View style={{ flex: 1, /*backgroundColor: "blue"*/}} >
-                           <View style={{ height: 50, /*backgroundColor: "green",*/ alignItems: "center", justifyContent: "center"}} >
-                              <Text style={{ fontSize: 25, marginBottom: 8, color: 'white' }}>
-                                 Detalles del match
-                              </Text>
-                           </View>
-                           <View style={{ flex: 1, /*backgroundColor: "yellow"*/}} >
-                              <View style={{ flex: 1, /*backgroundColor: "blue",*/ flexDirection: "row"}} >
-                                 <View style={{ flex: 1, /*backgroundColor: "grey",*/ alignItems: "center"}} >
-                                    <Text style={{ marginVertical: 8, color: 'white'}}>Equipo A</Text>
-                                    <View style={{flex: 1, alignItems: "center"}}>
-                                    {match && match.team_1.map( user => {
-                                     return (
-                                        <Text style={{color: 'white'}}>{user.nickname}</Text>)
-                                 })}
-                                    </View>
-                                 </View>
-                                 <View style={{ flex: 1, /*backgroundColor: "red",*/ alignItems: "center"}} >
-                                    <Text style={{ marginVertical: 8, color: 'white'}}>Equipo B</Text>
-                                    <View style={{flex: 1, alignItems: "center"}}>
-                                    {match && match.team_2.map( user => {
-                                     return (
-                                        <Text style={{color: 'white'}}>{user.nickname}</Text>)
-                                  })}
-                                    </View>
-                                 </View>
-                              </View>
+  useEffect(()=>{
+    const equipos = match.invitations_team1.concat(match.invitations_team2)
+    const arrayInvit = equipos.filter(invitation=>invitation.toId===user._id)
+    if (!arrayInvit[0]) return
+    if(arrayInvit[0].status==="accepted") setIsAccepted(false)
+  }, [match])
 
-                              <Text style={{paddingHorizontal: 8, marginTop: 12, color: 'white'}}>
-                                 El partido se disputara el {moment(match.date, "DD-MM-YYYY").format("DD [de] MMMM [de] YYYY")} a las {match.time}
-                              </Text>
-                              <View style={{ height: "auto", marginTop: 16, borderRadius: 10}}>
-               <Text>Descripcion</Text>
-             </View>
-                           </View>
-                           <View style={{ height: 115}} >
-             <TouchableOpacity style={[leagueStyles.join, {backgroundColor:"#16a085"}]} 
-                      >
-                <Text style={leagueStyles.joinTxt}>Boton confirm ocultable</Text>
-             </TouchableOpacity>
+  const acceptHandler = () => {
+    axios
+      .put(`${uri}/api/invitation/invitAcepted/${match._id}/user/${user._id}`)
+      .then(({ data }) => {setIsAccepted(false)});
+  };
+
+  return (
+    <View style={{ flex: 1 /*backgroundColor: "blue"*/ }}>
+      <View
+        style={{
+          height: 50,
+          /*backgroundColor: "green",*/ alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Text style={{ fontSize: 25, marginBottom: 8, color: "white" }}>
+          Detalles del match
+        </Text>
+      </View>
+      <View style={{ flex: 1 /*backgroundColor: "yellow"*/ }}>
+        <View
+          style={{ flex: 1, /*backgroundColor: "blue",*/ flexDirection: "row" }}
+        >
+          <View
+            style={{
+              flex: 1,
+              /*backgroundColor: "grey",*/ alignItems: "center",
+            }}
+          >
+            <Text style={{ marginVertical: 8, color: "white" }}>Equipo A</Text>
+            <View style={{ flex: 1, alignItems: "center" }}>
+              {match &&
+                match.team_1.map((user) => {
+                  return (
+                    <Text style={{ color: "white" }}>{user.nickname}</Text>
+                  );
+                })}
+            </View>
           </View>
-                        </View>)
+          <View
+            style={{
+              flex: 1,
+              /*backgroundColor: "red",*/ alignItems: "center",
+            }}
+          >
+            <Text style={{ marginVertical: 8, color: "white" }}>Equipo B</Text>
+            <View style={{ flex: 1, alignItems: "center" }}>
+              {match &&
+                match.team_2.map((user) => {
+                  return (
+                    <Text style={{ color: "white" }}>{user.nickname}</Text>
+                  );
+                })}
+            </View>
+          </View>
+        </View>
 
-   // return(
+        <Text style={{ paddingHorizontal: 8, marginTop: 12, color: "white" }}>
+          El partido se disputara el{" "}
+          {moment(match.date, "DD-MM-YYYY").format("DD [de] MMMM [de] YYYY")} a
+          las {match.time}
+        </Text>
+        <View style={{ height: "auto", marginTop: 16, borderRadius: 10 }}>
+          <Text>Descripcion</Text>
+        </View>
+      </View>
+      <View style={{ height: 115 }}>
+        {isAccepted ? (
+          <TouchableOpacity
+            style={[leagueStyles.join, { backgroundColor: "#16a085" }]}
+            onPress={acceptHandler}
+          >
+            <Text style={leagueStyles.joinTxt}>Confirmar participación</Text>
+          </TouchableOpacity>
+        ) : (
+          <Text style={leagueStyles.joinTxt}>
+            Ya has confirmado tu participación
+          </Text>
+        )}
+      </View>
+    </View>
+  );
 
-   //    <View style={{ flex: 1, backgroundColor: "blue"}} >
-   //       <View style={{ height: 50, backgroundColor: "green", alignItems: "center", justifyContent: "center"}} >
-   //          <Text>
-   //             Detalles del match
-   //          </Text>  
-   //       </View>
-         
-   //       <View style={{ flex: 1, backgroundColor: "yellow"}} >
-   //          <View style={{ flex: 1, backgroundColor: "blue", flexDirection: "row"}} >
-   //             <View style={{ flex: 1, backgroundColor: "grey", alignItems: "center"}} >
-   //                <Text style={{ marginVertical: 8}}>Equipo A</Text>
-                        
-   //                <View style={{flex: 1, alignItems: "center"}}>
-   //                                {match && match.team_1.map( user => {
-   //                                  return (
-   //                                     <Text>{user.nickname}</Text>)
-   //                               })}
-   //                </View>
-   //             </View>
-                           
-   //             <View style={{ flex: 1, backgroundColor: "red", alignItems: "center"}} >
-   //                <Text style={{ marginVertical: 8}}>Equipo B</Text>
-                        
-   //                <View style={{flex: 1, alignItems: "center"}}>
-   //                               {match && match.team_2.map( user => {
-   //                                  return (
-   //                                     <Text>{user.nickname}</Text>)
-   //                               })}
-   //                </View>
-   //             </View>
-   //          </View>
+  // return(
 
-   //          <Text>
-   //             El partido se disputara el {moment(match.date, "DD-MM-YYYY").format("DD [de] MMMM [de] YYYY")} a las {match.time}
-   //          </Text>
-                  
-   //          <View style={{ height: 84, marginTop: 16, borderRadius: 10}}>
-   //             <Text>Descripcion</Text>
-   //          </View>
-   //       </View>
-               
-   //       <View style={{ height: 115, backgroundColor: "red"}} >
-   //          <TouchableOpacity style={[leagueStyles.join, {backgroundColor:"#16a085"}]} 
-   //                   >
-   //             <Text style={leagueStyles.joinTxt}>Boton confirm ocultable</Text>
-   //          </TouchableOpacity>
-   //       </View>
-   //    </View>
-   // )
-}
+  //    <View style={{ flex: 1, backgroundColor: "blue"}} >
+  //       <View style={{ height: 50, backgroundColor: "green", alignItems: "center", justifyContent: "center"}} >
+  //          <Text>
+  //             Detalles del match
+  //          </Text>
+  //       </View>
 
-export default ConfirmCard
+  //       <View style={{ flex: 1, backgroundColor: "yellow"}} >
+  //          <View style={{ flex: 1, backgroundColor: "blue", flexDirection: "row"}} >
+  //             <View style={{ flex: 1, backgroundColor: "grey", alignItems: "center"}} >
+  //                <Text style={{ marginVertical: 8}}>Equipo A</Text>
+
+  //                <View style={{flex: 1, alignItems: "center"}}>
+  //                                {match && match.team_1.map( user => {
+  //                                  return (
+  //                                     <Text>{user.nickname}</Text>)
+  //                               })}
+  //                </View>
+  //             </View>
+
+  //             <View style={{ flex: 1, backgroundColor: "red", alignItems: "center"}} >
+  //                <Text style={{ marginVertical: 8}}>Equipo B</Text>
+
+  //                <View style={{flex: 1, alignItems: "center"}}>
+  //                               {match && match.team_2.map( user => {
+  //                                  return (
+  //                                     <Text>{user.nickname}</Text>)
+  //                               })}
+  //                </View>
+  //             </View>
+  //          </View>
+
+  //          <Text>
+  //             El partido se disputara el {moment(match.date, "DD-MM-YYYY").format("DD [de] MMMM [de] YYYY")} a las {match.time}
+  //          </Text>
+
+  //          <View style={{ height: 84, marginTop: 16, borderRadius: 10}}>
+  //             <Text>Descripcion</Text>
+  //          </View>
+  //       </View>
+
+  //       <View style={{ height: 115, backgroundColor: "red"}} >
+  //          <TouchableOpacity style={[leagueStyles.join, {backgroundColor:"#16a085"}]}
+  //                   >
+  //             <Text style={leagueStyles.joinTxt}>Boton confirm ocultable</Text>
+  //          </TouchableOpacity>
+  //       </View>
+  //    </View>
+  // )
+};
+
+export default ConfirmCard;

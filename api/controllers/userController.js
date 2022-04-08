@@ -154,9 +154,10 @@ exports.me = (req, res, next) => {
 
 exports.getLeaguesByUserId = (req, res, next) => {
   const { userId } = req.params;
-  User.findById(userId).populate({path: "leagues"})
+  User.findById(userId)
+    .populate({ path: "leagues" })
     .then((user) => {
-      res.send(user.leagues)
+      res.send(user.leagues);
     })
     .catch((error) => {
       res.status(400);
@@ -241,6 +242,8 @@ exports.getMatchesByUserId = (req, res, next) => {
       populate: [
         { path: "team_1", select: "nickname" },
         { path: "team_2", select: "nickname" },
+        { path: "invitations_team1" },
+        { path: "invitations_team2" },
       ],
     })
     .then((user) => {
@@ -260,6 +263,8 @@ exports.getUserMatchesByDate = (req, res, next) => {
       populate: [
         { path: "team_1", select: "nickname" },
         { path: "team_2", select: "nickname" },
+        { path: "invitations_team1" },
+        { path: "invitations_team2" },
       ],
       match: { date },
     })

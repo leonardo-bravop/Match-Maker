@@ -33,11 +33,11 @@ const Record = () => {
     const { manifest } = Constants
     const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`      
     
-    const user= useSelector( state => state.user)
+    const dispatch = useDispatch();
 
+    const user= useSelector( state => state.user)
     const match = useSelector( state => state.match)
 
-    const dispatch = useDispatch();
 
     useEffect(()=>{
       axios.get(`${uri}/api/user/getMatches/${user._id}`)

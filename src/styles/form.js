@@ -102,6 +102,16 @@ export const formR = StyleSheet.create({
     marginRight: 20,
     borderRadius: 7,
   },
+  leagueFormBtn: {
+    alignSelf: "center",
+    borderWidth: 1,
+    borderColor: "#f27e18",
+    padding: 15,
+    marginTop: 20,
+    marginLeft: 20,
+    marginRight: 20,
+    borderRadius: 7,
+  },
   colorTxtBtn: {
     color: '#FFFFFF',
     fontSize: 18,
