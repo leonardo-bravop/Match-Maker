@@ -18,6 +18,7 @@ function App() {
     <SafeAreaView style={{flex : 1, backgroundColor: "#0e0b29"}}>
       <RootNavigation/>
     </SafeAreaView>
+
     </Provider>
   );
 }
