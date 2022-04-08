@@ -70,19 +70,19 @@ const AuthNavigator = createStackNavigator({
   Welcome: {
     screen: Welcome,
     navigationOptions: () => ({
-      headerShown: true,
+      headerShown: false,
     }),
   },
   Login: {
     screen: Login,
     navigationOptions: () => ({
-      headerShown: true,
+      headerShown: false,
     }),
   },
   Register: {
     screen: Register,
     navigationOptions: () => ({
-      headerShown: true,
+      headerShown: false,
     }),
   },
 });

@@ -9,6 +9,7 @@ import Constants from "expo-constants";
 import { useDispatch, useSelector } from "react-redux";
 import { addUserToLeague } from "../state/memberList";
 import { setUserLeagues } from "../state/userLeague";
+import { resetChecks } from "../state/checks";
 const { manifest } = Constants;
 
 const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
@@ -29,7 +30,7 @@ const FootLigue = ({ leagueId, user }) => {
       .put(`${uri}/api/league/${leagueId}/addUser/${userData._id}`)
       .then( () => {
          user.rank = 20
-         dispatch( resetChecks() )
+         dispatch( resetChecks )
       })
    }
    
