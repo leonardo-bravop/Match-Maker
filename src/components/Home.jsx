@@ -189,7 +189,6 @@ function Home({ navigation: { navigate } }) {
               borderTopColor: "transparent",
             }}
             round={true}
-            showLoading={true}
             onClear={() => setResults([])}
             onCancel={() => setResults([])}
           />

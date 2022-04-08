@@ -30,7 +30,7 @@ import { setMembers } from "../state/memberList";
 import { useDispatch, useSelector } from "react-redux";
 import { setLeagueId } from "../state/idLeague";
 
-import { FAB, Portal, Provider } from 'react-native-paper';
+import { FAB, Portal, Provider } from "react-native-paper";
 
 const styles = StyleSheet.create({
   actionButtonIcon: {
@@ -50,7 +50,6 @@ const Profile = ({ navigation }) => {
   const onStateChange = ({ open }) => setState({ open });
 
   const { open } = state;
-
 
   const { manifest } = Constants;
   const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
@@ -125,13 +124,54 @@ const Profile = ({ navigation }) => {
             </MenuTrigger>
             <MenuOptions>
               <MenuOption onSelect={handleLogout}>
-                <Text style={{ color: "red", fontSize: 20 }}>Salir</Text>
+              <Text style={{ color: "red", fontSize: 20 }}>Salir</Text>
               </MenuOption>
-            </MenuOptions>
-          </Menu>
-        </MenuProvider>
-      </TouchableOpacity> */}
-   <Image
+              </MenuOptions>
+              </Menu>
+              </MenuProvider>
+            </TouchableOpacity> */}
+      <Provider>
+        <Portal>
+          <FAB.Group
+            style={[profile.settingsIcon,{
+              position: 'relative',
+              marginTop: 20,
+              
+              //position: "absolute",
+              // bottom: 0,
+              // right: 0,
+              //color: "black",
+              //margin: 16,
+            }]}
+            open={open}
+            icon={open ? "close" : "cog"}
+            actions={[
+              {
+                icon: "bell",
+                label: "NOTIFICACIONES",
+                onPress: () => {},
+              },
+              {
+                icon: "account-cog",
+                label: "EDIT",
+                onPress: () => handleLogout(),
+              },
+              {
+                icon: "account-remove",
+                label: "LOGOUT",
+                onPress: () => handleLogout(),
+              },
+            ]}
+            onStateChange={onStateChange}
+            onPress={() => {
+              if (open) {
+                // do something if the speed dial is open
+              }
+            }}
+          />
+        </Portal>
+      </Provider>
+      <Image
         style={profile.userImage}
         source={{
           uri: "https://cdn.pixabay.com/photo/2017/02/23/13/05/profile-2092113_960_720.png",
@@ -208,42 +248,6 @@ const Profile = ({ navigation }) => {
           </ScrollView>
         ) : null}
       </View>
-
-<Provider>
-      <Portal>
-        <FAB.Group
-          open={open}
-          icon={open ? 'close' : 'cog'}
-          actions={[
-            { icon: 'plus', onPress: () =>  {}},
-            {
-              icon: 'account-remove',
-              label: 'LOGOUT',
-              onPress: () => handleLogout(),
-            },
-            {
-              icon: 'email',
-              label: 'Email',
-              onPress: () => console.log('Pressed email'),
-            },
-            {
-              icon: 'bell',
-              label: 'Remind',
-              onPress: () => console.log('Pressed notifications'),
-              small: false,
-            },
-          ]}
-          onStateChange={onStateChange}
-          onPress={() => {
-            if (open) {
-              // do something if the speed dial is open
-            }
-          }}
-        />
-      </Portal>
-    </Provider>
-
-     
     </View>
   );
 };
