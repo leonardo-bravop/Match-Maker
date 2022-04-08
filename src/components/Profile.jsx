@@ -30,7 +30,7 @@ import { setMembers } from "../state/memberList";
 import { useDispatch, useSelector } from "react-redux";
 import { setLeagueId } from "../state/idLeague";
 
-import { FAB, Portal, Provider } from 'react-native-paper';
+import { FAB, Portal, Provider } from "react-native-paper";
 
 const styles = StyleSheet.create({
   actionButtonIcon: {
@@ -45,12 +45,12 @@ const Profile = ({ navigation }) => {
   const user = useSelector((state) => state.user);
   const leagues = useSelector((state) => state.userLeagues);
   const [userData, setUserData] = useState({});
+  const [userLeagues, setUserLeagues] = useState([])
 
   const [state, setState] = React.useState({ open: false });
   const onStateChange = ({ open }) => setState({ open });
 
   const { open } = state;
-
 
   const { manifest } = Constants;
   const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
@@ -104,6 +104,15 @@ const Profile = ({ navigation }) => {
   //   navigation.navigate("Ligas");
   // };
 
+  useEffect( () => {
+    
+    axios.get(`${uri}/api/user/getLeaguesAndRank/${user._id}`)
+    .then( ({data}) => {
+      setUserLeagues(data)
+      console.log('ligas de usuario ===>', userLeagues)
+    })
+  }, [])
+
   const handleLogout = async () => {
     try {
       const result = await axios.post(`${uri}/api/user/logout`);
@@ -125,13 +134,14 @@ const Profile = ({ navigation }) => {
             </MenuTrigger>
             <MenuOptions>
               <MenuOption onSelect={handleLogout}>
-                <Text style={{ color: "red", fontSize: 20 }}>Salir</Text>
+              <Text style={{ color: "red", fontSize: 20 }}>Salir</Text>
               </MenuOption>
-            </MenuOptions>
-          </Menu>
-        </MenuProvider>
-      </TouchableOpacity> */}
-   <Image
+              </MenuOptions>
+              </Menu>
+              </MenuProvider>
+            </TouchableOpacity> */}
+   
+      <Image
         style={profile.userImage}
         source={{
           uri: "https://cdn.pixabay.com/photo/2017/02/23/13/05/profile-2092113_960_720.png",
@@ -157,28 +167,28 @@ const Profile = ({ navigation }) => {
             </View>
           </View>
         </View>
-        {leagues[0] ? (
+        {userLeagues[0] ? (
           <ScrollView style={profile.listContainer}>
-            {leagues.map((item, i) => {
+            {userLeagues.map((item, i) => {
               return (
                 <View key={i}>
                   <TouchableOpacity
                     onPress={() => {
-                      dispatch(setLeague(item));
-                      dispatch(setMembers(item._id));
-                      dispatch(setLeagueId(item._id));
+                      dispatch(setLeague(item.league));
+                      dispatch(setMembers(item.league._id));
+                      dispatch(setLeagueId(item.league._id));
                       navigation.navigate("Liga", item);
                     }}
                   >
                     <View
                       style={[
                         leagueStyles.item,
-                        { backgroundColor: `${item.color}` },
+                        { backgroundColor: `${item.league.color}` },
                       ]}
                     >
                       <View style={leagueStyles.rank}>
                         <Text style={{ color: "#FFFFFF" }}>
-                          {parseInt(Math.random() * (1 - 20 + 1) + 20)}
+                          {item.user.rank}
                         </Text>
                       </View>
                       <View
@@ -189,15 +199,15 @@ const Profile = ({ navigation }) => {
                       >
                         <Image
                           style={profile.cardImage}
-                          source={{ uri: item.img }}
+                          source={{ uri: item.league.img }}
                         />
                       </View>
                       <View style={leagueStyles.nick}>
-                        <Text style={{ color: "#FFFFFF" }}>{item.name}</Text>
+                        <Text style={{ color: "#FFFFFF" }}>{item.league.name}</Text>
                       </View>
                       <View style={leagueStyles.elo}>
                         <Text style={{ color: "#FFFFFF" }}>
-                          {parseInt(Math.random() * (400 - 3000 + 1) + 3000)}
+                          {item.user.elo[0].value}
                         </Text>
                       </View>
                     </View>
@@ -208,42 +218,48 @@ const Profile = ({ navigation }) => {
           </ScrollView>
         ) : null}
       </View>
-
-<Provider>
-      <Portal>
-        <FAB.Group
-          open={open}
-          icon={open ? 'close' : 'cog'}
-          actions={[
-            { icon: 'plus', onPress: () =>  {}},
-            {
-              icon: 'account-remove',
-              label: 'LOGOUT',
-              onPress: () => handleLogout(),
-            },
-            {
-              icon: 'email',
-              label: 'Email',
-              onPress: () => console.log('Pressed email'),
-            },
-            {
-              icon: 'bell',
-              label: 'Remind',
-              onPress: () => console.log('Pressed notifications'),
-              small: false,
-            },
-          ]}
-          onStateChange={onStateChange}
-          onPress={() => {
-            if (open) {
-              // do something if the speed dial is open
-            }
-          }}
-        />
-      </Portal>
-    </Provider>
-
-     
+      <Provider>
+        <Portal>
+          <FAB.Group
+            style={[,{
+              // position: 'relative',
+              // marginBottom: 50
+              //marginTop: 20,
+              
+              //position: "absolute",
+              // bottom: 0,
+              // right: 0,
+              //color: "black",
+              //margin: 16,
+            }]}
+            open={open}
+            icon={open ? "close" : "cog"}
+            actions={[
+              // {
+              //   icon: "bell",
+              //   label: "NOTIFICACIONES",
+              //   onPress: () => {},
+              // },
+              // {
+              //   icon: "account-cog",
+              //   label: "EDIT",
+              //   onPress: () => handleLogout(),
+              // },
+              {
+                icon: "account-remove",
+                label: "LOGOUT",
+                onPress: () => handleLogout(),
+              },
+            ]}
+            onStateChange={onStateChange}
+            onPress={() => {
+              if (open) {
+                // do something if the speed dial is open
+              }
+            }}
+          />
+        </Portal>
+      </Provider>
     </View>
   );
 };

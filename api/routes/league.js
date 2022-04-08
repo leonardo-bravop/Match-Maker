@@ -18,7 +18,7 @@ router.get("/showLeague/:id", leagueController.findShowLeague);
 
 router.put("/editLeague/:id", leagueController.editLeague);
 
-router.get("/findLeague/", leagueController.findLeagueByName);
+router.get("/findLeague/:leagueName", leagueController.findLeagueByName);
 
 router.get("/showHistory/:leagueId", leagueController.showHistoryLeague);
 

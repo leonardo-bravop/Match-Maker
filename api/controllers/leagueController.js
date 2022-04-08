@@ -263,7 +263,7 @@ exports.showHistoryLeague = (req, res, next) => {
 };
 
 exports.findLeagueByName = (req, res, next) => {
-  const { leagueName } = req.body;
+  const { leagueName } = req.params;
   if (leagueName) {
     const cleanedName = leagueName
       .trim()
