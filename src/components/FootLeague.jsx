@@ -30,7 +30,7 @@ const FootLigue = ({ leagueId, user }) => {
       .put(`${uri}/api/league/${leagueId}/addUser/${userData._id}`)
       .then( () => {
          user.rank = 20
-         dispatch( resetChecks() )
+         dispatch( resetChecks )
       })
    }
    

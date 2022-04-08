@@ -9,6 +9,7 @@ import {
   Image,
   ImageBackground,
   ScrollView,
+  KeyboardAvoidingView,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SearchBar } from "@rneui/themed";
@@ -120,10 +121,13 @@ function Home({ navigation: { navigate } }) {
   const [meLeagues, setMeLeagues] = useState(false);
   const [results, setResults] = useState({});
 
+  const [select, setSelect] = useState();
+  const [selectMeLeagues, setSelectMeLeagues] = useState({color : "#39424d"});
+
   const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 
   const updateSearch = (search) => {
-    if(!search) setResults([])
+    if (!search) setResults([]);
     setSearch(search);
     axios.get(`${uri}/api/league/findLeague/${search}`).then(({ data }) => {
       setResults(data);
@@ -176,7 +180,6 @@ function Home({ navigation: { navigate } }) {
             <Text style={home.lastText}>Taserface</Text>
           </View>
         </TouchableOpacity>
-
         <View style={{ marginTop: 10 }}>
           <SearchBar
             placeholder="Type Here..."
@@ -195,147 +198,108 @@ function Home({ navigation: { navigate } }) {
         </View>
       </View>
 
-      {results[0] ? (
-        <>
-          <View style={[home.ligaContainer, {marginTop:30}]}>
-            <Text style={home.ligaTittle}>RESULTADO</Text>
-          </View>
-          <Text style={{ color: "white", textAlign: "center" }}>
-            ──────────────────────────────────────
-          </Text>
-          <FlatGrid
-            style={home.gridView}
-            itemDimension={120}
-            data={results}
-            // staticDimension={300}
-            // fixed
-            spacing={10}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                onPress={() => {
-                  dispatch(setLeagueId(item._id));
-                  dispatch(setLeague(item));
-                  dispatch(setMembers(item._id));
-                  navigate("Liga", item);
-                }}
-                style={[home.itemContainer, { backgroundColor: item.color }]}
-              >
-                <View style={{ flex: 1, justifyContent: "flex-start" }}>
-                  <Image
-                    source={{
-                      uri: item.img
-                        ? item.img
-                        : "https://trome.pe/resizer/G8-kkwwutkrNacKh5S6TJplAluU=/980x0/smart/filters:format(jpeg):quality(75)/cloudfront-us-east-1.images.arcpublishing.com/elcomercio/OXHJSIF4SZDAJP6F5PHFZTLRYI.jpg",
-                    }}
-                    resizeMode="cover"
-                    style={{ height: "100%" }}
-                  />
-                </View>
-                <Text style={home.itemName}>{item.name}</Text>
-                <Text style={home.itemCode}>{item.color}</Text>
-              </TouchableOpacity>
-            )}
-          />
-        </>
-      ) : (
-        <>
-          <View style={[home.ligaContainer, {marginTop:30}]}>
-            <Text style={home.ligaTittle} onPress={() => setMeLeagues(false)}>
-              LIGAS
+        {results[0] ? (
+          <>
+            <View style={[home.ligaContainer, {marginTop: 20}]}>
+              <Text style={[home.ligaTittle, {width: "100%",}]}>RESULTADO</Text>
+            </View>
+            <Text style={{ color: "white", textAlign: "center" }}>
+              ──────────────────────────────────────
             </Text>
-            <Text style={home.ligaTittle} onPress={() => setMeLeagues(true)}>
-              TUS LIGAS
+            <FlatGrid
+              style={home.gridView}
+              itemDimension={120}
+              data={results}
+              // staticDimension={300}
+              // fixed
+              spacing={10}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  onPress={() => {
+                    dispatch(setLeagueId(item._id));
+                    dispatch(setLeague(item));
+                    dispatch(setMembers(item._id));
+                    navigate("Liga", item);
+                  }}
+                  style={[home.itemContainer, { backgroundColor: item.color }]}
+                >
+                  <View style={{ flex: 1, justifyContent: "flex-start" }}>
+                    <Image
+                      source={{
+                        uri: item.img
+                          ? item.img
+                          : "https://trome.pe/resizer/G8-kkwwutkrNacKh5S6TJplAluU=/980x0/smart/filters:format(jpeg):quality(75)/cloudfront-us-east-1.images.arcpublishing.com/elcomercio/OXHJSIF4SZDAJP6F5PHFZTLRYI.jpg",
+                      }}
+                      resizeMode="cover"
+                      style={{ height: "100%" }}
+                    />
+                  </View>
+                  <Text style={home.itemName}>{item.name}</Text>
+                  <Text style={home.itemCode}>{item.color}</Text>
+                </TouchableOpacity>
+              )}
+            />
+          </>
+        ) : (
+          <>
+            <View style={[home.ligaContainer, {marginTop: 20}]}>
+              <Text style={[home.ligaTittle, select]} onPress={() => {
+                setSelect({color : "white"})
+                setSelectMeLeagues({color : "#39424d"})
+                setMeLeagues(false)
+              }
+            }>
+                LIGAS
+              </Text>
+              <Text style={[home.ligaTittle, selectMeLeagues]} onPress={() =>{
+                setSelectMeLeagues({color : "white"})
+                setSelect({color : "#39424d"})
+                setMeLeagues(true)
+              }}>
+                TUS LIGAS
+              </Text>
+            </View>
+            <Text style={{ color: "white", textAlign: "center" }}>
+              ──────────────────────────────────────
             </Text>
-          </View>
-          <Text style={{ color: "white", textAlign: "center" }}>
-            ──────────────────────────────────────
-          </Text>
 
-          <FlatGrid
-            style={home.gridView}
-            itemDimension={120}
-            data={meLeagues ? userLeagues : leagues}
-            // staticDimension={300}
-            // fixed
-            spacing={10}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                onPress={() => {
-                  dispatch(setLeagueId(item._id));
-                  dispatch(setLeague(item));
-                  dispatch(setMembers(item._id));
-                  navigate("Liga", item);
-                }}
-                style={[home.itemContainer, { backgroundColor: item.color }]}
-              >
-                <View style={{ flex: 1, justifyContent: "flex-start" }}>
-                  <Image
-                    source={{
-                      uri: item.img
-                        ? item.img
-                        : "https://trome.pe/resizer/G8-kkwwutkrNacKh5S6TJplAluU=/980x0/smart/filters:format(jpeg):quality(75)/cloudfront-us-east-1.images.arcpublishing.com/elcomercio/OXHJSIF4SZDAJP6F5PHFZTLRYI.jpg",
-                    }}
-                    resizeMode="cover"
-                    style={{ height: "100%" }}
-                  />
-                </View>
-                <Text style={home.itemName}>{item.name}</Text>
-                <Text style={home.itemCode}>{item.color}</Text>
-              </TouchableOpacity>
-            )}
-          />
-        </>
-      )}
+            <FlatGrid
+              style={home.gridView}
+              itemDimension={120}
+              data={meLeagues ? userLeagues : leagues}
+              // staticDimension={300}
+              // fixed
+              spacing={10}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  onPress={() => {
+                    dispatch(setLeagueId(item._id));
+                    dispatch(setLeague(item));
+                    dispatch(setMembers(item._id));
+                    navigate("Liga", item);
+                  }}
+                  style={[home.itemContainer, { backgroundColor: item.color }]}
+                >
+                  <View style={{ flex: 1, justifyContent: "flex-start" }}>
+                    <Image
+                      source={{
+                        uri: item.img
+                          ? item.img
+                          : "https://trome.pe/resizer/G8-kkwwutkrNacKh5S6TJplAluU=/980x0/smart/filters:format(jpeg):quality(75)/cloudfront-us-east-1.images.arcpublishing.com/elcomercio/OXHJSIF4SZDAJP6F5PHFZTLRYI.jpg",
+                      }}
+                      resizeMode="cover"
+                      style={{ height: "100%" }}
+                    />
+                  </View>
+                  <Text style={home.itemName}>{item.name}</Text>
+                  <Text style={home.itemCode}>{item.color}</Text>
+                </TouchableOpacity>
+              )}
+            />
+          </>
+        )}
     </View>
   );
 }
 
 export default Home;
-
-{
-  /* <View style={home.ligaContainer}>
-        <Text style={home.ligaTittle} onPress={() => setMeLeagues(false)}>
-          LIGAS
-        </Text>
-        <Text style={home.ligaTittle} onPress={() => setMeLeagues(true)}>
-          TUS LIGAS
-        </Text>
-      </View>
-      <Text style={{ color: "white", textAlign: "center" }}>
-        ──────────────────────────────────────
-      </Text>
-
-      <FlatGrid
-        style={home.gridView}
-        itemDimension={120}
-        data={meLeagues ? userLeagues : leagues}
-        // staticDimension={300}
-        // fixed
-        spacing={10}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() => {
-              dispatch(setLeagueId(item._id));
-              dispatch(setLeague(item));
-              dispatch(setMembers(item._id));
-              navigate("Liga", item);
-            }}
-            style={[home.itemContainer, { backgroundColor: item.color }]}
-          >
-            <View style={{ flex: 1, justifyContent: "flex-start" }}>
-              <Image
-                source={{
-                  uri: item.img
-                    ? item.img
-                    : "https://trome.pe/resizer/G8-kkwwutkrNacKh5S6TJplAluU=/980x0/smart/filters:format(jpeg):quality(75)/cloudfront-us-east-1.images.arcpublishing.com/elcomercio/OXHJSIF4SZDAJP6F5PHFZTLRYI.jpg",
-                }}
-                resizeMode="cover"
-                style={{ height: "100%" }}
-              />
-            </View>
-            <Text style={home.itemName}>{item.name}</Text>
-            <Text style={home.itemCode}>{item.color}</Text>
-          </TouchableOpacity>
-        )}
-      /> */
-}
