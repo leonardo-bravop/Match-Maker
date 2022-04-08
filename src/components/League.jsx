@@ -27,6 +27,8 @@ import { useDispatch, useSelector } from "react-redux";
 import ItemLeague from "./ItemLeague";
 import FootLigue from "./FootLeague";
 import { setLeagueId } from "../state/idLeague";
+import { setMembers } from "../state/memberList";
+import { setUserLeagues } from "../state/userLeague";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -51,173 +53,141 @@ const LeagueHome = ({ navigation }) => {
 
   const leagueId = useSelector((state) => state.leagueId);
 
-  const resetData = useSelector((state) => state.checks);
+   const leagueList = useSelector( state => state.userLeagues)
 
   useEffect(() => {
     let rank = 0;
+      const loadData = async () => {
 
-    axios.get(`${uri}/api/user/getLeagues/${userData._id}`).then(({ data }) => {
-      setLeagueList(data);
-      if (leagueId === "") dispatch(setLeagueId(data[0]._id));
-    });
+         const resData = await dispatch(setUserLeagues({ userId: userData._id }))
 
-    axios
-      .get(`${uri}/api/league/getUsers/${leagueId}`)
-      .then(({ data }) => {
-        setMemberList(
-          data.rankedUsers.map((element, i) => {
-            if (userData._id === element._id) rank = i + 1;
-            return {
-              id: element._id,
-              rank: i + 1,
-              color: "blue",
-              nickname: element.nickname,
-              elo: 2931,
-            };
-          })
-        );
+         if (leagueId === "") 
+            dispatch( setLeagueId(resData.payload[0]._id) )
+
+         const {payload} = await dispatch(setMembers(leagueId === "" ? leagueList[0]._id : leagueId ))
+            
+         setMemberList( payload )
+
+         const {data} = await axios.get(`${uri}/api/league/showLeague/${leagueId}`)
+            
+         setActualLeague(data)
+      }
+
+      loadData()
+
+   },[leagueId, userData])
+
+   const selectHandler = id =>{
+      dispatch(setLeagueId(id));
+      setShowCard(!showCard)
+   }
+
+   const joinHandler = () => {
+      const loadData = async () => {
+
+         const resData = await dispatch(setUserLeagues({ userId: userData._id }))
+
+         if (leagueId === "") 
+            await dispatch( setLeagueId(resData.payload[0]._id) )
+
+         const {payload} = await dispatch(setMembers(leagueId === "" ? leagueList[0]._id : leagueId ))
+            
+         setMemberList( payload )
+
+         const {data} = await axios.get(`${uri}/api/league/showLeague/${leagueId}`)
+            
+         setActualLeague(data)
+      }
+      axios
+      .put(`${uri}/api/league/${leagueId}/addUser/${userData._id}`)
+      .then( () => {
+         loadData()
       })
-      .then(() => {
-        setUser({
-          id: userData._id,
-          rank: rank,
-          color: "red",
-          nickname: userData.nickname,
-          elo: 2931,
-        });
-      });
+   }
 
-    axios.get(`${uri}/api/league/showLeague/${leagueId}`).then(({ data }) => {
-      setActualLeague(data);
-    });
-  }, [leagueId, resetData]);
-
-  const pressHandler = (id) => {
-    dispatch(setLeagueId(id));
-    setShowCard(!showCard);
-  };
-
-  return (
-    <View style={leagueStyles.back}>
-      <Modal animationType="fade" transparent={true} visible={showCard}>
-        <Pressable
-          onPress={() => {
-            setShowCard(false);
-          }}
-          style={{
-            height: "100%",
-            backgroundColor: "rgba(30,30,50,0.85)",
-            justifyContent: "center",
-          }}
-        >
-          <View>
-            <ScrollView>
-              <View
-                style={{
-                  flex: 1,
-                  marginHorizontal: 16,
-                  backgroundColor: "#0e0b29",
-                  padding: 10,
-                  borderRadius: 10,
-                }}
-              >
-                <View style={{ flex: 1 }}>
+   return (
+      <SafeAreaView style={leagueStyles.back}>
+         <Modal
+            animationType="fade"
+            transparent={true}
+            visible={showCard}
+         >
+             <Pressable onPress={() => { setShowCard(false) }}
+             style={{
+                  height: "100%",  
+                  backgroundColor: 'rgba(30,30,50,0.85)',
+                  justifyContent: "center"}}>
+               
+               <View>
                   <ScrollView>
-                    <View>
-                      {leagueList.map((item, i) => {
-                        return (
-                          <TouchableOpacity
-                            style={{ margin: 7 }}
-                            onPress={() => pressHandler(item._id)}
-                          >
-                            <Text
-                              style={{
-                                color: "#FFFFFF",
-                                fontSize: 16,
-                                textAlign: "center",
-                              }}
-                            >
-                              {item.name}
-                            </Text>
-                          </TouchableOpacity>
-                        );
-                      })}
-                    </View>
+                     <View style={{
+                        flex: 1,
+                        marginHorizontal: 16,
+                        backgroundColor: "#0e0b29", 
+                        padding:10,
+                        borderRadius: 10 }}>
+                        <View style={{ flex: 1}} >
+                           <ScrollView >
+                              <View>
+                                 { leagueList.map( (item, i) => {
+                                    return (
+                                       <TouchableOpacity style={{margin: 7}} 
+                                          onPress={()=>selectHandler(item._id)} >
+                                          <Text style={{ color: "#FFFFFF", fontSize: 16, textAlign: 'center'}}>{item.name}</Text>
+                                       </TouchableOpacity>
+                                    )}
+                                 )}
+                              </View>
+                           </ScrollView>
+                        </View>
+                     </View>
                   </ScrollView>
-                </View>
-              </View>
-            </ScrollView>
-          </View>
-        </Pressable>
-      </Modal>
-      {/* <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}> */}
+               </View>
+            </Pressable>
+         </Modal>
 
-      {/* </View> */}
-      <View
-        style={[leagueStyles.head, { backgroundColor: actualleague.color }]}
-      >
-        <ImageBackground
-          resizeMode="cover"
-          source={{ uri: actualleague.img }}
-          style={{ flex: 1 }}
-        >
-          <TouchableOpacity
-            style={[
-              leagueStyles.menu,
-              { alignSelf: "flex-end", justifyContent: "center" },
-            ]}
-            onPress={() => setShowCard(true)}
-          >
-            <Icon
-              name="caret-down-circle"
-              type="ionicon"
-              color="green"
-              size={32}
-            />
-          </TouchableOpacity>
 
-          <View style={leagueStyles.info}>
-            <Text style={leagueStyles.title}>{actualleague.name}</Text>
-          </View>
-        </ImageBackground>
-      </View>
+         <View style={[leagueStyles.head, { backgroundColor: actualleague.color }]} >
+            <ImageBackground resizeMode="cover" source={{uri: actualleague.img}} style={{flex: 1}}>
+               <TouchableOpacity style={[leagueStyles.menu, {alignSelf: "flex-end", justifyContent:"center"}]} 
+                  onPress={()=> setShowCard(true)}>
+                  <Icon name="caret-down-circle" type="ionicon" color="green" size = {32}/>
+               </TouchableOpacity>
+               
+               <View style={leagueStyles.info}>
+                  <Text style={leagueStyles.title}>
+                     {actualleague.name}
+                  </Text>
+               </View>
+            </ImageBackground>
+         </View>
 
-      <View style={leagueStyles.body}>
-        <View style={leagueStyles.listHead}>
-          <View style={leagueStyles.enum}>
-            <View
-              style={{ width: 50, alignItems: "center", marginVertical: 5 }}
-            >
-              <Text style={{ color: "#FFFFFF" }}>Rank</Text>
-            </View>
 
-            <View
-              style={{ width: 50, alignItems: "center", marginVertical: 5 }}
-            >
-              <Text style={{ color: "#FFFFFF" }}></Text>
-            </View>
-
-            <View
-              style={{
-                flex: 1,
-                width: "auto",
-                alignItems: "center",
-                marginVertical: 5,
-              }}
-            >
-              <Text style={{ color: "#FFFFFF" }}>Nick</Text>
-            </View>
-
-            <View
-              style={{ width: 100, alignItems: "center", marginVertical: 5 }}
-            >
-              <Text style={{ color: "#FFFFFF" }}>ELO</Text>
+         <View style={leagueStyles.body}>
+            <View style={leagueStyles.listHead}>
+               <View style={leagueStyles.enum}>
+                  <View style={{ width: 50, alignItems: "center", marginVertical: 5 }} >
+                     <Text style={{ color: "#FFFFFF" }}>Rank</Text>
+                  </View>
+                  
+                  <View style={{ width: 50, alignItems: "center", marginVertical: 5 }} >
+                     <Text style={{ color: "#FFFFFF" }}></Text>
+                  </View>
+                  
+                  <View style={{ flex: 1, width: "auto", alignItems: "center", marginVertical: 5 }} >
+                     <Text style={{ color: "#FFFFFF" }}>Nick</Text>
+                  </View>
+                  
+                  <View style={{ width: 100, alignItems: "center", marginVertical: 5 }} >
+                     <Text style={{ color: "#FFFFFF" }}>ELO</Text>
+                  </View>
+               </View>
             </View>
           </View>
         </View>
 
-        <List list={memberList} Element={ItemLeague} />
-        <TouchableOpacity
+ <List list={memberList} Element={ItemLeague} />
+                <TouchableOpacity
           style={{
             height: 50,
             borderRadius: 10,
@@ -236,11 +206,33 @@ const LeagueHome = ({ navigation }) => {
         >
           <Text style={{ fontSize: 18, color: "white" }}>CREAR LIGA</Text>
         </TouchableOpacity>
-        <FootLigue leagueId={actualleague._id} user={user} />
-      </View>
-    </View>
-  );
-};
+
+            {false && userData.leagues.includes(leagueId)
+            ?( userData.rank > 8 
+               ? <View style={leagueStyles.foot}>
+                  <View style={leagueStyles.user}>
+                     <View style={leagueStyles.rank}>
+                        <Text style={{color: '#FFFFFF'}}>{user.rank}</Text>
+                     </View>
+                     <View style={[leagueStyles.img, {backgroundColor: user.color}]}>
+                     </View>   
+                     <View style={leagueStyles.nick}>
+                        <Text style={{color: '#FFFFFF'}}>{user.nickname}</Text>
+                     </View>
+                     <View style={leagueStyles.elo}>
+                        <Text style={{color: '#FFFFFF'}}>{user.elo}</Text>
+                     </View> 
+                  </View>
+               </View>
+               : <></> )
+            : <View style={[leagueStyles.foot, { height: 100 }]}>
+                  <TouchableOpacity style={[leagueStyles.join, {backgroundColor:"#16a085"}]}
+                     onPress={() => joinHandler(leagueId)}>
+                     <Text style={leagueStyles.joinTxt}>Unirse</Text>
+                  </TouchableOpacity> 
+            </View>}
+         </View>
+      </SafeAreaView>
 
 const HomeScreen = ({ navigation }) => {
   const { manifest } = Constants;
@@ -449,6 +441,7 @@ function MyStack() {
   );
 }
 
+
 const League = () => {
   return (
     <NavigationContainer>
@@ -456,5 +449,6 @@ const League = () => {
     </NavigationContainer>
   );
 };
+
 
 export default League;

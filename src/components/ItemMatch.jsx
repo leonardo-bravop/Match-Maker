@@ -22,10 +22,10 @@ const ItemMatch = ({ item }) => {
       
    const checker = () => {
       if ( select ){
-         dispatch( removeTeam({ team: "teamA", id: item.id }))
+         dispatch( removeTeam({ team: "teamA", id: item._id }))
       }
       else {
-         dispatch( setTeam({ team: "teamA", id: item.id, nick: item.nickname }))
+         dispatch( setTeam({ team: "teamA", id: item._id, nick: item.nickname }))
       }
       setSelect(!select)
       setSelect2(false)
@@ -33,10 +33,10 @@ const ItemMatch = ({ item }) => {
       
    const checker2 = () => {
       if ( select2 ){
-         dispatch( removeTeam({ team: "teamB", id: item.id }))
+         dispatch( removeTeam({ team: "teamB", id: item._id }))
       }
       else {
-         dispatch( setTeam({ team: "teamB", id: item.id, nick: item.nickname }))
+         dispatch( setTeam({ team: "teamB", id: item._id, nick: item.nickname }))
       }
       setSelect2(!select2)
       setSelect(false)
