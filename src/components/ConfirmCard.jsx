@@ -15,6 +15,7 @@ const ConfirmCard = () => {
   const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 
   useEffect(() => {
+    console.log("\n\n\nEsto es match\n\n\n\n", match)
     const equipos = match.invitations_team1.concat(match.invitations_team2);
     const arrayInvit = equipos.filter(
       (invitation) => invitation.toId === user._id

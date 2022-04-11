@@ -23,7 +23,7 @@ import List from "../commons/List";
 import ItemMatch from "./ItemMatch";
 import ListHead from "./MatchListHead";
 
-import { cardStyles, colors, matchStyles, pickerStyles } from "../styles/match";
+import { cardStyles, matchStyles, pickerStyles } from "../styles/match";
 
 import { useDispatch, useSelector } from "react-redux";
 import { resetTeams } from "../state/teams";
@@ -31,7 +31,7 @@ import { resetChecks } from "../state/checks";
 import { setMembers } from "../state/memberList";
 import { setUserLeagues } from "../state/userLeague";
 import MatchDetails from "./matchDetails";
-
+import { colorSet } from "../styles/colorSet";
 
 const Match = ({navigation}) => {
 
@@ -201,11 +201,11 @@ const Match = ({navigation}) => {
                </Text>
                
                <TouchableOpacity onPress={()=> setShowPicker(true)} style={matchStyles.pickerButton}>
-                  <Icon name="caret-down-circle" type="ionicon" color={colors.text} size = {32}/>
+                  <Icon name="caret-down-circle" type="ionicon" color={colorSet.text} size = {32}/>
                </TouchableOpacity>
             </View>
             
-            <ListHead/>
+            <ListHead labels={["Aliados", "Usuario", "Rivales"]} styling={matchStyles.listHead}/>
          </View>
 
          <View style={matchStyles.body}>
@@ -220,12 +220,12 @@ const Match = ({navigation}) => {
                      scrollable
                      iconContainer={{flex: 0.1}}
                      iconStyle={{}}
-                     calendarHeaderStyle={{color: colors.text, fontSize: 15}}
-                     dateNumberStyle={{color: colors.text, fontSize: 14}}
-                     dateNameStyle={{color: colors.text}}
+                     calendarHeaderStyle={{color: colorSet.text, fontSize: 15}}
+                     dateNumberStyle={{color: colorSet.text, fontSize: 14}}
+                     dateNameStyle={{color: colorSet.text}}
                      highlightDateNameStyle={{fontSize: 0}}
-                     highlightDateNumberStyle={{color: colors.content , fontSize: 18}}
-                     highlightDateContainerStyle={{backgroundColor: colors.text}}
+                     highlightDateNumberStyle={{color: colorSet.content , fontSize: 18}}
+                     highlightDateContainerStyle={{backgroundColor: colorSet.text}}
                      locale={ {name: "es", config: {
                         months: 'Enero_Febrero_Marzo_Abril_Mayo_Junio_Julio_Agosto_Septiembre_Octubre_Noviembre_Diciembre'.split('_'),
                         weekdaysShort: 'DOM_LUN_MAR_MIE_JUE_VIE_SAB'.split('_'),}}}
@@ -243,7 +243,7 @@ const Match = ({navigation}) => {
                
                <TouchableOpacity 
                   disabled={noPress} onPress={createHandler}
-                     style={[matchStyles.createButton, {backgroundColor: noPress ? "grey" : colors.button/*"#16a085"*/}]}>
+                     style={[matchStyles.createButton, {backgroundColor: noPress ? "grey" : colorSet.button/*"#16a085"*/}]}>
                   <Text style={matchStyles.buttonTxt}>Crear</Text>
                </TouchableOpacity>
                
