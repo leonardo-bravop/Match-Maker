@@ -116,6 +116,7 @@ const Profile = ({ navigation }) => {
   const handleLogout = async () => {
     try {
       const result = await axios.post(`${uri}/api/user/logout`);
+      await AsyncStorage.setItem("userInfo", "")
       const emptyUser = result.data;
       setUserData(emptyUser);
       navigation.navigate("Welcome");

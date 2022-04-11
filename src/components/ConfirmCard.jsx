@@ -9,22 +9,34 @@ import Constants from "expo-constants";
 const ConfirmCard = () => {
   const match = useSelector((state) => state.match);
   const user = useSelector((state) => state.user);
-  const [isAccepted, setIsAccepted] = useState(true)
+  const [isAccepted, setIsAccepted] = useState(false);
 
   const { manifest } = Constants;
   const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 
-  useEffect(()=>{
-    const equipos = match.invitations_team1.concat(match.invitations_team2)
-    const arrayInvit = equipos.filter(invitation=>invitation.toId===user._id)
-    if (!arrayInvit[0]) return
-    if(arrayInvit[0].status==="accepted") setIsAccepted(false)
-  }, [match])
+  useEffect(() => {
+    const equipos = match.invitations_team1.concat(match.invitations_team2);
+    const arrayInvit = equipos.filter(
+      (invitation) => invitation.toId === user._id
+    );
+    if (!arrayInvit[0]) return;
+    console.log("====================================");
+    console.log(`is accepted e`, isAccepted);
+    console.log("====================================");
+    console.log(arrayInvit[0].status);
+    console.log("====================================");
+    // console.log(`match es`, match);
+    if (arrayInvit[0].status === "accepted") setIsAccepted(true);
+  }, [match]);
 
   const acceptHandler = () => {
     axios
       .put(`${uri}/api/invitation/invitAcepted/${match._id}/user/${user._id}`)
-      .then(({ data }) => {setIsAccepted(false)});
+      .then(({ data }) => {
+        setIsAccepted(true)
+        // console.log(`data es`, data);
+        // console.log(`match es`, match);
+      });
   };
 
   return (
@@ -88,7 +100,7 @@ const ConfirmCard = () => {
         </View>
       </View>
       <View style={{ height: 115 }}>
-        {isAccepted ? (
+        {!isAccepted ? (
           <TouchableOpacity
             style={[leagueStyles.join, { backgroundColor: "#16a085" }]}
             onPress={acceptHandler}

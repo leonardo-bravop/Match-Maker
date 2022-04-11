@@ -13,7 +13,9 @@ export const setUserMe = createAsyncThunk("ME", (userString) => {
 const initialState = {};
 
 const usersReducer = createReducer(initialState, {
-    [setUserMe.fulfilled]: (state, action) => action.payload,
+    [setUserMe.fulfilled]: (state, action) => {
+        console.log(`action payload es`, action.payload);
+        return action.payload},
 })
 
 export default usersReducer

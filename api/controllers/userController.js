@@ -39,7 +39,7 @@ exports.register = (req, res, next) => {
 
 exports.login = (req, res, next) => {
   const { email, password } = req.body;
-
+console.log(`req body es`, req.body);
   User.findOne({ email }).then((user) => {
     if (user) {
       user
@@ -142,6 +142,7 @@ exports.me = (req, res, next) => {
             name: user.name,
             surname: user.surname,
             nickname: user.nickname,
+            leagues: user.leagues
           })
         )
         .catch((error) => {
