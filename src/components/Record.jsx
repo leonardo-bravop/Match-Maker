@@ -31,6 +31,7 @@ const Record = () => {
     let [recordList, setRecordList] = useState([])
     let [onDate, setOnDate] = useState(moment())
     let [showAll, setShowAll] = useState(false)
+   let [dotList, setDotList] = useState([])
 
     const { manifest } = Constants
     const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`      
@@ -45,9 +46,12 @@ const Record = () => {
       axios.get(`${uri}/api/user/getMatches/${user._id}`)
       .then(({data}) => {
           setRecordList(data.reverse())
+          setDotList(data)
       })
       
     },[showAll])
+
+
 
     const matchDateHandler = matchDate => {
       axios.get(`${uri}/api/user/${user._id}/getMatchesByDate/${matchDate}`)
@@ -81,7 +85,7 @@ const Record = () => {
                   minDate={moment("01-01-2022", "MM-DD-YYYY")}
                   maxDate={moment().add(6, "M")}
                   startingDate={moment().subtract(3, 'd')}
-                  markedDates = {recordList.map( item =>{
+                  markedDates = {dotList.map( item =>{
                          return {
                            date: moment(item.date, "DD-MM-YYYY"),
                            dots: [ { color: "red" } ]
