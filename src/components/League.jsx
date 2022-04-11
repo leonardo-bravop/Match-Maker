@@ -204,6 +204,7 @@ const LeagueHome = ({ navigation }) => {
             setShowCard(false);
           }}
           style={{
+            color: "white",
             height: "100%",
             backgroundColor: "rgba(30,30,50,0.85)",
             justifyContent: "center",
@@ -227,7 +228,7 @@ const LeagueHome = ({ navigation }) => {
                         return (
                           <TouchableOpacity
                             style={{ margin: 7 }}
-                            onPress={() => selectHandler(item._id)}
+                            onPress={() => selectHandler(item.league._id)}
                             key={i}
                           >
                             <Text
@@ -237,7 +238,7 @@ const LeagueHome = ({ navigation }) => {
                                 textAlign: "center",
                               }}
                             >
-                              {item.name}
+                              {item.league.name}
                             </Text>
                           </TouchableOpacity>
                         );

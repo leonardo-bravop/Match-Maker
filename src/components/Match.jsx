@@ -72,9 +72,9 @@ const Match = ({navigation}) => {
          const resData = await dispatch(setUserLeagues({ userId: userData._id }))
 
          if (selectedValue === "") 
-            setSelectedValue(resData.payload[0]._id)
+            setSelectedValue(resData.payload[0].league._id)
 
-         const {payload} = await dispatch(setMembers(selectedValue === "" ? resData.payload[0]._id : selectedValue ))
+         const {payload} = await dispatch(setMembers(selectedValue === "" ? resData.payload[0].league._id : selectedValue ))
          
          let userInList
          let members = payload.filter( member => {
@@ -173,9 +173,9 @@ const Match = ({navigation}) => {
                         <ScrollView >
                               { leagueList && leagueList.map( (item, i) => {
                                  return (
-                                    <TouchableOpacity onPress={ () => setSelectedValue(item._id) } key={i}>
+                                    <TouchableOpacity onPress={ () => setSelectedValue(item.league._id) } key={i}>
                                        <Text style={pickerStyles.text}>
-                                          {item.name}
+                                          {item.league.name}
                                        </Text>
                                     </TouchableOpacity>
                                  )}

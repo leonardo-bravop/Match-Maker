@@ -31,12 +31,12 @@ const ItemRecord = ({ item }) => {
          </View>
       </ScrollView>*/}
             
-            {item.team_1.map( (user, i, arr) => {
-               if (i>2) return (<></>)
+            {item.team_1.slice(0,3).map( (user, i) => {
+               // if (i>2) return (<></>)
                   return (
                      <Text style={itemStyles.text} key= {i}>
-                        {arr.length > 3 && i === 2 
-                        ? `y ${arr.length-2} mas` 
+                        {item.team_1.length > 3 && i === 2 
+                        ? `y ${item.team_1.length-2} mas` 
                         : user.nickname }
                      </Text>)
                   })}
@@ -52,12 +52,12 @@ const ItemRecord = ({ item }) => {
          </View>
 
          <View style={[itemStyles.team, {borderColor: "blue" , borderWidth:0}]}>
-               {item.team_2.map( (user, i, arr) => {
-               if (i>2) return (<></>)
+               {item.team_2.slice(0,3).map( (user, i) => {
+               // if (i>2) return (<></>)
                   return (
                      <Text style={itemStyles.text} key= {i}>
-                        {arr.length > 3 && i === 2 
-                        ? `y ${arr.length-2} mas` 
+                        {item.team_2.length > 3 && i === 2 
+                        ? `y ${item.team_2.length-2} mas` 
                         : user.nickname }
                      </Text>)
                   })}
