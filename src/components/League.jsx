@@ -65,8 +65,9 @@ const LeagueHome = ({ navigation }) => {
   const leagueList = useSelector((state) => state.userLeagues);
 
   useEffect(() => {
-    let rank = 0;
+
     const loadData = async () => {
+
       console.log("lueage ides ", leagueId);
       console.log("userdata es ", userData);
 
