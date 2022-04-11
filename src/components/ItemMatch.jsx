@@ -101,6 +101,7 @@ export default ItemMatch;
                   iconType="ionicon"
                   uncheckedIcon="checkbox-outline" uncheckedColor='white'
                   checkedIcon="checkbox" checkedColor="#45fc03"
+
                />
             </View>
          </View>
@@ -124,6 +125,7 @@ export default ItemMatch;
                   iconType="ionicon"
                   uncheckedIcon="checkbox-outline" uncheckedColor='white'
                   checkedIcon="checkbox" checkedColor="#45fc03"
+
                />
             </View>
          </View> */}

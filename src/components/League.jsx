@@ -12,6 +12,8 @@ import {
   TextInput,
   ActivityIndicator,
   Image,
+  Keyboard,
+  Alert,
 } from "react-native";
 
 import axios from "axios";
@@ -30,12 +32,17 @@ import { setLeagueId } from "../state/idLeague";
 import { setMembers } from "../state/memberList";
 import { setUserLeagues } from "../state/userLeague";
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 
 import { Formik } from "formik";
 import * as yup from "yup";
 import { formR } from "../styles/form";
+
+import { CheckBox } from "react-native-elements";
+import { setUserMe } from "../state/user";
 
 const LeagueHome = ({ navigation }) => {
   const { manifest } = Constants;
@@ -45,6 +52,9 @@ const LeagueHome = ({ navigation }) => {
   let [actualleague, setActualLeague] = useState({});
   let [user, setUser] = useState({});
   let [showCard, setShowCard] = useState(false);
+  let [showSecretkeyCard, setShowSecretkeyCard] = useState(false);
+  let [secretKey, setSecretKey] = useState("");
+  let [secretError, setSecretError] = useState("");
 
   const dispatch = useDispatch();
 
@@ -58,19 +68,27 @@ const LeagueHome = ({ navigation }) => {
 
     const loadData = async () => {
 
-      const resData = await dispatch(setUserLeagues({ userId: userData._id }));
+      console.log("lueage ides ", leagueId);
+      console.log("userdata es ", userData);
 
+      console.log("Paso 1: ");
+      const resData = await dispatch(setUserLeagues({ userId: userData._id }));
+      console.log("Paso 2: ");
       if (leagueId === "") dispatch(setLeagueId(resData.payload[0]._id));
+      console.log("Paso 3: ");
 
       const { payload } = await dispatch(
         setMembers(leagueId === "" ? leagueList[0]._id : leagueId)
       );
+      console.log("Paso 4: ");
 
       setMemberList(payload);
+      console.log("Paso 5: ");
 
       const { data } = await axios.get(
         `${uri}/api/league/showLeague/${leagueId}`
       );
+      console.log("Paso 6: ");
 
       setActualLeague(data);
     };
@@ -79,33 +97,80 @@ const LeagueHome = ({ navigation }) => {
   }, [leagueId, userData]);
 
   const selectHandler = (id) => {
+    console.log("select handler paso 1");
     dispatch(setLeagueId(id));
+    console.log("select handler paso 2");
     setShowCard(!showCard);
   };
 
   const joinHandler = () => {
+    if (actualleague.isPrivate) {
+      setShowSecretkeyCard(true);
+    }
     const loadData = async () => {
-      const resData = await dispatch(setUserLeagues({ userId: userData._id }));
+      try {
+        console.log(`en loadData`);
+        console.log(`atnes del dispatch de user, userdata es`, userData);
+        const userString = await AsyncStorage.getItem("userInfo");
+        await dispatch(setUserMe(userString));
+        console.log(`luego del dispatch de user, userdata es`, userData);
+        const resData = await dispatch(
+          setUserLeagues({ userId: userData._id })
+        );
 
-      if (leagueId === "") await dispatch(setLeagueId(resData.payload[0]._id));
+        if (leagueId === "")
+          await dispatch(setLeagueId(resData.payload[0]._id));
 
-      const { payload } = await dispatch(
-        setMembers(leagueId === "" ? leagueList[0]._id : leagueId)
-      );
+        const { payload } = await dispatch(
+          setMembers(leagueId === "" ? leagueList[0]._id : leagueId)
+        );
+        // console.log(`payload es`, payload);
+        setMemberList(payload);
 
-      setMemberList(payload);
+        const { data } = await axios.get(
+          `${uri}/api/league/showLeague/${leagueId}`
+        );
 
-      const { data } = await axios.get(
-        `${uri}/api/league/showLeague/${leagueId}`
-      );
-
-      setActualLeague(data);
+        setActualLeague(data);
+      } catch (error) {
+        console.error(`Error: ${error.message}`);
+        setSecretError("Hubo un problema, por favor intenta de nuevo");
+      }
     };
-    axios
-      .put(`${uri}/api/league/${leagueId}/addUser/${userData._id}`)
-      .then(() => {
-        loadData();
-      });
+
+    const addUserFunc = async () => {
+      try {
+        console.log("adduserfunc paso 1");
+        const result = await axios.put(
+          `${uri}/api/league/${leagueId}/addUser/${userData._id}`,
+          {
+            enteredKey: secretKey,
+          }
+        );
+        console.log("adduserfunc paso 2");
+
+        console.log(`je`);
+        if (result) console.log(`result es`, result.request.status);
+        console.log("adduserfunc paso 3");
+
+        await loadData();
+        console.log("adduserfunc paso 4");
+        setSecretError("");
+        console.log(`user data es`, userData);
+        console.log(`league id es`, leagueId);
+
+        if (result && result.request.status === 200) {
+          Alert.alert("Bienvenido!", `Te uniste a la liga ${actualleague.name}`);
+          setSecretKey = "";
+          setShowSecretkeyCard(false);
+        } else setSecretError("Clave secreta inválida");
+      } catch (error) {
+        setSecretError("Clave secreta inválida");
+        console.error(`Error: ${error.message}`);
+      }
+    };
+
+    addUserFunc();
   };
 
   return (
@@ -155,6 +220,87 @@ const LeagueHome = ({ navigation }) => {
                       })}
                     </View>
                   </ScrollView>
+                </View>
+              </View>
+            </ScrollView>
+          </View>
+        </Pressable>
+      </Modal>
+
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={showSecretkeyCard}
+      >
+        <Pressable
+          onPress={() => {
+            setShowSecretkeyCard(false);
+            setSecretError("");
+          }}
+          style={{
+            height: "100%",
+            backgroundColor: "rgba(30,30,50,0.85)",
+            justifyContent: "center",
+          }}
+        >
+          <View>
+            <ScrollView>
+              <View
+                style={{
+                  flex: 1,
+                  marginHorizontal: 16,
+                  backgroundColor: "#0e0b29",
+                  padding: 10,
+                  borderRadius: 10,
+                }}
+              >
+                <View
+                  style={{ flex: 1, paddingVertical: 15, alignItems: "center" }}
+                >
+                  <Text
+                    style={{ color: "white", paddingBottom: 15, fontSize: 18 }}
+                  >
+                    Ingrese clave secreta de 5 caracteres:
+                  </Text>
+                  <TextInput
+                    style={{
+                      backgroundColor: "white",
+                      width: 100,
+                      fontSize: 18,
+                      textAlign: "center",
+                    }}
+                    maxLength={5}
+                    onChangeText={setSecretKey}
+                    onSubmitEditing={() => {
+                      Keyboard.dismiss;
+                      if (secretKey) {
+                        joinHandler(leagueId);
+                      } else {
+                        alert("Please provide a secretkey");
+                      }
+                    }}
+                  />
+                  {secretError.length > 1 ? (
+                    <Text style={{ color: "red", marginTop: 10 }}>
+                      {secretError}
+                    </Text>
+                  ) : null}
+
+                  <TouchableOpacity
+                    style={[
+                      leagueStyles.join,
+                      { backgroundColor: "#16a085", marginTop: 20 },
+                    ]}
+                    onPress={() => {
+                      if (secretKey) {
+                        joinHandler(leagueId);
+                      } else {
+                        setSecretError("Please provide a secretkey");
+                      }
+                    }}
+                  >
+                    <Text style={leagueStyles.joinTxt}>Aceptar</Text>
+                  </TouchableOpacity>
                 </View>
               </View>
             </ScrollView>
@@ -229,6 +375,7 @@ const LeagueHome = ({ navigation }) => {
 
         <TouchableOpacity
           style={{
+            marginVertical: 20,
             height: 50,
             borderRadius: 10,
             justifyContent: "center",
@@ -246,8 +393,8 @@ const LeagueHome = ({ navigation }) => {
           <Text style={{ fontSize: 18, color: "white" }}>CREAR LIGA</Text>
         </TouchableOpacity>
 
-        {false && userData.leagues.includes(leagueId) ? (
-          userData.rank > 8 ? (
+        {userData.leagues.includes(leagueId) ? (
+          userData.rank > 1 ? (
             <View style={leagueStyles.foot}>
               <View style={leagueStyles.user}>
                 <View style={leagueStyles.rank}>
@@ -271,7 +418,13 @@ const LeagueHome = ({ navigation }) => {
           <View style={[leagueStyles.foot, { height: 100 }]}>
             <TouchableOpacity
               style={[leagueStyles.join, { backgroundColor: "#16a085" }]}
-              onPress={() => joinHandler(leagueId)}
+              onPress={() => {
+                if (actualleague.isPrivate) {
+                  setShowSecretkeyCard(true);
+                } else {
+                  joinHandler(leagueId);
+                }
+              }}
             >
               <Text style={leagueStyles.joinTxt}>Unirse</Text>
             </TouchableOpacity>
@@ -288,8 +441,11 @@ const HomeScreen = ({ navigation }) => {
 
   const [isLoading, setIsLoading] = useState(false);
 
+  let [select, setSelect] = useState(false);
+
   const handleRegister = (values) => {
     console.log("values son", values);
+    // console.log(`check es`, check);
     if (values.isPrivate.toLowerCase() !== "no") {
       values.isPrivate = !!values.isPrivate;
     } else {
@@ -298,19 +454,19 @@ const HomeScreen = ({ navigation }) => {
     if (values.secretKey === "") delete values.secretKey;
     console.log("values son", values);
     setIsLoading(true);
-    axios
-      .post(`${uri}/api/league/new`, values)
-      .then((res) => {
-        setIsLoading(false);
-        console.log("====================================");
-        console.log("antes de navigate");
-        console.log("====================================");
-        res.status == 201 ? navigation.navigate("Leagues") : null;
-      })
-      .catch((error) => {
-        setIsLoading(false);
-        console.log("error es", error);
-      });
+    // axios
+    //   .post(`${uri}/api/league/new`, values)
+    //   .then((res) => {
+    //     setIsLoading(false);
+    //     console.log("====================================");
+    //     console.log("antes de navigate");
+    //     console.log("====================================");
+    //     res.status == 201 ? navigation.navigate("Leagues") : null;
+    //   })
+    //   .catch((error) => {
+    //     setIsLoading(false);
+    //     console.log("error es", error);
+    //   });
   };
 
   const validationSchema = yup.object().shape({
@@ -332,6 +488,10 @@ const HomeScreen = ({ navigation }) => {
     //   ),
   });
 
+  const checker = () => {
+    setSelect(!select);
+  };
+
   return (
     <View
       style={{
@@ -352,8 +512,9 @@ const HomeScreen = ({ navigation }) => {
           secretKey: "",
           color: "",
           img: "",
+          selected: false
         }}
-        onSubmit={(values) => handleRegister(values)}
+        onSubmit={(values) => handleRegister({...values, select})}
       >
         {({
           handleChange,
@@ -408,6 +569,15 @@ const HomeScreen = ({ navigation }) => {
                 onBlur={handleBlur("isPrivate")}
                 value={values.isPrivate}
                 keyboardType="default"
+              />
+              <CheckBox
+                checked={select}
+                onPress={checker}
+                iconType="ionicon"
+                uncheckedIcon="checkbox-outline"
+                checkedIcon="checkbox"
+                uncheckedColor="white"
+                checkedColor="#45fc03"
               />
 
               <TextInput
