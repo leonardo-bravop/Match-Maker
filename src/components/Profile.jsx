@@ -25,9 +25,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { setLeagueId } from "../state/idLeague";
 import { FAB, Portal, Provider } from "react-native-paper";
 
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+
 import { Camera } from "expo-camera";
 import { Ionicons } from "@expo/vector-icons";
+import { Entypo } from '@expo/vector-icons'; 
 import * as ImagePicker from "expo-image-picker";
+
+const { width, height } = Dimensions.get("screen");
 
 const styles = StyleSheet.create({
   actionButtonIcon: {
@@ -35,24 +41,48 @@ const styles = StyleSheet.create({
     height: 22,
     color: "white",
   },
-
   container: {
-    marginTop: 30,
     flex: 1,
   },
-
-  fixedRatio: {
+  camera: {
     flex: 1,
+  },
+  buttonContainer: {
+    flex: 1,
+    backgroundColor: "transparent",
+    flexDirection: "row",
+    margin: 20,
+  },
+  buttonReverse: {
+    height: 48,
+    width:48,
+    flex: 0.1,
+    alignSelf: "flex-end",
+    alignItems: "center",
+  },
+  buttonPicture: {
+    height: 48,
+    width:48,
+    display: 'flex',
+    position: 'absolute',
+    bottom: 0,
+    right: '50%',
+    marginRight: -25,
+  },
+  text: {
+    fontSize: 18,
+    color: "white",
   },
 });
 
-const Profile = ({ navigation }) => {
+const User = ({ navigation }) => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
   const leagues = useSelector((state) => state.userLeagues);
 
   const [userData, setUserData] = useState({});
   const [userLeagues, setUserLeagues] = useState([]);
+  const [editImage, setEditImage] = useState(false);
 
   const [state, setState] = React.useState({ open: false });
   const onStateChange = ({ open }) => setState({ open });
@@ -61,33 +91,6 @@ const Profile = ({ navigation }) => {
 
   const { manifest } = Constants;
   const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
-
-  const actions = [
-    {
-      text: "Accessibility",
-      icon: require("../assets/logo.png"),
-      name: "bt_accessibility",
-      position: 2,
-    },
-    {
-      text: "Language",
-      icon: require("../assets/logo.png"),
-      name: "bt_language",
-      position: 1,
-    },
-    {
-      text: "Location",
-      icon: require("../assets/logo.png"),
-      name: "bt_room",
-      position: 3,
-    },
-    {
-      text: "Video",
-      icon: require("../assets/logo.png"),
-      name: "bt_videocam",
-      position: 4,
-    },
-  ];
 
   useEffect(() => {
     axios
@@ -112,9 +115,7 @@ const Profile = ({ navigation }) => {
 
   return (
     <View style={profile.container}>
-      <Add />
-
-      {/*       <View style={{ borderColor: "#FFF", borderRadius: 85, borderWidth: 3 }}>
+      <View style={{ borderColor: "#FFF", borderRadius: 85, borderWidth: 3 }}>
         <Avatar
           size={160}
           rounded
@@ -125,11 +126,11 @@ const Profile = ({ navigation }) => {
           containerStyle={{ backgroundColor: "grey" }}
         >
           <Avatar.Accessory
-            size={23}
-            onPress={() => <Add/>}
+            size={48}
+            onPress={() => navigation.navigate("Change image user")}
           />
         </Avatar>
-      </View> */}
+      </View>
 
       <Text style={profile.userNameText}>{`${user.name} ${user.surname}`}</Text>
       <Text style={profile.userNameText}>{`${user.nickname}`}</Text>
@@ -252,7 +253,7 @@ const Profile = ({ navigation }) => {
   );
 };
 
-function Add() {
+function Add({ setEditImage, navigation }) {
   const [cameraPermission, setCameraPermission] = useState(null);
   const [galleryPermission, setGalleryPermission] = useState(null);
   const [showCamera, setShowCamera] = useState(false);
@@ -264,7 +265,7 @@ function Add() {
 
   const permisionFunction = async () => {
     // here is how you can get the camera permission
-    const cameraPermission = await Camera.requestPermissionsAsync();
+    const cameraPermission = await Camera.requestCameraPermissionsAsync();
     console.log("camera permission:", cameraPermission.status);
 
     setCameraPermission(cameraPermission.status === "granted");
@@ -289,7 +290,7 @@ function Add() {
   const takePicture = async () => {
     if (camera) {
       const data = await camera.takePictureAsync(null);
-      console.log(data.uri);
+      console.log("DATA URI ===>", data.uri);
       setImageUri(data.uri);
       setImageArray([...imageArray, data.uri]);
       setShowCamera(false);
@@ -302,18 +303,51 @@ function Add() {
       quality: 1,
     });
 
-    console.log(result.uri);
+    console.log("RESULT URI ===>", result.uri);
     if (!result.cancelled) {
-      setImageArray([...imageArray, result.uri]);
+      setImageArray([result.uri]);
     }
   };
 
   return (
-    <View style={styles.container}>
+    <View style={{flex: 4, marginTop: 50}}>
       {showCamera && (
-        <Camera ref={(ref) => setCamera(ref)} style={{ flex: 1 }} type={type} />
+        <View style={styles.container}>
+          <Camera
+            style={styles.camera}
+            type={type}
+            ref={(ref) => setCamera(ref)}
+          >
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={styles.buttonReverse}
+                onPress={() => {
+                  setType(
+                    type === Camera.Constants.Type.back
+                      ? Camera.Constants.Type.front
+                      : Camera.Constants.Type.back
+                  );
+                }}
+              >
+                <Ionicons name="camera-reverse-outline" size={36} color="white" />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.buttonPicture}
+                onPress={() => {
+                  setType(
+                    type === Camera.Constants.Type.back
+                      ? Camera.Constants.Type.front
+                      : Camera.Constants.Type.back
+                  );
+                }}
+              >
+                <Entypo name="circle" size={48} color="white" />
+              </TouchableOpacity>
+              
+            </View>
+          </Camera>
+        </View>
       )}
-      {showCamera && <Button title={"Click"} onPress={takePicture} />}
       {!showCamera && (
         <>
           <View
@@ -327,6 +361,10 @@ function Add() {
                 }}
               />
               <Button title={"Gallery"} onPress={pickImage} />
+              <Button
+                title={"Cancelar"}
+                onPress={() => navigation.navigate("User")}
+              />
             </View>
           </View>
           {imageArray.length > 0 && (
@@ -353,5 +391,26 @@ function Add() {
     </View>
   );
 }
+
+const Stack = createStackNavigator();
+
+function MyStack() {
+  return (
+    <Stack.Navigator
+      screenOptions={{ headerShown: false, animationEnabled: false }}
+    >
+      <Stack.Screen name="User" component={User} />
+      <Stack.Screen name="Change image user" component={Add} />
+    </Stack.Navigator>
+  );
+}
+
+const Profile = () => {
+  return (
+    <NavigationContainer>
+      <MyStack />
+    </NavigationContainer>
+  );
+};
 
 export default Profile;
