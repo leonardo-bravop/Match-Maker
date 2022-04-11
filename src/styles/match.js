@@ -1,5 +1,7 @@
 import { StyleSheet } from "react-native";
 
+import { colorSet } from "./colorSet";
+
 /*//populate users al add user y devolver usuarios
 //setear opciones de colores al crear una liga
 //imagenes con fondo en degradado de transparente a negro
@@ -13,21 +15,12 @@ subtitulos H5
 texto normal 18
 texto botones 18 todas en mayusculas*/ 
 
-export const colors = {
-   background: "#090A1C",
-   content: "#1A1C38",
-   item: "#4C657F"/*"#657A91"/*"#92A1B1"/*"#A2AEBB"/*"#D8DBE2"/*"#437F97"*/,
-   text: "#E8EFF8"/*"#FFFFFA"*/,
-   button: "#C49337"/*"#781919"/*"#af1b3f"/*"#E5DADA"/*"#0094C6"/*"#E59500"/*"#945600"/*"#E9B44C"*/,
-   error: "#C42021"/*"#EA2B1F"*/,
-   modalBack: 'rgba(9,10,28,0.85)'/*'rgba(30,30,50,0.85)'*/
-}
 
 export const matchStyles = StyleSheet.create({
 
    back: {
       flex: 1,
-      backgroundColor: colors.background
+      backgroundColor: colorSet.background
    },
 
    ///////////////////////////////
@@ -47,7 +40,7 @@ export const matchStyles = StyleSheet.create({
       alignSelf: "center",
       fontStyle: "italic",
       fontWeight: "bold",
-      color: colors.text
+      color: colorSet.text
    },
    pickerButton: {
       height: 50, 
@@ -61,7 +54,7 @@ export const matchStyles = StyleSheet.create({
       borderTopRightRadius: 10,
       flexDirection: "row",
       justifyContent: "space-evenly",
-      backgroundColor: colors.content
+      backgroundColor: colorSet.content
    },
 
    ///////////////////////////////
@@ -73,7 +66,7 @@ export const matchStyles = StyleSheet.create({
       flex: 1,
       borderBottomLeftRadius: 10,
       borderBottomRightRadius: 10,
-      backgroundColor: colors.content
+      backgroundColor: colorSet.content
    },
    labels:{
       flexDirection: "row",
@@ -84,14 +77,14 @@ export const matchStyles = StyleSheet.create({
 
    ////////////////////////////////
    foot: {
-      backgroundColor: colors.background
+      backgroundColor: colorSet.background
    },
    calendar: {
       height: 170,
       marginTop: 10,
       paddingVertical: 8,
       borderRadius: 10,
-      backgroundColor: colors.content
+      backgroundColor: colorSet.content
    },
    time: {
       height: 30,   
@@ -106,7 +99,7 @@ export const matchStyles = StyleSheet.create({
    timeTxt: {
       fontSize: 16,
       fontWeight: "bold",
-      color: colors.content
+      color: colorSet.content
    },
 
    createButton: {
@@ -121,12 +114,12 @@ export const matchStyles = StyleSheet.create({
    buttonTxt: {
       fontSize: 20,
       marginHorizontal:16,
-      color: colors.text,
+      color: colorSet.text,
     },
    errTxt: { 
       margin:5,
       alignSelf: "center",
-      color: colors.error
+      color: colorSet.error
    }
 })
 
@@ -151,7 +144,7 @@ export const itemStyles = StyleSheet.create({
       paddingHorizontal:10,
       alignContent: "center",
       borderRadius: 10,
-      //backgroundColor: colors.item
+      //backgroundColor: colorSet.item
    },
    text: {
       fontSize: 18, 
@@ -170,7 +163,7 @@ export const pickerStyles = StyleSheet.create({
    back: {
       height: "100%",
       paddingVertical: 16,  
-      backgroundColor: colors.modalBack
+      backgroundColor: colorSet.modalBack
    },
    pressArea: {
       flex: 1, 
@@ -180,13 +173,13 @@ export const pickerStyles = StyleSheet.create({
       flex: 1,
       marginHorizontal: 16,
       borderRadius: 10,
-      backgroundColor: colors.content
+      backgroundColor: colorSet.content
    },
    text: { 
       margin: 8,
       fontSize: 18, 
       textAlign: 'center',
-      color: colors.text
+      color: colorSet.text
    }
 })
 
@@ -195,7 +188,7 @@ export const cardStyles = StyleSheet.create({
    back: {
       height: "100%",  
       justifyContent: "flex-end",
-      backgroundColor: colors.modalBack
+      backgroundColor: colorSet.modalBack
    },
    body: {
       flex: 1,
@@ -203,7 +196,7 @@ export const cardStyles = StyleSheet.create({
       paddingHorizontal: 8,
       borderTopRightRadius: 10,
       borderTopLeftRadius: 10,
-      backgroundColor: colors.content
+      backgroundColor: colorSet.content
    },
    closeButton: {
       marginTop: 10, 
@@ -217,13 +210,13 @@ export const cardStyles = StyleSheet.create({
    title: { 
       fontSize: 32, 
       marginBottom: 8, 
-      color: colors.text
+      color: colorSet.text
    },
    txt: {
       fontSize: 18,
       marginTop: 12,
       paddingHorizontal: 8,  
-      color: colors.text
+      color: colorSet.text
    },
    inputContainer: { 
       height: 84, 
@@ -235,8 +228,8 @@ export const cardStyles = StyleSheet.create({
       marginHorizontal: 8,
       borderRadius: 10, 
       fontSize: 16,
-      color: colors.content,
-      backgroundColor: colors.text,
+      color: colorSet.content,
+      backgroundColor: colorSet.text,
    },
    confirmButton: {
       height: 50,
@@ -247,11 +240,11 @@ export const cardStyles = StyleSheet.create({
       borderRadius: 10,
       justifyContent: "center",
       alignItems: "center",
-      backgroundColor: colors.button
+      backgroundColor: colorSet.button
    },
    buttonTxt: {
       fontSize: 20,
       marginHorizontal:16,
-      color: colors.text,
+      color: colorSet.text,
    },
 })
