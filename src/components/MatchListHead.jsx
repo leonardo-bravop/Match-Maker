@@ -1,29 +1,26 @@
 import { View, Text} from "react-native";
 import React from "react";
-import { matchStyles } from "../styles/match";
 
-const ListHead = () => {
+const ListHead = ({labels, styling}) => {
   return (
-      <View style={matchStyles.listHead}>
-         {/* <View style={matchStyles.labels}> */}
+      <View style={styling}>
             <View style={{width: 85, alignItems: "center"}}>
                <Text style={{ fontSize: 18, color: '#FFFFFF' }}>
-                  Aliados
+                  {labels[0]}
                </Text>
             </View>
             
             <View style={{width: 150, alignItems: "center"}}>
                <Text style={{ fontSize: 18, color: '#FFFFFF'}}>
-                  Usuario
+                  {labels[1]}
                </Text>
             </View>
             
             <View style={{width: 85, alignItems: "center"}}>
                <Text style={{ fontSize: 18, color: '#FFFFFF'}}>
-                  Rivales
+                  {labels[2]}
                </Text>
             </View>
-         {/* </View> */}
       </View> )
 };
 

@@ -4,13 +4,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { removeTeam, setTeam } from "../state/teams";
 
 import { CheckBox } from 'react-native-elements';
-import { colors, itemStyles} from "../styles/match";
+import { itemStyles } from "../styles/match";
+import { colorSet } from "../styles/colorSet";
 
 const ItemMatch = ({ item, i }) => {
       
    let [select, setSelect] = useState(false),
       [select2, setSelect2] = useState(false),
-      [colorIs, setColorIs] = useState(colors.content)
+      [colorIs, setColorIs] = useState(colorSet.content)
 
    const dispatch = useDispatch();
 
@@ -18,7 +19,7 @@ const ItemMatch = ({ item, i }) => {
 
    useEffect(()=>{
 
-      setColorIs(colors.content)
+      setColorIs(colorSet.content)
       setSelect(false)
       setSelect2(false)
 
@@ -32,7 +33,7 @@ const ItemMatch = ({ item, i }) => {
    const checker = () => {
       if ( select ){
          dispatch( removeTeam({ team: "teamA", id: item._id }))
-         setColorIs(colors.content)
+         setColorIs(colorSet.content)
       }
       else {
          dispatch( setTeam({ team: "teamA", id: item._id, nick: item.nickname }))
@@ -45,7 +46,7 @@ const ItemMatch = ({ item, i }) => {
    const checker2 = () => {
       if ( select2 ){
          dispatch( removeTeam({ team: "teamB", id: item._id }))
-         setColorIs(colors.content)
+         setColorIs(colorSet.content)
       }
       else {
          dispatch( setTeam({ team: "teamB", id: item._id, nick: item.nickname }))
@@ -62,7 +63,7 @@ const ItemMatch = ({ item, i }) => {
             ? <CheckBox
                checked={ select } onPress={checker}
                iconType="ionicon"
-               uncheckedIcon="checkbox-outline" uncheckedColor={colors.text}
+               uncheckedIcon="checkbox-outline" uncheckedColor={colorSet.text}
                checkedIcon="checkbox" checkedColor="#3774C4"
                size={30}
             />
@@ -82,7 +83,7 @@ const ItemMatch = ({ item, i }) => {
             ? <CheckBox
                checked={ select2 } onPress={checker2}
                iconType="ionicon"
-               uncheckedIcon="checkbox-outline" uncheckedColor= {colors.text}
+               uncheckedIcon="checkbox-outline" uncheckedColor= {colorSet.text}
                checkedIcon="checkbox" checkedColor="#C43737"
                size={30}
             />
