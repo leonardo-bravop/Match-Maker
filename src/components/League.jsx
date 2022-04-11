@@ -66,43 +66,44 @@ const LeagueHome = ({ navigation }) => {
 
   useEffect(() => {
     const loadData = async () => {
-      try{
-        console.log('====================================');
+      try {
+        console.log("====================================");
         console.log(`EMPEZANDO EL USEEFFECT DE LEAGUE`);
-        console.log('====================================');
+        console.log("====================================");
         console.log("lueage ides ", leagueId);
         console.log("userdata es ", userData);
         // console.log('====================================');
         console.log("Paso 1: dispatch(setUserLeagues(");
-        const resData = await dispatch(setUserLeagues({ userId: userData._id }));
+        const resData = await dispatch(
+          setUserLeagues({ userId: userData._id })
+        );
+        console.log("Res data payload 0 es:", resData.payload[0].league);
         // console.log('====================================');
         console.log("Paso 2: dispatch(setLeagueId");
-        console.log("ESTE DISPATCH ES EL QUE HACE QUE SE EJECUTE EL USEEFFECT OTRA VEZ");
-        if (leagueId === "") dispatch(setLeagueId(resData.payload[0]._id));
-        console.log("Paso 3: ");
-        let auxLeagueId = leagueId === "" ? leagueList[0]._id : leagueId
-        const { payload } = await dispatch(
-          setMembers(auxLeagueId)
+        console.log(
+          "ESTE DISPATCH ES EL QUE HACE QUE SE EJECUTE EL USEEFFECT OTRA VEZ"
         );
+        if (leagueId === "") dispatch(setLeagueId(resData.payload[0].league._id));
+        console.log("Paso 3: ");
+        let auxLeagueId = leagueId === "" ? leagueList[0].league._id : leagueId;
+        const { payload } = await dispatch(setMembers(auxLeagueId));
         console.log("Paso 4: payload es ", payload);
-  
+
         setMemberList(payload);
         // console.log('====================================');
         console.log("Paso 5: memberlist es payload");
-  
+
         const { data } = await axios.get(
           `${uri}/api/league/showLeague/${auxLeagueId}`
         );
         // console.log('====================================');
         console.log("Paso 6: actual league es", data);
-  
+
         setActualLeague(data);
         console.log(`TERMINANDO USEEFFECT DE LEAGUE`);
+      } catch (error) {
+        console.error(error);
       }
-      catch (error) {
-        console.error(error)
-      }
-
     };
 
     loadData();
@@ -116,15 +117,15 @@ const LeagueHome = ({ navigation }) => {
   };
 
   const joinHandler = () => {
-    console.log('====================================');
-      console.log(`EMPEZANDO JOIN HANDLER`);
+    console.log("====================================");
+    console.log(`EMPEZANDO JOIN HANDLER`);
     if (actualleague.isPrivate) {
       setShowSecretkeyCard(true);
     }
     const loadData = async () => {
       try {
-        console.log('====================================');
-      console.log(`EMPEZANDO LOADDATA`);
+        console.log("====================================");
+        console.log(`EMPEZANDO LOADDATA`);
         console.log(`en loadData`);
         console.log(`atnes del dispatch de user, userdata es`, userData);
         const userString = await AsyncStorage.getItem("userInfo");
@@ -157,8 +158,8 @@ const LeagueHome = ({ navigation }) => {
 
     const addUserFunc = async () => {
       try {
-        console.log('====================================');
-      console.log(`EMPEZANDO ADDUSERFUNC`);
+        console.log("====================================");
+        console.log(`EMPEZANDO ADDUSERFUNC`);
         console.log("adduserfunc paso 1");
         const result = await axios.put(
           `${uri}/api/league/${leagueId}/addUser/${userData._id}`,
@@ -186,7 +187,6 @@ const LeagueHome = ({ navigation }) => {
         } else setSecretError("Clave secreta inválida");
 
         console.log(`TERMINANDO ADDUSERFUNC`);
-
       } catch (error) {
         setSecretError("Clave secreta inválida");
         console.error(`Error: ${error.message}`);

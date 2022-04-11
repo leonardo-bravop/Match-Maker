@@ -31,7 +31,7 @@ const ItemRecord = ({ item }) => {
                   {item.team_1.map( (user, i, arr) => {
                      if (i>2) return (<></>)
                      return (
-                     <Text style={{color: '#FFFFFF'}} key= {i}>
+                     <Text style={{color: '#FFFFFF'}} key= {user._id}>
                         {arr.length > 3 && i === 2 
                         ?  `${user.nickname}`+` y ${arr.length-3} mas` 
                         : user.nickname }

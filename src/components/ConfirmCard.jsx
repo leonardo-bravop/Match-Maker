@@ -81,9 +81,9 @@ const ConfirmCard = () => {
             <Text style={{ marginVertical: 8, color: "white" }}>Equipo B</Text>
             <View style={{ flex: 1, alignItems: "center" }}>
               {match &&
-                match.team_2.map((user) => {
+                match.team_2.map((user, i) => {
                   return (
-                    <Text style={{ color: "white" }}>{user.nickname}</Text>
+                    <Text style={{ color: "white" }} key={i}>{user.nickname}</Text>
                   );
                 })}
             </View>
