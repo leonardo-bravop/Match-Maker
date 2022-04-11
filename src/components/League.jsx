@@ -65,32 +65,45 @@ const LeagueHome = ({ navigation }) => {
   const leagueList = useSelector((state) => state.userLeagues);
 
   useEffect(() => {
-
     const loadData = async () => {
+      try {
+        console.log("====================================");
+        console.log(`EMPEZANDO EL USEEFFECT DE LEAGUE`);
+        console.log("====================================");
+        console.log("lueage ides ", leagueId);
+        console.log("userdata es ", userData);
+        // console.log('====================================');
+        console.log("Paso 1: dispatch(setUserLeagues(");
+        const resData = await dispatch(
+          setUserLeagues({ userId: userData._id })
+        );
+        console.log("Res data payload 0 es:", resData.payload[0].league);
+        // console.log('====================================');
+        console.log("Paso 2: dispatch(setLeagueId");
+        console.log(
+          "ESTE DISPATCH ES EL QUE HACE QUE SE EJECUTE EL USEEFFECT OTRA VEZ"
+        );
+        if (leagueId === "") dispatch(setLeagueId(resData.payload[0].league._id));
+        console.log("Paso 3: ");
+        let auxLeagueId = leagueId === "" ? leagueList[0].league._id : leagueId;
+        const { payload } = await dispatch(setMembers(auxLeagueId));
+        console.log("Paso 4: payload es ", payload);
 
-      console.log("lueage ides ", leagueId);
-      console.log("userdata es ", userData);
+        setMemberList(payload);
+        // console.log('====================================');
+        console.log("Paso 5: memberlist es payload");
 
-      console.log("Paso 1: ");
-      const resData = await dispatch(setUserLeagues({ userId: userData._id }));
-      console.log("Paso 2: ");
-      if (leagueId === "") dispatch(setLeagueId(resData.payload[0]._id));
-      console.log("Paso 3: ");
+        const { data } = await axios.get(
+          `${uri}/api/league/showLeague/${auxLeagueId}`
+        );
+        // console.log('====================================');
+        console.log("Paso 6: actual league es", data);
 
-      const { payload } = await dispatch(
-        setMembers(leagueId === "" ? leagueList[0]._id : leagueId)
-      );
-      console.log("Paso 4: ");
-
-      setMemberList(payload);
-      console.log("Paso 5: ");
-
-      const { data } = await axios.get(
-        `${uri}/api/league/showLeague/${leagueId}`
-      );
-      console.log("Paso 6: ");
-
-      setActualLeague(data);
+        setActualLeague(data);
+        console.log(`TERMINANDO USEEFFECT DE LEAGUE`);
+      } catch (error) {
+        console.error(error);
+      }
     };
 
     loadData();
@@ -104,11 +117,15 @@ const LeagueHome = ({ navigation }) => {
   };
 
   const joinHandler = () => {
+    console.log("====================================");
+    console.log(`EMPEZANDO JOIN HANDLER`);
     if (actualleague.isPrivate) {
       setShowSecretkeyCard(true);
     }
     const loadData = async () => {
       try {
+        console.log("====================================");
+        console.log(`EMPEZANDO LOADDATA`);
         console.log(`en loadData`);
         console.log(`atnes del dispatch de user, userdata es`, userData);
         const userString = await AsyncStorage.getItem("userInfo");
@@ -132,6 +149,7 @@ const LeagueHome = ({ navigation }) => {
         );
 
         setActualLeague(data);
+        console.log(`TERMINANDO LOADDATA`);
       } catch (error) {
         console.error(`Error: ${error.message}`);
         setSecretError("Hubo un problema, por favor intenta de nuevo");
@@ -140,6 +158,8 @@ const LeagueHome = ({ navigation }) => {
 
     const addUserFunc = async () => {
       try {
+        console.log("====================================");
+        console.log(`EMPEZANDO ADDUSERFUNC`);
         console.log("adduserfunc paso 1");
         const result = await axios.put(
           `${uri}/api/league/${leagueId}/addUser/${userData._id}`,
@@ -148,8 +168,6 @@ const LeagueHome = ({ navigation }) => {
           }
         );
         console.log("adduserfunc paso 2");
-
-        console.log(`je`);
         if (result) console.log(`result es`, result.request.status);
         console.log("adduserfunc paso 3");
 
@@ -160,10 +178,15 @@ const LeagueHome = ({ navigation }) => {
         console.log(`league id es`, leagueId);
 
         if (result && result.request.status === 200) {
-          Alert.alert("Bienvenido!", `Te uniste a la liga ${actualleague.name}`);
+          Alert.alert(
+            "Bienvenido!",
+            `Te uniste a la liga ${actualleague.name}`
+          );
           setSecretKey = "";
           setShowSecretkeyCard(false);
         } else setSecretError("Clave secreta inválida");
+
+        console.log(`TERMINANDO ADDUSERFUNC`);
       } catch (error) {
         setSecretError("Clave secreta inválida");
         console.error(`Error: ${error.message}`);
@@ -205,6 +228,7 @@ const LeagueHome = ({ navigation }) => {
                           <TouchableOpacity
                             style={{ margin: 7 }}
                             onPress={() => selectHandler(item._id)}
+                            key={i}
                           >
                             <Text
                               style={{
@@ -440,33 +464,45 @@ const HomeScreen = ({ navigation }) => {
   const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 
   const [isLoading, setIsLoading] = useState(false);
+  const userData = useSelector((state) => state.user);
 
   let [select, setSelect] = useState(false);
+  let [requiredSecretkey, setRequiredSecretKey] = useState("");
+
+  const dispatch = useDispatch();
 
   const handleRegister = (values) => {
-    console.log("values son", values);
-    // console.log(`check es`, check);
-    if (values.isPrivate.toLowerCase() !== "no") {
-      values.isPrivate = !!values.isPrivate;
-    } else {
-      values.isPrivate = false;
-    }
+    values.admin = userData._id;
+    values.isPrivate = select;
+    console.log("====================================");
+    console.log(`values es`, values);
+    console.log("====================================");
+
     if (values.secretKey === "") delete values.secretKey;
-    console.log("values son", values);
     setIsLoading(true);
-    // axios
-    //   .post(`${uri}/api/league/new`, values)
-    //   .then((res) => {
-    //     setIsLoading(false);
-    //     console.log("====================================");
-    //     console.log("antes de navigate");
-    //     console.log("====================================");
-    //     res.status == 201 ? navigation.navigate("Leagues") : null;
-    //   })
-    //   .catch((error) => {
-    //     setIsLoading(false);
-    //     console.log("error es", error);
-    //   });
+    axios
+      .post(`${uri}/api/league/new`, values)
+      .then((res) => {
+        setIsLoading(false);
+        if (res.status == 201) {
+          console.log("user data es", userData);
+          return dispatch(setUserLeagues({ userId: userData._id }));
+        }
+      })
+      .then(() => {
+        return AsyncStorage.getItem("userInfo");
+      })
+      .then((userString) => {
+        return dispatch(setUserMe(userString));
+      })
+      .then(() => {
+        navigation.navigate("Leagues");
+        Alert.alert("Liga creada!", `Se ha creado la liga ${values.name}`);
+      })
+      .catch((error) => {
+        setIsLoading(false);
+        console.log("error es", error);
+      });
   };
 
   const validationSchema = yup.object().shape({
@@ -478,14 +514,17 @@ const HomeScreen = ({ navigation }) => {
     //   .required("*Campo requerido")
     //   .max(10, "El nickname debe tener un maximo de 10 caracteres"),
 
-    // password: yup
-    //   .string("Ingresa tu eontraseña")
-    //   .min(8, "La contraseña debe tener al menos 8 caracteres")
-    //   .required("*Campo requerido")
-    //   .matches(
-    //     /^(?=(.*[A-Z]){1,})(?=(.*[0-9]){1,}).{8,}$/,
-    //     "La contraseña debe tener al menos una mayúscula y un número"
-    //   ),
+    secretKey: yup
+      .string("Ingrese una clave")
+      .min(5, "La clave debe tener 5 caracteres")
+      .matches(
+        /^(?=(.*[A-Z]){1,}).*$/,
+        "La contraseña debe tener al menos una mayúscula"
+      )
+      .matches(
+        /^(?=(.*[0-9]){1,}).*$/,
+        "La contraseña debe tener al menos un número"
+      ),
   });
 
   const checker = () => {
@@ -508,13 +547,17 @@ const HomeScreen = ({ navigation }) => {
           name: "",
           sport: "",
           description: "",
-          isPrivate: "",
           secretKey: "",
           color: "",
           img: "",
-          selected: false
         }}
-        onSubmit={(values) => handleRegister({...values, select})}
+        onSubmit={(values) => {
+          if (select && values.secretKey && values.secretKey.length === 5)
+            handleRegister({ ...values, select });
+          else if (!select && !values.secretKey) {
+            handleRegister({ ...values, select });
+          } else console.log(`que onda`);
+        }}
       >
         {({
           handleChange,
@@ -561,40 +604,56 @@ const HomeScreen = ({ navigation }) => {
                 name="description"
               />
 
-              <TextInput
-                style={formR.inputs}
-                placeholder="¿Es privada?"
-                name="email"
-                onChangeText={handleChange("isPrivate")}
-                onBlur={handleBlur("isPrivate")}
-                value={values.isPrivate}
-                keyboardType="default"
-              />
-              <CheckBox
-                checked={select}
-                onPress={checker}
-                iconType="ionicon"
-                uncheckedIcon="checkbox-outline"
-                checkedIcon="checkbox"
-                uncheckedColor="white"
-                checkedColor="#45fc03"
-              />
+              <View style={formR.customInput}>
+                <Text style={formR.textCustomInput}>¿Es privada?</Text>
+                <View
+                  style={[formR.customInput, { width: "auto", marginLeft: 5 }]}
+                >
+                  <CheckBox
+                    checked={select}
+                    onPress={checker}
+                    iconType="ionicon"
+                    uncheckedIcon="radio-button-off-outline"
+                    checkedIcon="radio-button-on-outline"
+                    uncheckedColor="white"
+                    checkedColor="#44ebdf"
+                  />
+                  <Text style={[formR.textCustomInput, { left: -12 }]}>Si</Text>
+                </View>
+                <View style={[formR.customInput, { width: "auto", left: -15 }]}>
+                  <CheckBox
+                    checked={!select}
+                    onPress={checker}
+                    iconType="ionicon"
+                    uncheckedIcon="radio-button-off-outline"
+                    checkedIcon="radio-button-on-outline"
+                    uncheckedColor="white"
+                    checkedColor="#44ebdf"
+                  />
+                  <Text style={[formR.textCustomInput, { left: -12 }]}>No</Text>
+                </View>
+              </View>
 
-              <TextInput
-                style={formR.inputs}
-                onChangeText={handleChange("secretKey")}
-                onBlur={handleBlur("secretKey")}
-                value={values.secretKey}
-                keyboardType="default"
-                secureTextEntry={true}
-                placeholder="Clave Secreta"
-                name="secretKey"
-              />
-
-              {values.isPrivate &&
-              values.isPrivate.toString().toLowerCase() !== "no" ? (
-                <Text>Ingrese una clave secreta</Text>
+              {select ? (
+                <TextInput
+                  style={formR.inputs}
+                  onChangeText={handleChange("secretKey")}
+                  onBlur={handleBlur("secretKey")}
+                  value={values.secretKey}
+                  keyboardType="default"
+                  secureTextEntry={true}
+                  placeholder="Clave Secreta (5)"
+                  name="secretKey"
+                  maxLength={5}
+                />
               ) : null}
+
+              {select && values.secretKey === "" ? (
+                <Text style={formR.error}>Por favor, ingrese una clave</Text>
+              ) : null}
+              {errors.secretKey && touched.secretKey && (
+                <Text style={formR.error}>{errors.secretKey}</Text>
+              )}
 
               <TextInput
                 style={formR.inputs}
@@ -615,15 +674,21 @@ const HomeScreen = ({ navigation }) => {
                 placeholder="Imagen (opcional)"
                 name="img"
               />
-              <Image
-                style={{
-                  marginTop: 20,
-                  height: "15%",
-                  backgroundColor: "transparent",
-                  resizeMode: "center",
-                }}
-                source={{ uri: values.img }}
-              />
+              {
+                <Image
+                  style={{
+                    marginTop: 20,
+                    height: "15%",
+                    backgroundColor: "transparent",
+                    resizeMode: "center",
+                  }}
+                  source={{
+                    uri:
+                      values.img ||
+                      "https://www.tibs.org.tw/images/default.jpg",
+                  }}
+                />
+              }
             </View>
             <View style={{ display: "flex", flexDirection: "row" }}>
               <TouchableOpacity
