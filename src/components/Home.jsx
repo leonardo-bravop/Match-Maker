@@ -137,20 +137,25 @@ function Home({ navigation: { navigate } }) {
 
   useEffect(async () => {
     try {
+      console.log(`Home Paso 1`);
       const userString = await AsyncStorage.getItem("userInfo");
       console.log(`userString es`, userString);
       if (!userString) return;
+      console.log(`Home Paso 2`);
       const result = await dispatch(setUserMe(userString));
+      console.log(`Home Paso 3`);
       const userLeagues = await dispatch(
         setUserLeagues({ userId: result.payload._id })
       );
-
+      console.log(`Home Paso 4`);
       const { payload } = await dispatch(setLeagues(false));
-      console.log(`result es`, result);
+      // console.log(`result es`, result);
+      console.log(`Home Paso 5`);
       const { data } = await axios.get(
         `${uri}/api/user/getMatches/${result.payload._id}`
       );
-      console.log("DATA ===> ", data);
+      // console.log("DATA ===> ", data);
+      console.log(`Home Paso 6`);
       setMatches(data);
     } catch (err) {
       console.log(err);
