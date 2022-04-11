@@ -55,8 +55,9 @@ const LeagueHome = ({ navigation }) => {
   const leagueList = useSelector((state) => state.userLeagues);
 
   useEffect(() => {
-    let rank = 0;
+
     const loadData = async () => {
+
       const resData = await dispatch(setUserLeagues({ userId: userData._id }));
 
       if (leagueId === "") dispatch(setLeagueId(resData.payload[0]._id));
