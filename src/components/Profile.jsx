@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 /* import { Icon } from "react-native-elements"; */
-import { SafeAreaView } from "react-navigation";
 import { profile } from "../styles/profile";
 import { Avatar } from "@rneui/themed";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -17,6 +16,7 @@ import {
   Dimensions,
   ScrollView,
   Button,
+  SafeAreaView
 } from "react-native";
 import { leagueStyles } from "../styles/league";
 import { setLeague } from "../state/selectLeague";
@@ -396,8 +396,10 @@ const Stack = createStackNavigator();
 
 function MyStack() {
   return (
-    <Stack.Navigator
-      screenOptions={{ headerShown: false, animationEnabled: false }}
+
+      <Stack.Navigator
+      
+      screenOptions={{ headerShown: false, animationEnabled: false}}
     >
       <Stack.Screen name="User" component={User} />
       <Stack.Screen name="Change image user" component={Add} />

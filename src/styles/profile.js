@@ -13,9 +13,6 @@ export const profile = StyleSheet.create({
         ios: {
           marginTop: -1,
         },
-        android: {
-          marginTop: 50,
-        },
       }),
     },
     userImage: {
