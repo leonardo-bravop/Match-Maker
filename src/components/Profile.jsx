@@ -105,11 +105,15 @@ const Profile = ({ navigation }) => {
   // };
 
   useEffect( () => {
-    
+    console.log('====================================');
+    console.log(`EMPEZANDO USEEFFECT DE PROFILE`);
+    console.log('====================================');
+    console.log(`user es`, user);
     axios.get(`${uri}/api/user/getLeaguesAndRank/${user._id}`)
     .then( ({data}) => {
       setUserLeagues(data)
-      console.log('ligas de usuario ===>', userLeagues)
+      console.log('ligas de usuario ===>', data)
+      console.log(`TERMINANDO USEEFFECT DE PROFILE`);
     })
   }, [])
 

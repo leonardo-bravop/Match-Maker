@@ -102,6 +102,11 @@ export const formR = StyleSheet.create({
     fontSize: 18,
     alignSelf: "center",
   },
+  error: {
+    color: "black",
+    width: "80%",
+    alignSelf: "center",
+  },
   colorBtn: {
     alignSelf: "center",
     width: "50%",

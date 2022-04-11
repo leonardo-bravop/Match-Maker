@@ -6,7 +6,7 @@ const Elo = require("../models/Elo");
 exports.new = (req, res, next) => {
   const { name, sport, description, isPrivate, secretKey, color, img, admin } =
     req.body;
-  console.log(`req body es`, req.body);
+  let newLeagueRef;
   if (isPrivate && !secretKey) {
     res.status(400);
     next(new Error("A private league must have a secret key"));
@@ -17,7 +17,7 @@ exports.new = (req, res, next) => {
           res.status(400);
           next(new Error("League Already Exists"));
         } else {
-          League.create({
+          return League.create({
             name,
             sport,
             description,
@@ -25,15 +25,33 @@ exports.new = (req, res, next) => {
             secretKey,
             color,
             img,
-            admin
-          })
-            .then((league) => {
-              res.status(201).send(league);
-            })
-            .catch((error) => {
-              next(new Error(error));
-            });
+            admin,
+            users: admin,
+          });
         }
+      })
+      .then((league) => {
+        if (league) {
+          newLeagueRef = league;
+          return Elo.create({ league: league._id.toString(), user: admin });
+        }
+      })
+      .then((elo) => {
+        if (elo) {
+          return User.findByIdAndUpdate(
+            admin,
+            {
+              $push: {
+                leagues: newLeagueRef._id.toString(),
+                elo: elo._id.toString(),
+              },
+            },
+            { new: true, useFindAndModify: false }
+          );
+        }
+      })
+      .then((updatedUser) => {
+        res.status(201).send(newLeagueRef);
       })
       .catch((error) => {
         next(new Error(error));
@@ -83,14 +101,14 @@ exports.addUser = (req, res, next) => {
       }
     })
     .then((elo) => {
-      if(elo) {
+      if (elo) {
         const eloId = elo._id.toString();
         return User.findByIdAndUpdate(
           userId,
           { $push: { leagues: leagueId, elo: eloId } },
           { new: true, useFindAndModify: false }
         );
-      } 
+      }
     })
     .then((updatedUser) => {
       console.log(`updateduser es`, updatedUser);
@@ -156,7 +174,7 @@ exports.getUserByLeagueId = (req, res, next) => {
         if (league.users) {
           const leagueUsers = league.users;
           console.log(`pedido a league users`);
-          console.log(`league es`, league);
+          // console.log(`league es`, league);
           leagueUsers.sort((a, b) => {
             if (a["elo"][0] && b["elo"][0]) {
               return a["elo"]["0"]["value"] > b["elo"]["0"]["value"]
