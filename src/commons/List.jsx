@@ -10,7 +10,7 @@ const List = ({list, Element, marginNum}) => {
                return (
                   <Element item={item} key={i} i={i}/>
                )}
-            ):null}
+            )}
          </View>
       </ScrollView>
 )}
