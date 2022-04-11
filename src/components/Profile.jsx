@@ -16,13 +16,6 @@ import {
   Dimensions,
   ScrollView,
 } from "react-native";
-import {
-  Menu,
-  MenuProvider,
-  MenuOptions,
-  MenuOption,
-  MenuTrigger,
-} from "react-native-popup-menu";
 import { leagueStyles } from "../styles/league";
 import { setLeague } from "../state/selectLeague";
 import { setMembers } from "../state/memberList";
@@ -82,30 +75,7 @@ const Profile = ({ navigation }) => {
     },
   ];
 
-  // useEffect(async () => {
-  //   try {
-  //     const userToken = await AsyncStorage.getItem("userInfo");
-  //     const user = await axios.post(
-  //       `${uri}/api/user/me`,
-  //       {},
-  //       { headers: { Authorization: `Bearer ${userToken}` } }
-  //     );
-  //     setUser(user.data);
-  //     const leagues = await axios.get(
-  //       `${uri}/api/user/getLeagues/${user.data._id}`
-  //     );
-  //     setLeagues(leagues.data);
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // }, [navigation.state.params]);
-
-  // const onPress = () => {
-  //   navigation.navigate("Ligas");
-  // };
-
   useEffect( () => {
-    
     axios.get(`${uri}/api/user/getLeaguesAndRank/${user._id}`)
     .then( ({data}) => {
       setUserLeagues(data)
@@ -127,21 +97,6 @@ const Profile = ({ navigation }) => {
 
   return (
     <View style={profile.container}>
-      {/*       <TouchableOpacity style={profile.settingsIcon}>
-        <MenuProvider style={profile.settingsMenu}>
-          <Menu>
-            <MenuTrigger customStyles={profile.menu}>
-              <Icon name="ios-settings" type="ionicon" color="white" />
-            </MenuTrigger>
-            <MenuOptions>
-              <MenuOption onSelect={handleLogout}>
-              <Text style={{ color: "red", fontSize: 20 }}>Salir</Text>
-              </MenuOption>
-              </MenuOptions>
-              </Menu>
-              </MenuProvider>
-            </TouchableOpacity> */}
-   
       <Image
         style={profile.userImage}
         source={{
@@ -168,9 +123,9 @@ const Profile = ({ navigation }) => {
             </View>
           </View>
         </View>
-        {userLeagues[0] ? (
+        {leagues[0] ? (
           <ScrollView style={profile.listContainer}>
-            {userLeagues.map((item, i) => {
+            {leagues.map((item, i) => {
               return (
                 <View key={i}>
                   <TouchableOpacity
