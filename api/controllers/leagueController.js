@@ -4,7 +4,7 @@ const Match = require("../models/Match");
 const Elo = require("../models/Elo");
 
 exports.new = (req, res, next) => {
-  const { name, sport, description, isPrivate, secretKey, color, img } =
+  const { name, sport, description, isPrivate, secretKey, color, img, admin } =
     req.body;
   console.log(`req body es`, req.body);
   if (isPrivate && !secretKey) {
@@ -25,6 +25,7 @@ exports.new = (req, res, next) => {
             secretKey,
             color,
             img,
+            admin
           })
             .then((league) => {
               res.status(201).send(league);

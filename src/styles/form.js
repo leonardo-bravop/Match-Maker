@@ -1,6 +1,5 @@
 import { StyleSheet } from "react-native";
 
-
 export const form = StyleSheet.create({
   container: {
     backgroundColor: "#0e0b29",
@@ -26,7 +25,7 @@ export const form = StyleSheet.create({
     width: "80%",
     alignSelf: "center",
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     paddingLeft: 20,
     borderWidth: 2,
     borderRadius: 7,
@@ -40,8 +39,8 @@ export const form = StyleSheet.create({
     alignSelf: "center",
     width: "50%",
     borderWidth: 1,
-    borderColor: '#f27e18',
-    backgroundColor: '#e69249',
+    borderColor: "#f27e18",
+    backgroundColor: "#e69249",
     padding: 15,
     marginTop: 20,
     marginLeft: 20,
@@ -49,11 +48,11 @@ export const form = StyleSheet.create({
     borderRadius: 7,
   },
   colorTxtBtn: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     fontSize: 16,
-    textAlign: 'center'
-  }
-})
+    textAlign: "center",
+  },
+});
 
 export const formR = StyleSheet.create({
   container: {
@@ -80,7 +79,7 @@ export const formR = StyleSheet.create({
     width: "80%",
     alignSelf: "center",
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     paddingLeft: 20,
     borderWidth: 2,
     borderRadius: 7,
@@ -90,12 +89,25 @@ export const formR = StyleSheet.create({
     marginBottom: 10,
     backgroundColor: "white",
   },
+  customInput: {
+    width: "80%",
+    alignSelf: "center",
+    fontWeight: "600",
+    marginVertical: 5,
+    display: "flex",
+    flexDirection: "row",
+  },
+  textCustomInput: {
+    color: "white",
+    fontSize: 18,
+    alignSelf: "center",
+  },
   colorBtn: {
     alignSelf: "center",
     width: "50%",
     borderWidth: 1,
-    borderColor: '#f27e18',
-    backgroundColor: '#e69249',
+    borderColor: "#f27e18",
+    backgroundColor: "#e69249",
     padding: 15,
     marginTop: 20,
     marginLeft: 20,
@@ -113,8 +125,8 @@ export const formR = StyleSheet.create({
     borderRadius: 7,
   },
   colorTxtBtn: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     fontSize: 18,
-    textAlign: 'center'
-  }
-})
+    textAlign: "center",
+  },
+});

@@ -160,7 +160,10 @@ const LeagueHome = ({ navigation }) => {
         console.log(`league id es`, leagueId);
 
         if (result && result.request.status === 200) {
-          Alert.alert("Bienvenido!", `Te uniste a la liga ${actualleague.name}`);
+          Alert.alert(
+            "Bienvenido!",
+            `Te uniste a la liga ${actualleague.name}`
+          );
           setSecretKey = "";
           setShowSecretkeyCard(false);
         } else setSecretError("Clave secreta inválida");
@@ -440,27 +443,22 @@ const HomeScreen = ({ navigation }) => {
   const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 
   const [isLoading, setIsLoading] = useState(false);
+  const userData = useSelector((state) => state.user);
 
   let [select, setSelect] = useState(false);
 
   const handleRegister = (values) => {
-    console.log("values son", values);
-    // console.log(`check es`, check);
-    if (values.isPrivate.toLowerCase() !== "no") {
-      values.isPrivate = !!values.isPrivate;
-    } else {
-      values.isPrivate = false;
-    }
+    values.admin = userData._id;
+    values.isPrivate = select;
+    console.log('====================================');
+    console.log(`values es`, values);
+    console.log('====================================');
     if (values.secretKey === "") delete values.secretKey;
-    console.log("values son", values);
     setIsLoading(true);
     // axios
     //   .post(`${uri}/api/league/new`, values)
     //   .then((res) => {
     //     setIsLoading(false);
-    //     console.log("====================================");
-    //     console.log("antes de navigate");
-    //     console.log("====================================");
     //     res.status == 201 ? navigation.navigate("Leagues") : null;
     //   })
     //   .catch((error) => {
@@ -508,13 +506,11 @@ const HomeScreen = ({ navigation }) => {
           name: "",
           sport: "",
           description: "",
-          isPrivate: "",
           secretKey: "",
           color: "",
           img: "",
-          selected: false
         }}
-        onSubmit={(values) => handleRegister({...values, select})}
+        onSubmit={(values) => handleRegister({ ...values, select })}
       >
         {({
           handleChange,
@@ -561,40 +557,45 @@ const HomeScreen = ({ navigation }) => {
                 name="description"
               />
 
-              <TextInput
-                style={formR.inputs}
-                placeholder="¿Es privada?"
-                name="email"
-                onChangeText={handleChange("isPrivate")}
-                onBlur={handleBlur("isPrivate")}
-                value={values.isPrivate}
-                keyboardType="default"
-              />
-              <CheckBox
-                checked={select}
-                onPress={checker}
-                iconType="ionicon"
-                uncheckedIcon="checkbox-outline"
-                checkedIcon="checkbox"
-                uncheckedColor="white"
-                checkedColor="#45fc03"
-              />
+              <View style={formR.customInput}>
+                <Text style={formR.textCustomInput}>¿Es privada?</Text>
+                <View style={[formR.customInput, { width: "auto", marginLeft: 5 }]}>
+                  <CheckBox
+                    checked={select}
+                    onPress={checker}
+                    iconType="ionicon"
+                    uncheckedIcon="radio-button-off-outline"
+                    checkedIcon="radio-button-on-outline"
+                    uncheckedColor="white"
+                    checkedColor="#44ebdf"
+                  />
+                  <Text style={[formR.textCustomInput, {left: -12}]}>Si</Text>
+                </View>
+                <View style={[formR.customInput, { width: "auto", left: -15 }]}>
+                  <CheckBox
+                    checked={!select}
+                    onPress={checker}
+                    iconType="ionicon"
+                    uncheckedIcon="radio-button-off-outline"
+                    checkedIcon="radio-button-on-outline"
+                    uncheckedColor="white"
+                    checkedColor="#44ebdf"
+                  />
+                  <Text style={[formR.textCustomInput, {left: -12}]}>No</Text>
+                </View>
+              </View>
 
-              <TextInput
+              {select? <TextInput
                 style={formR.inputs}
                 onChangeText={handleChange("secretKey")}
                 onBlur={handleBlur("secretKey")}
                 value={values.secretKey}
                 keyboardType="default"
                 secureTextEntry={true}
-                placeholder="Clave Secreta"
+                placeholder="Clave Secreta (5)"
                 name="secretKey"
-              />
-
-              {values.isPrivate &&
-              values.isPrivate.toString().toLowerCase() !== "no" ? (
-                <Text>Ingrese una clave secreta</Text>
-              ) : null}
+                maxLength={5}
+              /> : null}
 
               <TextInput
                 style={formR.inputs}
@@ -615,15 +616,15 @@ const HomeScreen = ({ navigation }) => {
                 placeholder="Imagen (opcional)"
                 name="img"
               />
-              <Image
+              {<Image
                 style={{
                   marginTop: 20,
                   height: "15%",
                   backgroundColor: "transparent",
                   resizeMode: "center",
                 }}
-                source={{ uri: values.img }}
-              />
+                source={{ uri: values.img || "https://www.tibs.org.tw/images/default.jpg" }}
+              />}
             </View>
             <View style={{ display: "flex", flexDirection: "row" }}>
               <TouchableOpacity
