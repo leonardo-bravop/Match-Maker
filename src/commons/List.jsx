@@ -6,11 +6,11 @@ const List = ({list, Element}) => {
    return (
       <ScrollView >
          <View style={ { marginLeft:16, marginRight:16 } }>
-            { list.map( (item, i) => {
+            { list? list.map( (item, i) => {
                return (
                   <Element item={item} key={i}/>
                )}
-            )}
+            ):null}
          </View>
       </ScrollView>
 )}
