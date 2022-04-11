@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { 
    View, 
    Text, 
@@ -7,7 +7,8 @@ import {
    TextInput, 
    ScrollView, 
    Pressable, 
-   Modal 
+   Modal, 
+   ImageBackground
 } from "react-native";
 
 import axios from "axios";
@@ -18,14 +19,18 @@ import 'moment/locale/es'
 import CalendarStrip from 'react-native-calendar-strip'
 import { Icon } from "react-native-elements";
 
-import { leagueStyles } from "../styles/league";
-import { matchStyles } from "../styles/match";
-
 import List from "../commons/List";
 import ItemMatch from "./ItemMatch";
+import ListHead from "./MatchListHead";
+
+import { cardStyles, colors, matchStyles, pickerStyles } from "../styles/match";
+
 import { useDispatch, useSelector } from "react-redux";
 import { resetTeams } from "../state/teams";
 import { resetChecks } from "../state/checks";
+import { setMembers } from "../state/memberList";
+import { setUserLeagues } from "../state/userLeague";
+import MatchDetails from "./matchDetails";
 
 
 const Match = ({navigation}) => {
@@ -34,82 +39,76 @@ const Match = ({navigation}) => {
    const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 
    let [memberList, setMemberList] = useState([])
-   let [leagueList, setLeagueList] = useState([])
    let [actualleague, setActualLeague] = useState({})
-   let [user, setUser] = useState({})
-   let [match, setMatch] = useState({})
    let [selectedValue, setSelectedValue] = useState("")
-   let [showCard, setShowCard] = useState(false)
-   let [showPicker, setShowPicker] = useState(false)
+   let [match, setMatch] = useState({})
+
    let [onDate, setOnDate] = useState(moment())
    let [nicks1, setNicks1] = useState([])
    let [nicks2, setNicks2] = useState([])
    let [description, setDescription] = useState("")
+
    let [noPress, setNoPress] = useState(false)
-   let [errMessage, setErrMessage] = useState("No ha seleccionado ningun participante")
-   
-   
+   let [showCard, setShowCard] = useState(false)
+   let [showPicker, setShowPicker] = useState(false)
+
+   let [errMessage, setErrMessage] = useState("Ambos equipos deben tener igual numero de participantes")
 
    const dispatch = useDispatch();
 
    const userData = useSelector( state => state.user)
+   const leagueList = useSelector( state => state.userLeagues)
    const teams = useSelector( state => state.teams )
+
 
    useEffect(()=>{
       setNoPress(false)
    },[teams])
 
-   useEffect(() => {
+   useLayoutEffect(() => {
 
-      let rank = 0
-      
-      axios
-      .get(`${uri}/api/user/getLeagues/${userData._id}`)
-      .then(({data})=>{
-         setLeagueList(data)
+      const loadData = async () => {
+
+         const resData = await dispatch(setUserLeagues({ userId: userData._id }))
+
          if (selectedValue === "") 
-            setSelectedValue(data[0]._id)
-      })
+            setSelectedValue(resData.payload[0]._id)
 
-      axios
-      .get(`${uri}/api/league/getUsers/${selectedValue}`)
-      .then(({ data })=>{
-         setMemberList( data.map( (element, i) =>{
-            if ( userData._id === element._id) 
-                  rank = i+1
-            return {
-               id: element._id,
-               rank: i+1,
-               color:"blue",
-               nickname: element.nickname,
-               elo: 2931,
+         const {payload} = await dispatch(setMembers(selectedValue === "" ? resData.payload[0]._id : selectedValue ))
+         
+         let userInList
+         let members = payload.filter( member => {
+            if (member._id === userData._id) {
+               userInList = member
+               return false
             }
-         }))
-      })
-      .then(()=>{
-         setUser({
-            id: userData._id,
-            rank: rank,
-            color:"red",
-            nickname: userData.nickname,
-            elo: 2931,
-         })
-      })
+            return true
+         } )
+         members.unshift(userInList)
 
-      
-      axios
-      .get(`${uri}/api/league/showLeague/${selectedValue}`)
-      .then( ({ data }) => {
+         setMemberList(members)
+
+         const {data} = await axios.get(`${uri}/api/league/showLeague/${selectedValue}`)
+            
          setActualLeague(data)
+         setDescription("")
+         
          dispatch( resetChecks() )
          dispatch( resetTeams() )
-         setDescription("")
-      })
+      }
+
+      loadData()
+      setShowPicker(false)
 
    },[selectedValue])   
 
    const createHandler = () => {
-      if (teams.teamA.length === 0 && teams.teamB.length === 0) return setNoPress(true)
+      console.log("Estos son los equipos\n*****************\n\n", teams)
+      if (teams.teamA.length === 0 && teams.teamB.length === 0) {
+         setErrMessage("No ha seleccionado ningun participante")
+         setNoPress(true)
+         return 
+      } 
 
       if (teams.teamA.length === teams.teamB.length) {
          let members1Nick = []
@@ -136,7 +135,7 @@ const Match = ({navigation}) => {
             team_2: members2Id, 
             date: moment(onDate).format("DD-MM-YYYY"),
             time: "16:45",
-            invitationText: description
+            invitationText: ""
          })
 
          setShowCard(true)
@@ -149,7 +148,7 @@ const Match = ({navigation}) => {
    }
 
    const confirmHandler = () => {
-
+      match.invitationText = description
       axios
       .post(`${uri}/api/match/newMatch`, match)
       .then(()=>{
@@ -161,75 +160,191 @@ const Match = ({navigation}) => {
       })
    }
 
-   const pressHandler = id =>{
-      setSelectedValue(id)
-      setShowPicker(!showPicker)
-   }
-
    return (
-      <SafeAreaView style={leagueStyles.back}>
-         <Modal
-            animationType="fade"
-            transparent={true}
-            visible={showPicker}
-         >
-            <Pressable onPress={() => { setShowPicker(false) }}
-               style={{
-                  height: "100%",  
-                  backgroundColor: 'rgba(30,30,50,0.85)',
-                  justifyContent: "center"}}>
+      <SafeAreaView style={matchStyles.back}>
+
+         <Modal animationType="fade" transparent={true} visible={showPicker} >
+            <View style={pickerStyles.back}>
+               <Pressable onPress={() => setShowPicker(false) } style={pickerStyles.pressArea}/>
                
                <View>
                   <ScrollView>
-                     <View style={{
-                        flex: 1,
-                        marginHorizontal: 16,
-                        backgroundColor: "#0e0b29", 
-                        padding:10,
-                        borderRadius: 10 }}>
-                        <View style={{ flex: 1}} >
-                           <ScrollView >
-                              <View>
-                                 { leagueList.map( (item, i) => {
-                                    return (
-                                       <TouchableOpacity style={{margin: 7}} onPress={()=>pressHandler(item._id)} >
-                                          <Text style={{ color: "#FFFFFF", fontSize: 16, textAlign: 'center'}}>{item.name}</Text>
-                                       </TouchableOpacity>
-                                    )}
+                     <View style={pickerStyles.body}>
+                        <ScrollView >
+                              { leagueList && leagueList.map( (item, i) => {
+                                 return (
+                                    <TouchableOpacity onPress={ () => setSelectedValue(item._id) } key={i}>
+                                       <Text style={pickerStyles.text}>
+                                          {item.name}
+                                       </Text>
+                                    </TouchableOpacity>
                                  )}
-                              </View>
-                           </ScrollView>
-                        </View>
+                              )}
+                        </ScrollView>
                      </View>
                   </ScrollView>
                </View>
-            </Pressable>
+               
+               <Pressable onPress={() => setShowPicker(false) } style={pickerStyles.pressArea}/>
+            </View>
+         </Modal>
+
+         <View style={[matchStyles.head, {backgroundColor: actualleague.color}]}>
+         {/*<ImageBackground
+          resizeMode="cover"
+          source={require('../assets/doodad.png')}
+          style={{ flex: 1 }}
+        > */}
+            <View style={matchStyles.info}>
+               <Text style={matchStyles.title}>
+                  {actualleague.name}
+               </Text>
+               
+               <TouchableOpacity onPress={()=> setShowPicker(true)} style={matchStyles.pickerButton}>
+                  <Icon name="caret-down-circle" type="ionicon" color={colors.text} size = {32}/>
+               </TouchableOpacity>
+            </View>
+            
+            <ListHead/>
+         </View>
+
+         <View style={matchStyles.body}>
+            <View style={matchStyles.list}>
+               <List list={memberList} Element={ItemMatch}/>
+            </View>
+
+            <View style={[matchStyles.foot]}>
+               <View style={[matchStyles.calendar]}>
+                  <CalendarStrip
+                     style={{height:110, paddingTop: 5}}
+                     scrollable
+                     iconContainer={{flex: 0.1}}
+                     iconStyle={{}}
+                     calendarHeaderStyle={{color: colors.text, fontSize: 15}}
+                     dateNumberStyle={{color: colors.text, fontSize: 14}}
+                     dateNameStyle={{color: colors.text}}
+                     highlightDateNameStyle={{fontSize: 0}}
+                     highlightDateNumberStyle={{color: colors.content , fontSize: 18}}
+                     highlightDateContainerStyle={{backgroundColor: colors.text}}
+                     locale={ {name: "es", config: {
+                        months: 'Enero_Febrero_Marzo_Abril_Mayo_Junio_Julio_Agosto_Septiembre_Octubre_Noviembre_Diciembre'.split('_'),
+                        weekdaysShort: 'DOM_LUN_MAR_MIE_JUE_VIE_SAB'.split('_'),}}}
+                     minDate={moment("01-01-2022", "MM-DD-YYYY")}
+                     maxDate={moment().add(6, "M")}
+                     startingDate={moment().subtract(3, 'd')}
+                     selectedDate={onDate}
+                     onDateSelected={ selected => 
+                        setOnDate(moment(selected, "YYYY-MM-DDTHH:mm:ss.SSSZ"))}
+                  />
+                  <View style={matchStyles.time}>
+                        <Text style={matchStyles.timeTxt} >16:45</Text>
+                  </View>
+               </View>
+               
+               <TouchableOpacity 
+                  disabled={noPress} onPress={createHandler}
+                     style={[matchStyles.createButton, {backgroundColor: noPress ? "grey" : colors.button/*"#16a085"*/}]}>
+                  <Text style={matchStyles.buttonTxt}>Crear</Text>
+               </TouchableOpacity>
+               
+               { noPress 
+               ? <Text style={matchStyles.errTxt}>
+                     {errMessage}
+                  </Text>
+               : <View style={{height: 30}}></View> }
+               
+            </View>
+         </View>
+
+         <Modal animationType="fade" transparent={true}
+            onRequestClose={() => setShowCard(!showCard) }
+            visible={showCard}
+         >
+            <View style={cardStyles.back}>
+               <View>
+                  <ScrollView>
+                     <View style={cardStyles.body}>
+                        <Pressable onPress={() => setShowCard(false)} style={cardStyles.closeButton} >
+                           <Icon name="close-circle" type="ionicon" color="red" />
+                        </Pressable>
+                  
+                        <View style={{ flex: 1}} >
+                           
+                           <MatchDetails team1= {nicks1} team2= {nicks2} match= {match} />
+                           
+                           <View style={cardStyles.inputContainer}>
+                              <ScrollView>
+                                 <TextInput style={cardStyles.input}
+                                    name="text" keyboardType="default"
+                                    multiline={true} numberOfLines={3}
+                                    placeholder="Texto de invitacion"
+                                    value={description} 
+                                    onChangeText={ text => setDescription(text)}
+                                 />
+                              </ScrollView>
+                           </View>
+
+                           <View style={{ height: 115}} >
+                              <TouchableOpacity onPress={confirmHandler} style={cardStyles.confirmButton} >
+                                 <Text style={cardStyles.buttonTxt}>Confirmar</Text>
+                              </TouchableOpacity>
+                           </View>
+                        </View>
+            
+                     </View>
+                  </ScrollView>
+               </View>
+            </View>
+         </Modal>
+
+      </SafeAreaView>
+) }
+
+export default Match;
+
+
+{/*<Modal animationType="fade" transparent={true} visible={showPicker} >
+            <View style={pickerStyles.back}>
+               <Pressable onPress={() => setShowPicker(false) } style={pickerStyles.pressArea}/>
+               
+               <View>
+                  <ScrollView>
+                     <View style={pickerStyles.body}>
+                        <ScrollView >
+                              { leagueList && leagueList.map( (item, i) => {
+                                 return (
+                                    <TouchableOpacity onPress={ () => setSelectedValue(item._id) } key={i}>
+                                       <Text style={pickerStyles.text}>
+                                          {item.name}
+                                       </Text>
+                                    </TouchableOpacity>
+                                 )}
+                              )}
+                        </ScrollView>
+                     </View>
+                  </ScrollView>
+               </View>
+               
+               <Pressable onPress={() => setShowPicker(false) } style={pickerStyles.pressArea}/>
+            </View>
          </Modal>
          
          <View style={[matchStyles.head, {backgroundColor: actualleague.color}]}>
             <View style={matchStyles.info}>
-               <Text style={matchStyles.title}>{actualleague.name}</Text>
+               <Text style={matchStyles.title}>
+                  {actualleague.name}
+               </Text>
             </View>
             
-            <TouchableOpacity style={[leagueStyles.menu, {alignSelf: "flex-end", justifyContent:"center"}]} onPress={()=> setShowPicker(true)}>
+            <TouchableOpacity onPress={()=> setShowPicker(true)} style={matchStyles.pickerButton}>
                <Icon name="caret-down-circle" type="ionicon" color="green" size = {32}/>
             </TouchableOpacity>
+            <ListHead/> 
          </View>
       
-         <View style={leagueStyles.body}>
-            <View style={matchStyles.listHead}>
-               <View style={matchStyles.enum}>
-                  <View style={{width: 100, alignItems: "center"}}>
-                     <Text style={{color: '#FFFFFF'}}>Equipo A</Text>
-                  </View>
-                  <View style={{flex: 1, width: "auto", alignItems: "center"}}>
-                     <Text style={{color: '#FFFFFF'}}>Nick</Text>
-                  </View>
-                  <View style={{width: 100, alignItems: "center"}}>
-                     <Text style={{color: '#FFFFFF'}}>Equipo B</Text>
-                  </View>
-               </View>
-            </View>
+         <View style={matchStyles.body}>
+
+            <ListHead/>
             
             <List list={memberList} Element={ItemMatch}/>
             
@@ -256,97 +371,56 @@ const Match = ({navigation}) => {
                   />
                </View>
 
-               <View style={{marginHorizontal: 16, height: 84, marginTop: 16, borderRadius: 10}}>
+               <View style={matchStyles.time}>
                   
-               </View>
-               {noPress 
-               ? <Text style={{color: "red", alignSelf: "center"}}>
+               </View>               
+               
+               <TouchableOpacity 
+                  disabled={noPress} onPress={createHandler}
+                  style={[matchStyles.createButton, {backgroundColor: noPress ? "grey" : "#16a085"}]}>
+                  <Text style={matchStyles.buttonTxt}>Crear</Text>
+               </TouchableOpacity>
+               
+               { noPress 
+               ? <Text style={matchStyles.errTxt}>
                      {errMessage}
                   </Text>
                : <></> }
-               <TouchableOpacity disabled={noPress} style={[leagueStyles.join, {backgroundColor:noPress ? "grey" : "#16a085"}]} 
-                  onPress={createHandler}>
-                  <Text style={leagueStyles.joinTxt}>Crear</Text>
-               </TouchableOpacity>
 
             </View>
          </View>
       
-         <Modal
-            animationType="fade"
-            transparent={true}
+         <Modal animationType="fade" transparent={true}
+            onRequestClose={() => setShowCard(!showCard) }
             visible={showCard}
-            onRequestClose={() => { setShowCard(!showCard) }}
          >
-            <View style={{
-               height: "100%",  
-               backgroundColor: 'rgba(30,30,50,0.85)',
-               justifyContent: "flex-end"}}>
-               
+            <View style={cardStyles.back}>
                <View>
                   <ScrollView>
-                     <View style={{
-                        flex: 1,
-                        marginHorizontal: 16,
-                        backgroundColor: "#0e0b29", 
-                        paddingHorizontal: 8,
-                        borderTopRightRadius: 10,
-                        borderTopLeftRadius: 10 }}>
-               
-                        <Pressable style={{marginTop: 10, alignItems: "flex-end"}} onPress={() => setShowCard(!showCard)} >
+                     <View style={cardStyles.body}>
+                        <Pressable onPress={() => setShowCard(false)} style={cardStyles.closeButton} >
                            <Icon name="close-circle" type="ionicon" color="red" />
                         </Pressable>
                   
-                        <View style={{ flex: 1, /*backgroundColor: "blue"*/}} >
-                           <View style={{ height: 50, /*backgroundColor: "green",*/ alignItems: "center", justifyContent: "center"}} >
-                              <Text style={{ fontSize: 25, marginBottom: 8, color: 'white' }}>
-                                 Detalles del match
-                              </Text>
+                        <View style={{ flex: 1}} >
+                           
+                           <MatchDetails team1= {nicks1} team2= {nicks2} match= {match} />
+                           
+                           <View style={cardStyles.inputContainer}>
+                              <ScrollView>
+                                 <TextInput style={cardStyles.input}
+                                    name="text" keyboardType="default"
+                                    multiline={true} numberOfLines={4}
+                                    placeholder="Texto de invitacion"
+                                    value={description} 
+                                    onChangeText={ text => setDescription(text)}
+                                 />
+                              </ScrollView>
                            </View>
-                           <View style={{ flex: 1, /*backgroundColor: "yellow"*/}} >
-                              <View style={{ flex: 1, /*backgroundColor: "blue",*/ flexDirection: "row"}} >
-                                 <View style={{ flex: 1, /*backgroundColor: "grey",*/ alignItems: "center"}} >
-                                    <Text style={{ marginVertical: 8, color: 'white'}}>Equipo A</Text>
-                                    <View style={{flex: 1, alignItems: "center"}}>
-                                       {nicks1.map( (nick, i) => {
-                                          return (
-                                             <Text style={{ color: 'white'}}>{nick}</Text>)
-                                       })}
-                                    </View>
-                                 </View>
-                                 <View style={{ flex: 1, /*backgroundColor: "red",*/ alignItems: "center"}} >
-                                    <Text style={{ marginVertical: 8, color: 'white'}}>Equipo B</Text>
-                                    <View style={{flex: 1, alignItems: "center"}}>
-                                       {nicks2.map( (nick, i) => {
-                                          return (
-                                             <Text style={{ color: 'white'}}>{nick}</Text>)
-                                       })}
-                                    </View>
-                                 </View>
-                              </View>
 
-                              <Text style={{paddingHorizontal: 8, marginTop: 12, color: 'white'}}>
-                                 El partido se disputara el {moment(match.date, "DD-MM-YYYY").format("DD [de] MMMM [de] YYYY")} a las {match.time}
-                              </Text>
-                              <View style={{ height: 84, marginTop: 16, borderRadius: 10}}>
-                                 <ScrollView>
-                                    <TextInput
-                                       style={{backgroundColor:"white", paddingHorizontal: 8,borderRadius: 10, }}
-                                       multiline={true}
-                                       numberOfLines={4}
-                                       placeholder="Texto de invitacion"
-                                       name="textArea"
-                                       keyboardType="default"
-                                       onChangeText={ text => setDescription(text)}
-                                       value={description}
-                                    />
-                                 </ScrollView>
-                              </View>
-                           </View>
-                           <View style={{ height: 115, /*backgroundColor: "red"*/}} >
-                              <TouchableOpacity  style={[leagueStyles.join, {backgroundColor:"#16a085"}]} 
-                                 onPress={confirmHandler}>
-                                 <Text style={leagueStyles.joinTxt}>Confirmar</Text>
+                           <View style={{ height: 115}} >
+                              <TouchableOpacity onPress={confirmHandler} style={cardStyles.confirmButton} >
+                                 <Text style={cardStyles.buttonTxt}>Confirmar</Text>
                               </TouchableOpacity>
                            </View>
                         </View>
@@ -355,8 +429,4 @@ const Match = ({navigation}) => {
                   </ScrollView>
                </View>
             </View>
-         </Modal>
-      </SafeAreaView>
-) }
-
-export default Match;
+         </Modal>*/}

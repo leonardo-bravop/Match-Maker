@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Button, View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 /* import { styles } from "../styles/Styles"; */
 
 import Register from "./Register";
 import Login from "./Login";
+import { useDispatch, useSelector } from "react-redux";
+import { setUserMe } from "../state/user";
 export const form = StyleSheet.create({
   container: {
     backgroundColor: "#0e0b29",
@@ -30,7 +33,7 @@ export const form = StyleSheet.create({
     width: "80%",
     alignSelf: "center",
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     paddingLeft: 20,
     borderWidth: 2,
     borderRadius: 7,
@@ -44,8 +47,8 @@ export const form = StyleSheet.create({
     alignSelf: "center",
     width: "50%",
     borderWidth: 1,
-    borderColor: '#f27e18',
-    backgroundColor: '#e69249',
+    borderColor: "#f27e18",
+    backgroundColor: "#e69249",
     padding: 15,
     marginTop: 20,
     marginLeft: 20,
@@ -53,11 +56,11 @@ export const form = StyleSheet.create({
     borderRadius: 7,
   },
   colorTxtBtn: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     fontSize: 20,
-    textAlign: 'center'
-  }
-})
+    textAlign: "center",
+  },
+});
 const welcome = StyleSheet.create({
   container: {
     backgroundColor: "#0e0b29",
@@ -85,7 +88,7 @@ const welcome = StyleSheet.create({
     textAlign: "center",
     textTransform: "uppercase",
     fontWeight: "900",
-    fontFamily: "Roboto"
+    fontFamily: "Roboto",
   },
   btnContainer: {
     backgroundColor: "#0e0b29",
@@ -96,25 +99,56 @@ const welcome = StyleSheet.create({
 });
 
 function Welcome({ navigation }) {
-  return (
-    <View style={welcome.container}>
-      <Text style={welcome.info}>Bienvenido a Match Maker</Text>
+  const userData = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+  const [userString, setUserString] = useState("")
 
-      <View style={welcome.btnContainer}>
-        <TouchableOpacity
-          style={welcome.colorBtn}
-          onPress={() => navigation.navigate("Login")}
-        >
-          <Text style={welcome.colorTxtBtn}>Iniciar Sesion</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={welcome.colorBtn}
-          onPress={() => navigation.navigate("Register")}
-        >
-          <Text style={welcome.colorTxtBtn}>Registrarse</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+  useEffect(() => {
+    // console.log(`user string es`, userString);
+    console.log(`user data es`, userData);
+    console.log(`user string es`, userString);
+    const asyncUser = async () => {
+      const result = await AsyncStorage.getItem("userInfo");
+      setUserString(result)
+      if (result) {
+        await dispatch(setUserMe(userString));
+        navigation.navigate("Home")
+        return
+      };
+      console.log(`luego de naigate`);
+      console.log(`result es`, result);
+      const { payload } = await dispatch(setUserMe(userString));
+      // if (payload._id) navigation.navigate("Home");
+    };
+    asyncUser();
+  }, []);
+
+  // useEffect(()=>{
+
+  // })
+  return (
+    <>
+      {userString===null ? (
+        <View style={welcome.container}>
+          <Text style={welcome.info}>Bienvenido a Match Maker</Text>
+
+          <View style={welcome.btnContainer}>
+            <TouchableOpacity
+              style={welcome.colorBtn}
+              onPress={() => navigation.navigate("Login")}
+            >
+              <Text style={welcome.colorTxtBtn}>Iniciar Sesion</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={welcome.colorBtn}
+              onPress={() => navigation.navigate("Register")}
+            >
+              <Text style={welcome.colorTxtBtn}>Registrarse</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      ) : <View style={welcome.container}></View> }
+    </>
   );
 }
 

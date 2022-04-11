@@ -39,7 +39,7 @@ exports.register = (req, res, next) => {
 
 exports.login = (req, res, next) => {
   const { email, password } = req.body;
-
+console.log(`req body es`, req.body);
   User.findOne({ email }).then((user) => {
     if (user) {
       user
@@ -142,6 +142,7 @@ exports.me = (req, res, next) => {
             name: user.name,
             surname: user.surname,
             nickname: user.nickname,
+            leagues: user.leagues
           })
         )
         .catch((error) => {
@@ -152,22 +153,81 @@ exports.me = (req, res, next) => {
   });
 };
 
-//add rank to league info
 exports.getLeaguesByUserId = (req, res, next) => {
   const { userId } = req.params;
   User.findById(userId)
+    .populate({ path: "leagues" })
     .then((user) => {
-      League.find()
-        .where("_id")
-        .in(user.leagues)
-        .exec()
-        .then((leagues) => {
-          res.send(leagues);
-        })
-        .catch((error) => {
-          res.status(400);
-          next(new Error(error));
-        });
+      res.send(user.leagues);
+    })
+    .catch((error) => {
+      res.status(400);
+      next(new Error(error));
+    });
+};
+
+exports.getLeaguesAndRankByUserId = (req, res, next) => {
+  const { userId } = req.params;
+  User.findById(userId)
+    .then((user) => {
+      const userLeagues = user.leagues;
+      const promisesArray = userLeagues.map((leagueId) => {
+        return League.findById(leagueId, "name isPrivate color img")
+          .populate({
+            path: "users",
+            select: "nickname img elo",
+            populate: {
+              path: "elo",
+              match: { league: leagueId },
+              select: "value",
+            },
+          })
+          .then((league) => {
+            if (league.users) {
+              const leagueUsers = league.users;
+              leagueUsers.sort((a, b) => {
+                if (a["elo"][0] && b["elo"][0]) {
+                  return a["elo"]["0"]["value"] > b["elo"]["0"]["value"]
+                    ? -1
+                    : b["elo"]["0"]["value"] > a["elo"]["0"]["value"]
+                    ? 1
+                    : 0;
+                } else if (!a["elo"][0] && b["elo"][0]) return 1;
+                else if (!b["elo"][0] && a["elo"][0]) return -1;
+              });
+              const rankedUsers = leagueUsers.map((user, i) => {
+                return { rank: i + 1, ...user._doc };
+              });
+              return { league, rankedUsers };
+            } else {
+              res.status(400);
+              next(new Error("Invalid league id"));
+            }
+          })
+          .catch((error) => {
+            res.status(400);
+            next(new Error(error));
+          });
+      });
+
+      return Promise.all(promisesArray);
+    })
+    .then((leagueAndUsers) => {
+      const rankedUserArray = leagueAndUsers.map((object) => {
+        return {
+          league: {
+            _id: object.league._id,
+            name: object.league.name,
+            isPrivate: object.league.isPrivate,
+            color: object.league.color,
+            img: object.league.img,
+          },
+          user: object.rankedUsers.filter((user) => {
+            return user._id.toString() === userId;
+          })[0],
+        };
+      });
+      res.send(rankedUserArray);
     })
     .catch((error) => {
       res.status(400);
@@ -183,6 +243,8 @@ exports.getMatchesByUserId = (req, res, next) => {
       populate: [
         { path: "team_1", select: "nickname" },
         { path: "team_2", select: "nickname" },
+        { path: "invitations_team1" },
+        { path: "invitations_team2" },
       ],
     })
     .then((user) => {
@@ -202,6 +264,8 @@ exports.getUserMatchesByDate = (req, res, next) => {
       populate: [
         { path: "team_1", select: "nickname" },
         { path: "team_2", select: "nickname" },
+        { path: "invitations_team1" },
+        { path: "invitations_team2" },
       ],
       match: { date },
     })

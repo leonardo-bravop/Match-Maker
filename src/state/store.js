@@ -11,6 +11,7 @@ import {teamsReducer} from "./teams";
 import { checksReducer } from './checks';
 import { matchReducer } from "./record";
 import { leagueIdReducer } from "./idLeague";
+import { reloadReducer } from "./reload";
 
 const store = configureStore({
   middleware: (getDefaultMiddleware) => getDefaultMiddleware()/*.concat(logger)*/,
@@ -23,7 +24,8 @@ const store = configureStore({
     teams: teamsReducer,
     checks: checksReducer,
     match: matchReducer,
-    leagueId: leagueIdReducer
+    leagueId: leagueIdReducer,
+    reload: reloadReducer
   },
 });
 

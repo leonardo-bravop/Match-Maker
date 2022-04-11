@@ -19,6 +19,7 @@ exports.updateResult = (req, res, next) => {
 };
 //entrar a update result desde el id del match
 
+//solo se puede confirmar si match status es active
 exports.confirmResultTeam = (req, res, next) => {
   const { resultId, team, matchId } = req.params;
   let scorefinal;

@@ -9,7 +9,8 @@ import Constants from "expo-constants";
 import { useDispatch, useSelector } from "react-redux";
 import { addUserToLeague } from "../state/memberList";
 import { setUserLeagues } from "../state/userLeague";
-import { resetChecks } from "../state/checks";
+import { setLeagueId } from "../state/idLeague";
+import { reload } from "../state/reload";
 const { manifest } = Constants;
 
 const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
@@ -18,6 +19,7 @@ const FootLigue = ({ leagueId, user }) => {
    const dispatch = useDispatch()
    // const members = useSelector((state) => state.members)
    const userData = useSelector(state => state.user)
+
    // if (!userData.rank) return <></>
 
 /*    const [buttonValue, setButtonValue] = useState(false) */
@@ -29,8 +31,8 @@ const FootLigue = ({ leagueId, user }) => {
       axios
       .put(`${uri}/api/league/${leagueId}/addUser/${userData._id}`)
       .then( () => {
-         user.rank = 20
-         dispatch( resetChecks )
+         // dispatch(setUserLeagues(userData._id))
+         dispatch(setLeagueId(leagueId));
       })
    }
    
@@ -53,8 +55,8 @@ const FootLigue = ({ leagueId, user }) => {
    // }, [dispatch])
 
    return ( <>
-      { /*member[0] /* && buttonValue */ user.rank !== 0 ?
-           ( user.rank > 8 
+      { /*member[0] /* && buttonValue */ false && userData.leagues.includes(leagueId) ?
+           ( userData.rank > 8 
             ? <View style={leagueStyles.foot}>
                <View style={leagueStyles.user}>
                   <View style={leagueStyles.rank}>

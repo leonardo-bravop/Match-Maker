@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 /* import { Icon } from "react-native-elements"; */
 import { SafeAreaView } from "react-navigation";
 import { profile } from "../styles/profile";
+import { Avatar } from "@rneui/themed";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Constants from "expo-constants";
 import axios from "axios";
@@ -15,22 +16,18 @@ import {
   FlatList,
   Dimensions,
   ScrollView,
+  Button,
 } from "react-native";
-import {
-  Menu,
-  MenuProvider,
-  MenuOptions,
-  MenuOption,
-  MenuTrigger,
-} from "react-native-popup-menu";
 import { leagueStyles } from "../styles/league";
 import { setLeague } from "../state/selectLeague";
 import { setMembers } from "../state/memberList";
-
 import { useDispatch, useSelector } from "react-redux";
 import { setLeagueId } from "../state/idLeague";
+import { FAB, Portal, Provider } from "react-native-paper";
 
-import { FAB, Portal, Provider } from 'react-native-paper';
+import { Camera } from "expo-camera";
+import { Ionicons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
 
 const styles = StyleSheet.create({
   actionButtonIcon: {
@@ -38,19 +35,29 @@ const styles = StyleSheet.create({
     height: 22,
     color: "white",
   },
+
+  container: {
+    marginTop: 30,
+    flex: 1,
+  },
+
+  fixedRatio: {
+    flex: 1,
+  },
 });
 
 const Profile = ({ navigation }) => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
   const leagues = useSelector((state) => state.userLeagues);
+
   const [userData, setUserData] = useState({});
+  const [userLeagues, setUserLeagues] = useState([]);
 
   const [state, setState] = React.useState({ open: false });
   const onStateChange = ({ open }) => setState({ open });
 
   const { open } = state;
-
 
   const { manifest } = Constants;
   const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
@@ -82,31 +89,19 @@ const Profile = ({ navigation }) => {
     },
   ];
 
-  // useEffect(async () => {
-  //   try {
-  //     const userToken = await AsyncStorage.getItem("userInfo");
-  //     const user = await axios.post(
-  //       `${uri}/api/user/me`,
-  //       {},
-  //       { headers: { Authorization: `Bearer ${userToken}` } }
-  //     );
-  //     setUser(user.data);
-  //     const leagues = await axios.get(
-  //       `${uri}/api/user/getLeagues/${user.data._id}`
-  //     );
-  //     setLeagues(leagues.data);
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // }, [navigation.state.params]);
-
-  // const onPress = () => {
-  //   navigation.navigate("Ligas");
-  // };
+  useEffect(() => {
+    axios
+      .get(`${uri}/api/user/getLeaguesAndRank/${user._id}`)
+      .then(({ data }) => {
+        setUserLeagues(data);
+        console.log("ligas de usuario ===>", userLeagues);
+      });
+  }, []);
 
   const handleLogout = async () => {
     try {
       const result = await axios.post(`${uri}/api/user/logout`);
+      await AsyncStorage.setItem("userInfo", "");
       const emptyUser = result.data;
       setUserData(emptyUser);
       navigation.navigate("Welcome");
@@ -117,26 +112,25 @@ const Profile = ({ navigation }) => {
 
   return (
     <View style={profile.container}>
-      {/*       <TouchableOpacity style={profile.settingsIcon}>
-        <MenuProvider style={profile.settingsMenu}>
-          <Menu>
-            <MenuTrigger customStyles={profile.menu}>
-              <Icon name="ios-settings" type="ionicon" color="white" />
-            </MenuTrigger>
-            <MenuOptions>
-              <MenuOption onSelect={handleLogout}>
-                <Text style={{ color: "red", fontSize: 20 }}>Salir</Text>
-              </MenuOption>
-            </MenuOptions>
-          </Menu>
-        </MenuProvider>
-      </TouchableOpacity> */}
-   <Image
-        style={profile.userImage}
-        source={{
-          uri: "https://cdn.pixabay.com/photo/2017/02/23/13/05/profile-2092113_960_720.png",
-        }}
-      />
+      <Add />
+
+      {/*       <View style={{ borderColor: "#FFF", borderRadius: 85, borderWidth: 3 }}>
+        <Avatar
+          size={160}
+          rounded
+          source={{
+            uri: "https://cdn.pixabay.com/photo/2017/02/23/13/05/profile-2092113_960_720.png",
+          }}
+          title="Bj"
+          containerStyle={{ backgroundColor: "grey" }}
+        >
+          <Avatar.Accessory
+            size={23}
+            onPress={() => <Add/>}
+          />
+        </Avatar>
+      </View> */}
+
       <Text style={profile.userNameText}>{`${user.name} ${user.surname}`}</Text>
       <Text style={profile.userNameText}>{`${user.nickname}`}</Text>
 
@@ -164,21 +158,21 @@ const Profile = ({ navigation }) => {
                 <View key={i}>
                   <TouchableOpacity
                     onPress={() => {
-                      dispatch(setLeague(item));
-                      dispatch(setMembers(item._id));
-                      dispatch(setLeagueId(item._id));
+                      dispatch(setLeague(item.league));
+                      dispatch(setMembers(item.league._id));
+                      dispatch(setLeagueId(item.league._id));
                       navigation.navigate("Liga", item);
                     }}
                   >
                     <View
                       style={[
                         leagueStyles.item,
-                        { backgroundColor: `${item.color}` },
+                        { backgroundColor: `${item.league.color}` },
                       ]}
                     >
                       <View style={leagueStyles.rank}>
                         <Text style={{ color: "#FFFFFF" }}>
-                          {parseInt(Math.random() * (1 - 20 + 1) + 20)}
+                          {item.user.rank}
                         </Text>
                       </View>
                       <View
@@ -189,15 +183,17 @@ const Profile = ({ navigation }) => {
                       >
                         <Image
                           style={profile.cardImage}
-                          source={{ uri: item.img }}
+                          source={{ uri: item.league.img }}
                         />
                       </View>
                       <View style={leagueStyles.nick}>
-                        <Text style={{ color: "#FFFFFF" }}>{item.name}</Text>
+                        <Text style={{ color: "#FFFFFF" }}>
+                          {item.league.name}
+                        </Text>
                       </View>
                       <View style={leagueStyles.elo}>
                         <Text style={{ color: "#FFFFFF" }}>
-                          {parseInt(Math.random() * (400 - 3000 + 1) + 3000)}
+                          {item.user.elo[0].value}
                         </Text>
                       </View>
                     </View>
@@ -208,44 +204,154 @@ const Profile = ({ navigation }) => {
           </ScrollView>
         ) : null}
       </View>
-
-<Provider>
-      <Portal>
-        <FAB.Group
-          open={open}
-          icon={open ? 'close' : 'cog'}
-          actions={[
-            { icon: 'plus', onPress: () =>  {}},
-            {
-              icon: 'account-remove',
-              label: 'LOGOUT',
-              onPress: () => handleLogout(),
-            },
-            {
-              icon: 'email',
-              label: 'Email',
-              onPress: () => console.log('Pressed email'),
-            },
-            {
-              icon: 'bell',
-              label: 'Remind',
-              onPress: () => console.log('Pressed notifications'),
-              small: false,
-            },
-          ]}
-          onStateChange={onStateChange}
-          onPress={() => {
-            if (open) {
-              // do something if the speed dial is open
-            }
-          }}
-        />
-      </Portal>
-    </Provider>
-
-     
+      <Provider>
+        <Portal>
+          <FAB.Group
+            style={[
+              ,
+              {
+                // position: 'relative',
+                // marginBottom: 50
+                //marginTop: 20,
+                //position: "absolute",
+                // bottom: 0,
+                // right: 0,
+                //color: "black",
+                //margin: 16,
+              },
+            ]}
+            open={open}
+            icon={open ? "close" : "cog"}
+            actions={[
+              // {
+              //   icon: "bell",
+              //   label: "NOTIFICACIONES",
+              //   onPress: () => {},
+              // },
+              // {
+              //   icon: "account-cog",
+              //   label: "EDIT",
+              //   onPress: () => handleLogout(),
+              // },
+              {
+                icon: "account-remove",
+                label: "LOGOUT",
+                onPress: () => handleLogout(),
+              },
+            ]}
+            onStateChange={onStateChange}
+            onPress={() => {
+              if (open) {
+                // do something if the speed dial is open
+              }
+            }}
+          />
+        </Portal>
+      </Provider>
     </View>
   );
 };
+
+function Add() {
+  const [cameraPermission, setCameraPermission] = useState(null);
+  const [galleryPermission, setGalleryPermission] = useState(null);
+  const [showCamera, setShowCamera] = useState(false);
+
+  const [camera, setCamera] = useState(null);
+  const [imageUri, setImageUri] = useState([]);
+  const [type, setType] = useState(Camera.Constants.Type.back);
+  const [imageArray, setImageArray] = useState([]);
+
+  const permisionFunction = async () => {
+    // here is how you can get the camera permission
+    const cameraPermission = await Camera.requestPermissionsAsync();
+    console.log("camera permission:", cameraPermission.status);
+
+    setCameraPermission(cameraPermission.status === "granted");
+
+    const imagePermission = await ImagePicker.getMediaLibraryPermissionsAsync();
+    console.log("permission:", imagePermission.status);
+
+    setGalleryPermission(imagePermission.status === "granted");
+
+    if (
+      imagePermission.status !== "granted" &&
+      cameraPermission.status !== "granted"
+    ) {
+      alert("Permission for media access needed.");
+    }
+  };
+
+  useEffect(() => {
+    permisionFunction();
+  }, []);
+
+  const takePicture = async () => {
+    if (camera) {
+      const data = await camera.takePictureAsync(null);
+      console.log(data.uri);
+      setImageUri(data.uri);
+      setImageArray([...imageArray, data.uri]);
+      setShowCamera(false);
+    }
+  };
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
+    });
+
+    console.log(result.uri);
+    if (!result.cancelled) {
+      setImageArray([...imageArray, result.uri]);
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      {showCamera && (
+        <Camera ref={(ref) => setCamera(ref)} style={{ flex: 1 }} type={type} />
+      )}
+      {showCamera && <Button title={"Click"} onPress={takePicture} />}
+      {!showCamera && (
+        <>
+          <View
+            style={{ flexDirection: "row", justifyContent: "space-between" }}
+          >
+            <View style={{ flexDirection: "row" }}>
+              <Button
+                title={"Camera"}
+                onPress={() => {
+                  setShowCamera(true);
+                }}
+              />
+              <Button title={"Gallery"} onPress={pickImage} />
+            </View>
+          </View>
+          {imageArray.length > 0 && (
+            <View style={{ height: 110 }}>
+              <FlatList
+                horizontal
+                data={imageArray}
+                renderItem={({ item }) => (
+                  <Image
+                    source={{ uri: item }}
+                    style={{
+                      width: 100,
+                      height: 100,
+                      borderRadius: 10,
+                      margin: 5,
+                    }}
+                  />
+                )}
+              />
+            </View>
+          )}
+        </>
+      )}
+    </View>
+  );
+}
 
 export default Profile;

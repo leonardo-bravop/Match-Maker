@@ -6,32 +6,38 @@ const Elo = require("../models/Elo");
 exports.new = (req, res, next) => {
   const { name, sport, description, isPrivate, secretKey, color, img } =
     req.body;
-  League.findOne({ name })
-    .then((league) => {
-      if (league) {
-        res.status(400);
-        next(new Error("League Already Exists"));
-      } else {
-        League.create({
-          name,
-          sport,
-          description,
-          isPrivate,
-          secretKey,
-          color,
-          img,
-        })
-          .then((league) => {
-            res.status(201).send(league);
+  console.log(`req body es`, req.body);
+  if (isPrivate && !secretKey) {
+    res.status(400);
+    next(new Error("A private league must have a secret key"));
+  } else {
+    League.findOne({ name })
+      .then((league) => {
+        if (league) {
+          res.status(400);
+          next(new Error("League Already Exists"));
+        } else {
+          League.create({
+            name,
+            sport,
+            description,
+            isPrivate,
+            secretKey,
+            color,
+            img,
           })
-          .catch((error) => {
-            next(new Error(error));
-          });
-      }
-    })
-    .catch((error) => {
-      next(new Error(error));
-    });
+            .then((league) => {
+              res.status(201).send(league);
+            })
+            .catch((error) => {
+              next(new Error(error));
+            });
+        }
+      })
+      .catch((error) => {
+        next(new Error(error));
+      });
+  }
 };
 
 exports.addUser = (req, res, next) => {
@@ -64,6 +70,7 @@ exports.addUser = (req, res, next) => {
         return false;
       } else {
         res.status(400);
+        // res.send("Invalid SecretKey")
         next(new Error("Invalid SecretKey"));
         return false;
       }
@@ -75,16 +82,22 @@ exports.addUser = (req, res, next) => {
       }
     })
     .then((elo) => {
-      const eloId = elo._id.toString();
-      return User.findByIdAndUpdate(
-        userId,
-        { $push: { leagues: leagueId, elo: eloId } },
-        { new: true, useFindAndModify: false }
-      );
+      if(elo) {
+        const eloId = elo._id.toString();
+        return User.findByIdAndUpdate(
+          userId,
+          { $push: { leagues: leagueId, elo: eloId } },
+          { new: true, useFindAndModify: false }
+        );
+      } 
     })
-    .then((result) => {
-      if (updatedLeague._id) {
-        res.send(updatedLeague);
+    .then((updatedUser) => {
+      console.log(`updateduser es`, updatedUser);
+      if (updatedLeague) {
+        if (updatedLeague._id) {
+          // console.log(`te voy a mandar`, updatedLeague);
+          res.send(updatedLeague);
+        }
       }
     })
     .catch((error) => {
@@ -95,89 +108,81 @@ exports.addUser = (req, res, next) => {
 
 exports.deleteUser = (req, res, next) => {
   const { leagueId, userId } = req.params;
-  League.findById(leagueId).then((league) => {
-    console.log("entre al then del league");
-    for (let i = 0; i < league.users.length; i++) {
-      console.log("entre al for del league");
-      if (league.users[i].toString() === userId) {
-        console.log("entre al if del league");
-        league.users.splice(i, 1);
-      }
-    }
-    league
-      .save()
-      .then(() => {
-        User.findById(userId).then((user) => {
-          console.log("entre al then del user");
-          for (let j = 0; j < user.leagues.length; j++) {
-            console.log("entre al for del user");
-            if (user.leagues[j].toString() === leagueId) {
-              console.log("entre al if del user");
-              user.leagues.splice(j, 1);
-            }
-          }
-          Elo.findOne({ user: userId, league: leagueId }).then((elo) => {
-            console.log("entre al then del elo");
-            for (let k = 0; k < user.elo.length; k++) {
-              console.log("entre al for del elo");
-              if (user.elo[k].toString() === elo._id.toString()) {
-                console.log("entre al if del elo");
-                user.elo.splice(k, 1);
-              }
-            }
-          });
-          user.save().then(() => {
-            console.log("entre al save del user ");
-            Elo.findOneAndDelete({ user: userId, league: leagueId }).then(
-              (elo) => {
-                console.log("saque el elo");
-                res.send("delete elo success");
-              }
-            );
-          });
-        });
-      })
-      .catch((error) => {
-        res.status(400);
-        next(new Error(error));
-      });
-  });
+  League.findByIdAndUpdate(
+    leagueId,
+    { $pull: { users: userId } },
+    { new: true }
+  )
+    .then((updatedLeague) => {
+      return User.findByIdAndUpdate(
+        userId,
+        { $pull: { leagues: leagueId } },
+        { new: true }
+      );
+    })
+    .then((updatedUser) => {
+      return Elo.findOne({ user: userId, league: leagueId });
+    })
+    .then((elo) => {
+      return User.findByIdAndUpdate(
+        userId,
+        { $pull: { elo: elo._id } },
+        { new: true }
+      );
+    })
+    .then(() => {
+      return Elo.findOneAndDelete({ user: userId, league: leagueId });
+    })
+    .then(() => {
+      res.send("delete elo success");
+    })
+    .catch((error) => {
+      res.status(400);
+      next(new Error(error));
+    });
 };
 
 exports.getUserByLeagueId = (req, res, next) => {
   const { leagueId } = req.params;
-  League.findById(leagueId)
-    .populate({
-      path: "users",
-      select: "nickname img elo",
-      populate: { path: "elo", match: { league: leagueId }, select: "value" },
-    })
-    .then(({ users }) => {
-      if (users) {
-        users.sort((a, b) => {
-          if (a["elo"][0] && b["elo"][0]) {
-            console.log(`a elo value es`, a["elo"]["0"]["value"]);
-            return a["elo"]["0"]["value"] > b["elo"]["0"]["value"]
-              ? -1
-              : b["elo"]["0"]["value"] > a["elo"]["0"]["value"]
-              ? 1
-              : 0;
-          } else if (!a["elo"][0] && b["elo"][0]) return 1;
-          else if (!b["elo"][0] && a["elo"][0]) return -1;
-        });
-        const rankedUsers = users.map((user, i) => {
-          return { rank: i + 1, ...user._doc };
-        });
-        res.send(rankedUsers);
-      } else {
+  if (leagueId) {
+    League.findById(leagueId)
+      .populate({
+        path: "users",
+        select: "nickname img elo",
+        populate: { path: "elo", match: { league: leagueId }, select: "value" },
+      })
+      .then((league) => {
+        if (league.users) {
+          const leagueUsers = league.users;
+          console.log(`pedido a league users`);
+          console.log(`league es`, league);
+          leagueUsers.sort((a, b) => {
+            if (a["elo"][0] && b["elo"][0]) {
+              return a["elo"]["0"]["value"] > b["elo"]["0"]["value"]
+                ? -1
+                : b["elo"]["0"]["value"] > a["elo"]["0"]["value"]
+                ? 1
+                : 0;
+            } else if (!a["elo"][0] && b["elo"][0]) return 1;
+            else if (!b["elo"][0] && a["elo"][0]) return -1;
+          });
+          const rankedUsers = leagueUsers.map((user, i) => {
+            return { rank: i + 1, ...user._doc };
+          });
+          res.send({ league, rankedUsers });
+        } else {
+          res.status(400);
+          next(new Error("Invalid league id"));
+        }
+      })
+      .catch((error) => {
         res.status(400);
-        next(new Error("Invalid league id"));
-      }
-    })
-    .catch((error) => {
-      res.status(400);
-      next(new Error("An error ocurred"));
-    });
+        next(new Error("An error ocurred"));
+      });
+  } else {
+    res.status(400);
+    next(new Error("Please enter a league id"));
+  }
 };
 
 exports.deleteLeague = (req, res, next) => {
@@ -195,20 +200,25 @@ exports.deleteLeague = (req, res, next) => {
 //get league by id
 exports.findShowLeague = (req, res, next) => {
   const { id } = req.params;
-  League.findById(id)
-    .then((data) => {
-      res.send(data);
-    })
-    .catch((error) => {
-      res.status(400);
-      next(new Error(error));
-    });
+  if (id) {
+    League.findById(id)
+      .then((data) => {
+        res.send(data);
+      })
+      .catch((error) => {
+        res.status(400);
+        next(new Error(error));
+      });
+  } else {
+    res.status(400);
+    next(new Error("Please enter a league id"));
+  }
 };
 
 //dividir get all en privadas y publicas
 exports.getAll = (req, res, next) => {
-  const{isPrivate} = req.params
-  League.find({isPrivate: (isPrivate==="true")})
+  const { isPrivate } = req.params;
+  League.find({ isPrivate: isPrivate === "true" })
     .then((data) => {
       res.send(data);
     })
@@ -264,7 +274,7 @@ exports.findLeagueByName = (req, res, next) => {
     }
     const searchReg = new RegExp(reg, "i");
     League.find({ name: { $regex: searchReg } })
-      /* .select("name") */
+      // .select("name")
       .then((leagues) => {
         res.send(leagues);
       })

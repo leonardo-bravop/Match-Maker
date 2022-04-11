@@ -1,31 +1,42 @@
-import { View, Text } from "react-native";
 import React, { useEffect, useState } from "react";
-import { leagueStyles } from "../styles/league";
-import { CheckBox } from 'react-native-elements';
+import { View, Text, Image } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import { removeTeam, setTeam, setTeamA } from "../state/teams";
+import { removeTeam, setTeam } from "../state/teams";
 
-const ItemMatch = ({ item }) => {
+import { CheckBox } from 'react-native-elements';
+import { colors, itemStyles} from "../styles/match";
+
+const ItemMatch = ({ item, i }) => {
       
    let [select, setSelect] = useState(false),
-      [select2, setSelect2] = useState(false)
+      [select2, setSelect2] = useState(false),
+      [colorIs, setColorIs] = useState(colors.content)
 
    const dispatch = useDispatch();
 
    const isCreated = useSelector( state => state.checks )
 
    useEffect(()=>{
+
+      setColorIs(colors.content)
       setSelect(false)
       setSelect2(false)
+
+      if (!i) {
+         dispatch( setTeam({ team: "teamA", id: item._id, nick: item.nickname }))
+         setColorIs("#3774C4")
+      }
    },[isCreated])
 
       
    const checker = () => {
       if ( select ){
-         dispatch( removeTeam({ team: "teamA", id: item.id }))
+         dispatch( removeTeam({ team: "teamA", id: item._id }))
+         setColorIs(colors.content)
       }
       else {
-         dispatch( setTeam({ team: "teamA", id: item.id, nick: item.nickname }))
+         dispatch( setTeam({ team: "teamA", id: item._id, nick: item.nickname }))
+         setColorIs("#3774C4")
       }
       setSelect(!select)
       setSelect2(false)
@@ -33,53 +44,88 @@ const ItemMatch = ({ item }) => {
       
    const checker2 = () => {
       if ( select2 ){
-         dispatch( removeTeam({ team: "teamB", id: item.id }))
+         dispatch( removeTeam({ team: "teamB", id: item._id }))
+         setColorIs(colors.content)
       }
       else {
-         dispatch( setTeam({ team: "teamB", id: item.id, nick: item.nickname }))
+         dispatch( setTeam({ team: "teamB", id: item._id, nick: item.nickname }))
+         setColorIs("#C43737")
       }
       setSelect2(!select2)
       setSelect(false)
    }
 
    return (
-      <View style={leagueStyles.item}>
-         <View style={[leagueStyles.elo, {flexDirection: "row"}]}>
-            <View style={leagueStyles.checkContainer}>
-               <CheckBox
-                  checked={select}
-                  onPress={checker}
-                  iconType="ionicon"
-                  uncheckedIcon="checkbox-outline"
-                  checkedIcon="checkbox"
-                  uncheckedColor='green'
-                  checkedColor="green"
-               />
-            </View>
-         </View>
-
-         <View style={[leagueStyles.img, {backgroundColor: "blue"                                                                                                                                                                                                                                                                              }]}>
+      <View style={itemStyles.item}>
+         <View style={itemStyles.checkContainer}>
+            {i 
+            ? <CheckBox
+               checked={ select } onPress={checker}
+               iconType="ionicon"
+               uncheckedIcon="checkbox-outline" uncheckedColor={colors.text}
+               checkedIcon="checkbox" checkedColor="#3774C4"
+               size={30}
+            />
+            : <></>}
          </View>
          
-         <View style={leagueStyles.nick}>
-            <Text style={{color: '#FFFFFF'}}>{item.nickname}</Text>
+         <View style={[itemStyles.nick, {borderColor: colorIs , borderWidth:1.5}]}>
+            <Image style={itemStyles.img} source={{ uri: item.img }}/>
+            
+            <Text style={itemStyles.text}>
+               {item.nickname}
+            </Text>
          </View>
-
-         <View style={[leagueStyles.elo, {flexDirection: "row"}]}>
-            <View style={leagueStyles.checkContainer}>
-               <CheckBox
-                  checked={select2}
-                  onPress={checker2}
-                  iconType="ionicon"
-                  uncheckedIcon="checkbox-outline"
-                  checkedIcon="checkbox"
-                  uncheckedColor='green'
-                  checkedColor="green"
-               />
-            </View>
+            
+         <View style={itemStyles.checkContainer}>
+            {i 
+            ? <CheckBox
+               checked={ select2 } onPress={checker2}
+               iconType="ionicon"
+               uncheckedIcon="checkbox-outline" uncheckedColor= {colors.text}
+               checkedIcon="checkbox" checkedColor="#C43737"
+               size={30}
+            />
+            : <></>}
          </View>
       </View> 
   );
 };
 
 export default ItemMatch;
+
+{/* <View style={itemStyles.elo}>
+            <View style={itemStyles.checkContainer}>
+               <CheckBox
+                  checked={select} onPress={checker}
+                  iconType="ionicon"
+                  uncheckedIcon="checkbox-outline" uncheckedColor='white'
+                  checkedIcon="checkbox" checkedColor="#45fc03"
+
+               />
+            </View>
+         </View>
+         <View style={{flex: 1,width: 100,backgroundColor: "green", flexDirection: "row"}}>
+            <View style={{flex: 1,width: 70, justifyContent: "center", alignItems: "flex-end", }}>
+               <Image style={itemStyles.img} source={{ uri: item.img }}/>
+            </View>
+         
+            <View style={itemStyles.nick}>
+               <Text style={itemStyles.text}>
+                  {item.nickname}
+               </Text>
+            </View>
+         </View>
+         
+
+         <View style={itemStyles.elo}>
+            <View style={itemStyles.checkContainer}>
+               <CheckBox
+                  checked={select2} onPress={checker2}
+                  iconType="ionicon"
+                  uncheckedIcon="checkbox-outline" uncheckedColor='white'
+                  checkedIcon="checkbox" checkedColor="#45fc03"
+
+               />
+            </View>
+         </View> */}
