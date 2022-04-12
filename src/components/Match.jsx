@@ -44,6 +44,10 @@ const Match = ({navigation}) => {
    let [match, setMatch] = useState({})
 
    let [onDate, setOnDate] = useState(moment())
+   let [onTime, setOnTime] = useState(
+      parseInt(moment().format("mm"))>30 
+      ?[`${parseInt(moment().format("H"))+1}`,"00"]
+      :[moment().format("H"),"30"])
    let [nicks1, setNicks1] = useState([])
    let [nicks2, setNicks2] = useState([])
    let [description, setDescription] = useState("")
@@ -51,6 +55,7 @@ const Match = ({navigation}) => {
    let [noPress, setNoPress] = useState(false)
    let [showCard, setShowCard] = useState(false)
    let [showPicker, setShowPicker] = useState(false)
+   let [showTime, setShowTime] = useState(false)
 
    let [errMessage, setErrMessage] = useState("Ambos equipos deben tener igual numero de participantes")
 
@@ -66,6 +71,10 @@ const Match = ({navigation}) => {
    },[teams])
 
    useLayoutEffect(() => {
+      setOnTime(
+         parseInt(moment().format("mm"))>30 
+         ?[`${parseInt(moment().format("H"))+1}`,"00"]
+         :[moment().format("H"),"30"])
 
       const loadData = async () => {
 
@@ -103,7 +112,6 @@ const Match = ({navigation}) => {
    },[selectedValue])   
 
    const createHandler = () => {
-      console.log("Estos son los equipos\n*****************\n\n", teams)
       if (teams.teamA.length === 0 && teams.teamB.length === 0) {
          setErrMessage("No ha seleccionado ningun participante")
          setNoPress(true)
@@ -134,7 +142,7 @@ const Match = ({navigation}) => {
             team_1: members1Id, 
             team_2: members2Id, 
             date: moment(onDate).format("DD-MM-YYYY"),
-            time: "16:45",
+            time: `${onTime[0]}:${onTime[1]}`,
             invitationText: ""
          })
 
@@ -156,6 +164,10 @@ const Match = ({navigation}) => {
          dispatch( resetChecks() )
          dispatch( resetTeams() )
          setDescription("")
+         setOnTime(
+            parseInt(moment().format("mm"))>30 
+            ?[`${parseInt(moment().format("H"))+1}`,"00"]
+            :[moment().format("H"),"30"])
          navigation.navigate('Historial')
       })
    }
@@ -236,14 +248,42 @@ const Match = ({navigation}) => {
                      onDateSelected={ selected => 
                         setOnDate(moment(selected, "YYYY-MM-DDTHH:mm:ss.SSSZ"))}
                   />
-                  <View style={matchStyles.time}>
-                        <Text style={matchStyles.timeTxt} >16:45</Text>
+                  {showTime
+                  ?<View style={{width: 292, heigth: 30, alignSelf: "center"}}>
+                  <ScrollView horizontal={true} contentOffset={{x:1667, y:0}}>
+                     { ["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23"].map((hour, i)=>{
+                        return(<>
+                           <TouchableOpacity onPress={() =>{
+                                 setShowTime(false)
+                                 setOnTime([hour,"00"])
+                              }} 
+                              style={[matchStyles.time, {backgroundColor:i === 12 ? colorSet.text: colorSet.content}]} key={i*25}>
+                              <Text style={[matchStyles.timeTxt,{color: i === 12 ? colorSet.content: colorSet.text}]} >{hour+":00"}</Text>
+                           </TouchableOpacity>
+                           <TouchableOpacity onPress={() => {
+                                 setShowTime(false)
+                                 setOnTime([hour,"30"])
+                              }} 
+                              style={[matchStyles.time,{backgroundColor: colorSet.content}]} key={i*50+1}>
+                              <Text style={[matchStyles.timeTxt,{color: colorSet.text}]} >{hour+":30"}</Text>
+                           </TouchableOpacity>
+                        </>)
+                     })}
+                  </ScrollView>
                   </View>
+                  :<TouchableOpacity onPress={() => setShowTime(true)} style={matchStyles.time}>
+                        <Text style={matchStyles.timeTxt} >
+                           {`${onTime[0]}:${onTime[1]}`}
+                        </Text>
+                  </TouchableOpacity>
+
+                  }
+                  
                </View>
                
                <TouchableOpacity 
                   disabled={noPress} onPress={createHandler}
-                     style={[matchStyles.createButton, {backgroundColor: noPress ? "grey" : colorSet.button/*"#16a085"*/}]}>
+                     style={[matchStyles.createButton, {backgroundColor: noPress ? "grey" : actualleague.color/*"#16a085"*/}]}>
                   <Text style={matchStyles.buttonTxt}>Crear</Text>
                </TouchableOpacity>
                
@@ -285,7 +325,7 @@ const Match = ({navigation}) => {
                            </View>
 
                            <View style={{ height: 115}} >
-                              <TouchableOpacity onPress={confirmHandler} style={cardStyles.confirmButton} >
+                              <TouchableOpacity onPress={confirmHandler} style={[cardStyles.confirmButton,{backgroundColor: actualleague.color}]} >
                                  <Text style={cardStyles.buttonTxt}>Confirmar</Text>
                               </TouchableOpacity>
                            </View>
