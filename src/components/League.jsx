@@ -22,7 +22,7 @@ import Constants from "expo-constants";
 import "moment/locale/es";
 import { Icon } from "react-native-elements";
 
-import { leagueStyles } from "../styles/league";
+import { leagueStyles, newLeagueStyles } from "../styles/league";
 
 import List from "../commons/List";
 import { useDispatch, useSelector } from "react-redux";
@@ -43,6 +43,8 @@ import { formR } from "../styles/form";
 
 import { CheckBox } from "react-native-elements";
 import { setUserMe } from "../state/user";
+import { colorSet } from "../styles/colorSet";
+import ListHead from "./MatchListHead";
 
 const LeagueHome = ({ navigation }) => {
   const { manifest } = Constants;
@@ -197,8 +199,9 @@ const LeagueHome = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={leagueStyles.back}>
-      <Modal animationType="fade" transparent={true} visible={showCard}>
+    <SafeAreaView style={newLeagueStyles.back}>
+     
+     <Modal animationType="fade" transparent={true} visible={showCard}>
         <Pressable
           onPress={() => {
             setShowCard(false);
@@ -333,72 +336,41 @@ const LeagueHome = ({ navigation }) => {
         </Pressable>
       </Modal>
 
-      <View
-        style={[leagueStyles.head, { backgroundColor: actualleague.color }]}
-      >
-        <ImageBackground
+
+
+
+      <View style={[newLeagueStyles.head, {backgroundColor: actualleague.color}]}>
+      <ImageBackground
           resizeMode="cover"
           source={{ uri: actualleague.img }}
           style={{ flex: 1 }}
         >
+            <View style={newLeagueStyles.info}>
+               <Text style={newLeagueStyles.title}>
+                  {actualleague.name}
+               </Text>
+               
+               <TouchableOpacity onPress={()=> setShowCard(true)} style={newLeagueStyles.pickerButton}>
+                  <Icon name="caret-down-circle" type="ionicon" color={colorSet.text} size = {32}/>
+               </TouchableOpacity>
+            </View>
+            
+            </ImageBackground>
+         </View>
+
+        <View style={newLeagueStyles.body}>
+          <ListHead labels={["Rank", "Usuario", "ELO"]} styling={newLeagueStyles.listHead}/>
+
+          <View style={newLeagueStyles.list}>
+            <List list={memberList} Element={ItemLeague} marginNum={1} colorLeague= {actualleague.color}/>
+          </View>
+        
+
+
+
+
+
           <TouchableOpacity
-            style={[
-              leagueStyles.menu,
-              { alignSelf: "flex-end", justifyContent: "center" },
-            ]}
-            onPress={() => setShowCard(true)}
-          >
-            <Icon
-              name="caret-down-circle"
-              type="ionicon"
-              color="green"
-              size={32}
-            />
-          </TouchableOpacity>
-
-          <View style={leagueStyles.info}>
-            <Text style={leagueStyles.title}>{actualleague.name}</Text>
-          </View>
-        </ImageBackground>
-      </View>
-
-      <View style={leagueStyles.body}>
-        <View style={leagueStyles.listHead}>
-          <View style={leagueStyles.enum}>
-            <View
-              style={{ width: 50, alignItems: "center", marginVertical: 5 }}
-            >
-              <Text style={{ color: "#FFFFFF" }}>Rank</Text>
-            </View>
-
-            <View
-              style={{ width: 50, alignItems: "center", marginVertical: 5 }}
-            >
-              <Text style={{ color: "#FFFFFF" }}></Text>
-            </View>
-
-            <View
-              style={{
-                flex: 1,
-                width: "auto",
-                alignItems: "center",
-                marginVertical: 5,
-              }}
-            >
-              <Text style={{ color: "#FFFFFF" }}>Nick</Text>
-            </View>
-
-            <View
-              style={{ width: 100, alignItems: "center", marginVertical: 5 }}
-            >
-              <Text style={{ color: "#FFFFFF" }}>ELO</Text>
-            </View>
-          </View>
-        </View>
-
-        <List list={memberList} Element={ItemLeague} />
-
-        <TouchableOpacity
           style={{
             marginVertical: 20,
             height: 50,
@@ -442,7 +414,7 @@ const LeagueHome = ({ navigation }) => {
         ) : (
           <View style={[leagueStyles.foot, { height: 100 }]}>
             <TouchableOpacity
-              style={[leagueStyles.join, { backgroundColor: "#16a085" }]}
+              style={[leagueStyles.join, { backgroundColor: actualleague.color /*"#16a085"*/ }]}
               onPress={() => {
                 if (actualleague.isPrivate) {
                   setShowSecretkeyCard(true);
@@ -456,6 +428,8 @@ const LeagueHome = ({ navigation }) => {
           </View>
         )}
       </View>
+
+     
     </SafeAreaView>
   );
 };

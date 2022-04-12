@@ -48,7 +48,7 @@ const Record = () => {
           setRecordList(data.reverse())
           setDotList(data)
       })
-      
+      setOnDate(moment())
     },[showAll])
 
 
@@ -88,7 +88,7 @@ const Record = () => {
                   markedDates = {dotList.map( item =>{
                          return {
                            date: moment(item.date, "DD-MM-YYYY"),
-                           dots: [ { color: "red" } ]
+                           dots: [ { color: colorSet.text } ]
                          }
                         })}
                   selectedDate={onDate}
@@ -117,7 +117,7 @@ const Record = () => {
       
          <Modal animationType="fade" transparent={true}
             onRequestClose={() => setShowCard(!showCard) }
-            visible={match && match.id}
+            visible={false && match && match.id}
          >
             <View style={cardStyles.back}>
                <View>

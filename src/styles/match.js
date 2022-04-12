@@ -77,7 +77,7 @@ export const matchStyles = StyleSheet.create({
 
    ////////////////////////////////
    foot: {
-      backgroundColor: colorSet.background
+      backgroundColor: colorSet.background,
    },
    calendar: {
       height: 170,
@@ -87,17 +87,20 @@ export const matchStyles = StyleSheet.create({
       backgroundColor: colorSet.content
    },
    time: {
-      height: 30,   
+      height: 30,
+      width: 66,   
       borderRadius: 10,
       marginTop: 8,
       marginBottom: 6,
       paddingHorizontal: 8,
+      marginHorizontal: 4,
       alignSelf: "center",
       justifyContent: "center",
       backgroundColor: "white"
    },
    timeTxt: {
       fontSize: 16,
+      textAlign: "center",
       fontWeight: "bold",
       color: colorSet.content
    },

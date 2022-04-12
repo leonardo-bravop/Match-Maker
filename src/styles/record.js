@@ -51,7 +51,7 @@ export const recordStyles = StyleSheet.create({
    body: {
       flex: 1,
       marginHorizontal:16,
-      marginBottom: 16
+      marginBottom: 10
    },
    listHead:{
       paddingVertical: 8,
@@ -64,20 +64,24 @@ export const recordStyles = StyleSheet.create({
    list: {
       flex: 1,
       borderBottomLeftRadius: 10,
-      borderBottomRightRadius: 10
+      borderBottomRightRadius: 10,
+      marginTop: 6
    },
 })
 
 export const itemStyles = StyleSheet.create({
-
    item: {
-      height: 110,
+      height: "auto",
+      width: "100%",
+      marginBottom: 6,
+      borderRadius: 10,
+      backgroundColor: colorSet.content
+   },
+   head: {
+      height: 120,
       width: "100%",
       flexDirection: "row",
-      marginTop: 6,
-      borderRadius: 10,
-      justifyContent: "space-between",
-      backgroundColor: colorSet.content
+      justifyContent: "space-between"
    },
    img: {
       height: 46,
@@ -95,12 +99,12 @@ export const itemStyles = StyleSheet.create({
       flex:1,
       justifyContent: "center",
       alignItems: "center",
-      backgroundColor: colorSet.button
+      //backgroundColor: colorSet.button
     },
    text: {
       fontSize: 18, 
-      color: '#FFFFFF',
-      alignSelf: "center"
+      alignSelf: "center",
+      color: colorSet.text,
    },
 })
 
@@ -132,7 +136,7 @@ export const cardStyles = StyleSheet.create({
       marginBottom: 8, 
       color: colorSet.text
    },
-   txt: {
+   text: {
       fontSize: 18,
       marginTop: 12,
       paddingHorizontal: 8,  
@@ -144,8 +148,9 @@ export const cardStyles = StyleSheet.create({
       borderRadius: 10
    },
    input: { 
+      width:90,
       paddingHorizontal: 12,
-      marginHorizontal: 8,
+      marginHorizontal: 16,
       borderRadius: 10, 
       fontSize: 16,
       color: colorSet.content,
@@ -165,6 +170,7 @@ export const cardStyles = StyleSheet.create({
    buttonTxt: {
       fontSize: 20,
       marginHorizontal:16,
+      textTransform: "uppercase",
       color: colorSet.text,
    },
 })
