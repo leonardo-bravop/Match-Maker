@@ -305,10 +305,11 @@ function Add({ setEditImage, navigation }) {
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      //mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 1,
       aspect: [1,1],
-      allowsEditing:true
+      allowsEditing:true,
+      base64: true
     });
 
     console.log("RESULT URI ===>", result);
@@ -323,19 +324,26 @@ function Add({ setEditImage, navigation }) {
     try{
       console.log('LA IMAGEN ANTES DE EDITAR ===r>', image)
       //image.uri.split('.').reverse()[0]
+
       const newfile = {
         uri: image.uri,
         //type: `test/${image.uri.split('.').reverse()[0]}`,
         //name: `test/${image.uri.split('.').reverse()[0]}`
       }
       console.log('LA IMAGEN DESPUES DE EDITAR ===r>', newfile)
+      let base64Img = `data:image/jpg;base64,${image.base64}`
+
       const data = new FormData()
-      data.append('file', image)
-      data.append('upload_present', 'uwecgn8w')
-      //data.append('cluod_name', 'dbqdhlxvl')
+      data.append('file', base64Img)
+      data.append('upload_present', 'match-maker')
+      data.append('cluod_name', 'dbqdhlxvl')
+
       console.log('LA DATA ANTES DE SUBIR ===>', data)
-      const res = await axios.post('https://api.cloudinary.com/v1_1/dbqdhlxvl/image/upload', {body:data})
+
+      const res = await axios.post('https://api.cloudinary.com/v1_1/dbqdhlxvl/image/upload', JSON.stringify(data))
+
       console.log('LA RESPUESTA ===>', res.data)
+
     } catch (err) {
       console.log('ALGO ROMPIO ===>', err)
     }
