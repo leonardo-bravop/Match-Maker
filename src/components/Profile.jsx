@@ -325,8 +325,8 @@ function Add({ setEditImage, navigation }) {
       //image.uri.split('.').reverse()[0]
       const newfile = {
         uri: image.uri,
-        //type: `test/${image.uri.split('.').reverse()[0]}`,
-        //name: `test/${image.uri.split('.').reverse()[0]}`
+        type: /* `test/${image.uri.split('.').reverse()[0]}` */image.type,
+        name: /* `test/${image.uri.split('.').reverse()[1]}` */"image.jpg"
       }
       console.log('LA IMAGEN DESPUES DE EDITAR ===r>', newfile)
       const data = new FormData()
@@ -334,7 +334,7 @@ function Add({ setEditImage, navigation }) {
       data.append('upload_present', 'uwecgn8w')
       //data.append('cluod_name', 'dbqdhlxvl')
       console.log('LA DATA ANTES DE SUBIR ===>', data)
-      const res = await axios.post('https://api.cloudinary.com/v1_1/dbqdhlxvl/image/upload', {body:data})
+      const res = await axios.post('https://api.cloudinary.com/v1_1/dbqdhlxvl/image/upload', data)
       console.log('LA RESPUESTA ===>', res.data)
     } catch (err) {
       console.log('ALGO ROMPIO ===>', err)
