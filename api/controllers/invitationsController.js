@@ -1,5 +1,6 @@
 const Invitation = require("../models/Invitation");
 const Match = require("../models/Match");
+const {cancelMatch} = require("./matchController")
 
 exports.deleteAll = (req, res, next) => {
   Invitation.deleteMany()
@@ -47,15 +48,16 @@ exports.matchInvitationAcepted = (req, res, next) => {
 
 exports.invitationRejected = (req, res, next) => {
   const { matchId, userId } = req.params;
-  Invitation.findOneAndUpdate(
+  return Invitation.findOneAndUpdate(
     {
       $and: [{ "fromId.matchId": matchId }, { toId: userId }],
     },
     { status: "rejected" }, {new: true}
   )
-    .then((data) => {
-      res.send(data);
+    .then(() => {
+      return cancelMatch(matchId)
     })
+    .then(updatedMatch=>res.send(updatedMatch))
     .catch((error) => {
       next(new Error(error));
     });

@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setMatch } from "../state/record";
 import { colorSet } from "../styles/colorSet";
 import Constants from "expo-constants";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { cardStyles, itemStyles, record2Styles, recordStyles } from "../styles/record";
 
@@ -18,6 +19,7 @@ const ItemRecord = ({ item }) => {
    const [statusColor, setStatusColor] = useState("grey");
    const [result1, setResult1] = useState(0);
    const [result2, setResult2] = useState(0);
+   const [userString, setUserString] = useState("")
 
    const match = useSelector((state) => state.match);
    const user = useSelector((state) => state.user);
@@ -25,14 +27,21 @@ const ItemRecord = ({ item }) => {
  
    useEffect(() => {
       
-      if (item.status === "active" && moment().isSameOrAfter(moment(`${item.date} ${item.time}`, "DD-MM-YYYY H:mm"))) {
+      const asyncUser = async () => {
+         const result = await AsyncStorage.getItem("userInfo");
+         setUserString(result)
+      }
+
+      asyncUser()
+      
+      if (item.status === "lista" && moment().isSameOrAfter(moment(`${item.date} ${item.time}`, "DD-MM-YYYY H:mm"))) {
             item.status = "result"
       }
 
       setStatusColor(colorSet[item.status])
 
 
-      if (item.status === "pending") {
+      if (item.status === "pendiente") {
          const equipos = item.invitations_team1.concat(item.invitations_team2);
          const arrayInvit = equipos.filter(
             (invitation) => invitation.toId === user._id
@@ -45,7 +54,7 @@ const ItemRecord = ({ item }) => {
  
    const acceptHandler = () => {
      axios
-      .put(`${uri}/api/invitation/invitAcepted/${item._id}/user/${user._id}`)
+      .put(`${uri}/api/invitation/invitAcepted/${item._id}/user/${user._id}`, {}, {headers: {Authorization: `Bearer ${userString}`,},})
       .then(({ data }) => {
          item = data   
          setIsAccepted(true)
@@ -54,13 +63,18 @@ const ItemRecord = ({ item }) => {
 
    const resultHandler = () => {
       axios
-      .put(`${uri}/api/result/updateResult/${item.result}`, {score_1: result1, score_2: result2})
+      .put(`${uri}/api/result/updateResult/match/${item._id}/user/${user._id}`, {score: `${result1}-${result2}`}, {headers: {Authorization: `Bearer ${userString}`,},})
       .then(({ data }) => {
+         console.log(`updated match es`, data)
       });
    };
 
    const cancelHandler = () => {
-
+      axios
+      .put(`${uri}/api/invitation/invitRejected/${item._id}/user/${user._id}`, {}, {headers: {Authorization: `Bearer ${userString}`,},})
+      .then(({ data }) => {
+      });
+      
    }
 
 

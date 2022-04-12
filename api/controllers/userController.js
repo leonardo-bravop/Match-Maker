@@ -4,6 +4,8 @@ const generateToken = require("../config/generateToken");
 const jwt = require("jsonwebtoken");
 const League = require("../models/League");
 
+const {cancelMatch} = require("./matchController")
+
 exports.register = (req, res, next) => {
   const { name, surname, nickname, email, password, age } = req.body;
   User.findOne({ email })
@@ -242,11 +244,14 @@ exports.getMatchesByUserId = (req, res, next) => {
   const { userId } = req.params;
   getUserAndMatches(userId)
     .then((user) => {
-      cancelUserMatches(user)
+      cancelUserMatches(user);
     })
-    .then(()=>{
-      return getUserAndMatches(userId)})
-    .then(user=>res.send(user.matches))
+    .then(() => {
+      return getUserAndMatches(userId);
+    })
+    .then((user) => {
+      res.send(user.matches);
+    })
     .catch((error) => {
       res.status(400);
       next(new Error(error));
@@ -254,7 +259,7 @@ exports.getMatchesByUserId = (req, res, next) => {
 };
 
 const cancelUserMatches = (userAndMatches) => {
-  const canceledMatches = user.matches.filter(
+  const canceledMatches = userAndMatches.matches.filter(
     (match) => !match.invitations_team1[0]
   );
   return Promise.all(
@@ -262,15 +267,9 @@ const cancelUserMatches = (userAndMatches) => {
       return cancelMatch(cancelledMatch._id.toString());
     })
   );
-}
-
-const cancelMatch = (matchId) => {
-  return Match.findByIdAndUpdate(matchId, { status: "canceled" }, { new: true }).then(
-    (updatedMatch) => updatedMatch
-  );
 };
 
-const getUserAndMatches = (userId, matchParams={}) => {
+const getUserAndMatches = (userId, matchParams = {}) => {
   return User.findById(userId).populate({
     path: "matches",
     populate: [
@@ -285,17 +284,18 @@ const getUserAndMatches = (userId, matchParams={}) => {
 
 exports.getUserMatchesByDate = (req, res, next) => {
   const { userId, date } = req.params;
-  getUserAndMatches(userId, {date})
-  .then((user) => {
-    cancelUserMatches(user)
-  })
-  .then(()=>{
-    return getUserAndMatches(userId)})
-  .then(user=>res.send(user.matches))
-  .catch((error) => {
-    res.status(400);
-    next(new Error(error));
-  });
+  getUserAndMatches(userId, { date })
+    .then((user) => {
+      cancelUserMatches(user);
+    })
+    .then(() => {
+      return getUserAndMatches(userId);
+    })
+    .then((user) => res.send(user.matches))
+    .catch((error) => {
+      res.status(400);
+      next(new Error(error));
+    });
 };
 
 exports.verifyToken = (req, res, next) => {

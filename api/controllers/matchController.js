@@ -194,3 +194,12 @@ exports.deleteAll = (req, res, next) => {
       next(new Error(error));
     });
 };
+
+
+exports.cancelMatch = (matchId) => {
+  return Match.findByIdAndUpdate(
+    matchId,
+    { status: "cancelada" },
+    { new: true }
+  ).then((updatedMatch) => updatedMatch);
+};

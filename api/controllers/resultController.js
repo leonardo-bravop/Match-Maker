@@ -3,9 +3,20 @@ const Match = require("../models/Match");
 const User = require("../models/Users");
 const Elo = require("../models/Elo");
 
+//cuando uno de un equipo updatea el result, confirmation pasa a true
+//match status sigue en completada
+//cuando el otro pone un result diferente
+//match status pasa a conflicto
+//confirmation pasa a false
+//en el front aparece el input de resultado otra vez
+//caso 1: uno de los dos pone un resultado diferente, pero siguen  conflicto
+//confirmation de los 2 equipos sigue en false, match status sigue en conflicto
+//caso 2: uno de los pone el mismo resultado que el otro
+//si son iguales match.status cambia a confirmado, confirmation 1 y 2 pasan a true
+
 exports.updateResult = (req, res, next) => {
   const { score } = req.body;
-  const { resultId, matchId, userId } = req.params;
+  const { matchId, userId } = req.params;
   let matchRef, team, equalResults, matchStatus;
   Match.findById(matchId)
     .then((match) => {
@@ -16,7 +27,7 @@ exports.updateResult = (req, res, next) => {
           match.status === "completada" ||
           match.status === "conflicto"
         ) {
-          return Result.findById(resultId);
+          return Result.findById(match.result.toString());
         }
       }
     })
@@ -41,6 +52,7 @@ exports.updateResult = (req, res, next) => {
             ? (matchStatus = "confirmada")
             : (matchStatus = "conflicto");
         }
+        console.log(`linea 44`);
         if (matchStatus) {
           return Match.findByIdAndUpdate(
             matchId,
