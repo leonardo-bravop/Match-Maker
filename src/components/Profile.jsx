@@ -16,7 +16,7 @@ import {
   Dimensions,
   ScrollView,
   Button,
-  SafeAreaView
+  SafeAreaView,
 } from "react-native";
 import { leagueStyles } from "../styles/league";
 import { setLeague } from "../state/selectLeague";
@@ -30,7 +30,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 
 import { Camera } from "expo-camera";
 import { Ionicons } from "@expo/vector-icons";
-import { Entypo } from '@expo/vector-icons'; 
+import { Entypo } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 
 const { width, height } = Dimensions.get("screen");
@@ -55,18 +55,18 @@ const styles = StyleSheet.create({
   },
   buttonReverse: {
     height: 48,
-    width:48,
+    width: 48,
     flex: 0.1,
     alignSelf: "flex-end",
     alignItems: "center",
   },
   buttonPicture: {
     height: 48,
-    width:48,
-    display: 'flex',
-    position: 'absolute',
+    width: 48,
+    display: "flex",
+    position: "absolute",
     bottom: 0,
-    right: '50%',
+    right: "50%",
     marginRight: -25,
   },
   text: {
@@ -310,7 +310,9 @@ function Add({ setEditImage, navigation }) {
   };
 
   return (
-    <View style={{flex: 4, marginTop: 50}}>
+    <View
+      style={{ flex: 4, justifyContent: "center", backgroundColor: "#0e0b29" }}
+    >
       {showCamera && (
         <View style={styles.container}>
           <Camera
@@ -329,7 +331,11 @@ function Add({ setEditImage, navigation }) {
                   );
                 }}
               >
-                <Ionicons name="camera-reverse-outline" size={36} color="white" />
+                <Ionicons
+                  name="camera-reverse-outline"
+                  size={36}
+                  color="white"
+                />
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.buttonPicture}
@@ -343,30 +349,27 @@ function Add({ setEditImage, navigation }) {
               >
                 <Entypo name="circle" size={48} color="white" />
               </TouchableOpacity>
-              
             </View>
           </Camera>
         </View>
       )}
       {!showCamera && (
-        <>
-          <View
-            style={{ flexDirection: "row", justifyContent: "space-between" }}
-          >
-            <View style={{ flexDirection: "row" }}>
+        <View style={{ flexDirection: "row", justifyContent: "center"}}>
+          <View>
               <Button
                 title={"Camera"}
+                color="#841584"
                 onPress={() => {
                   setShowCamera(true);
                 }}
               />
-              <Button title={"Gallery"} onPress={pickImage} />
+              <Button title={"Gallery"} onPress={pickImage} color="#841584" />
               <Button
                 title={"Cancelar"}
+                color="#841584"
                 onPress={() => navigation.navigate("User")}
               />
-            </View>
-          </View>
+              </View>
           {imageArray.length > 0 && (
             <View style={{ height: 110 }}>
               <FlatList
@@ -386,7 +389,7 @@ function Add({ setEditImage, navigation }) {
               />
             </View>
           )}
-        </>
+        </View>
       )}
     </View>
   );
@@ -396,10 +399,8 @@ const Stack = createStackNavigator();
 
 function MyStack() {
   return (
-
-      <Stack.Navigator
-      
-      screenOptions={{ headerShown: false, animationEnabled: false}}
+    <Stack.Navigator
+      screenOptions={{ headerShown: false, animationEnabled: false }}
     >
       <Stack.Screen name="User" component={User} />
       <Stack.Screen name="Change image user" component={Add} />
