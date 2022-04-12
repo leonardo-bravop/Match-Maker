@@ -14,7 +14,7 @@ const initialState = [];
 
 const userLeaguesReducer = createReducer(initialState, {
     [setUserLeagues.fulfilled]: (state, action) => {
-        console.log(`Setee user leagues con action.payload`);
+        console.log(`Setee user leagues con action.payload`, action.payload);
         return action.payload},
 })
 

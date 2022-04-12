@@ -13,7 +13,7 @@ const inivitationSchema = new Schema({
     },
   status: {
     type: String,
-    default: "pending",
+    default: "pendiente",
   },
 }, {timestamps: true});
 

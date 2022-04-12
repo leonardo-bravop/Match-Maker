@@ -4,15 +4,15 @@ const { Schema } = mongoose;
 const resultSchema = new Schema({
   score_1: 
     {
-        type: Number,
+        type: String,
         required: [true, "Please, write the team score"],
-        default: 0
+        default: "0-0"
     },
   score_2: 
     {
-        type: Number,
+        type: String,
         required: [true, "Please, write the team score"],
-        default: 0
+        default: "0-0"
     },
   confirmation_1: 
     {
