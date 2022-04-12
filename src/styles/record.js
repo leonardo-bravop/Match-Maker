@@ -156,6 +156,18 @@ export const cardStyles = StyleSheet.create({
       color: colorSet.content,
       backgroundColor: colorSet.text,
    },
+   cancelButton: {
+      height: 48,
+      marginLeft:"auto",
+      marginRight: "auto",
+      marginBottom:"auto",
+      marginTop: "auto",
+      justifyContent: "center",
+      alignItems: "center"
+   },
+   cancelTxt:{
+      fontSize: 16,
+   },
    confirmButton: {
       height: 50,
       marginLeft:"auto",
