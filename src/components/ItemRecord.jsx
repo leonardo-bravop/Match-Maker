@@ -5,7 +5,6 @@ import { View, TouchableOpacity, Text, ScrollView, TextInput } from "react-nativ
 import { useDispatch, useSelector } from "react-redux";
 import { setMatch } from "../state/record";
 import { colorSet } from "../styles/colorSet";
-import { leagueStyles } from "../styles/league";
 import Constants from "expo-constants";
 
 import { cardStyles, itemStyles, record2Styles, recordStyles } from "../styles/record";
@@ -29,40 +28,40 @@ const ItemRecord = ({ item }) => {
       if (item.status === "active" && moment().isSameOrAfter(moment(`${item.date} ${item.time}`, "DD-MM-YYYY H:mm"))) {
             item.status = "result"
       }
-         console.log("este es item -----------", item)
+
       setStatusColor(colorSet[item.status])
-      const equipos = item.invitations_team1.concat(item.invitations_team2);
-     const arrayInvit = equipos.filter(
-       (invitation) => invitation.toId === user._id
-     );
-     if (!arrayInvit[0]) return;
-     console.log("====================================");
-     console.log(`is accepted e`, isAccepted);
-     console.log("====================================");
-     console.log(arrayInvit[0].status);
-     console.log("====================================");
-     // console.log(`match es`, match);
-     if (arrayInvit[0].status === "accepted") setIsAccepted(true);
+
+
+      if (item.status === "pending") {
+         const equipos = item.invitations_team1.concat(item.invitations_team2);
+         const arrayInvit = equipos.filter(
+            (invitation) => invitation.toId === user._id
+         );
+         if (!arrayInvit[0]) return;
+         if (arrayInvit[0].status === "accepted") setIsAccepted(true);
+      }
     
    }, [item]);
  
    const acceptHandler = () => {
      axios
-       .put(`${uri}/api/invitation/invitAcepted/${item._id}/user/${user._id}`)
-       .then(({ data }) => {
+      .put(`${uri}/api/invitation/invitAcepted/${item._id}/user/${user._id}`)
+      .then(({ data }) => {
+         item = data   
          setIsAccepted(true)
-         // console.log(`data es`, data);
-         // console.log(`match es`, match);
-       });
+      });
    };
 
    const resultHandler = () => {
       axios
-        .put(`${uri}/api/result/updateResult/${item.result}`, {score_1: result1, score_2: result2})
-        .then(({ data }) => {
-          console.log("Aver si resulta ------------", data)
-        });
-    };
+      .put(`${uri}/api/result/updateResult/${item.result}`, {score_1: result1, score_2: result2})
+      .then(({ data }) => {
+      });
+   };
+
+   const cancelHandler = () => {
+
+   }
 
 
    return (
@@ -81,11 +80,11 @@ const ItemRecord = ({ item }) => {
             </View>
             
             <View style={[itemStyles.info, {borderColor: "red" , borderWidth:0}]}>
-               <Text style={[itemStyles.text, { textTransform: "uppercase", color:statusColor }]}>
+               <Text style={[itemStyles.text, { textTransform: "uppercase", color: statusColor }]}>
                   {item.status}
                </Text>
             
-               <Text style={[itemStyles.text, { textTransform: "uppercase", color:statusColor }]}>
+               <Text style={[itemStyles.text, { textTransform: "uppercase", color: statusColor }]}>
                   {moment(item.date, "DD-MM-YYYY").format("DD-MM")}
                </Text>
             </View>
@@ -104,7 +103,119 @@ const ItemRecord = ({ item }) => {
          
          { showInfo
          ? <View>
-               <View>
+               <Text style={[itemStyles.text]}>
+                  El partido se { item.status === "pending" || item.status === "active" ? "disputara" : "disputo"} a las {item.time}
+               </Text>
+               {item.invitationText === ""
+               ? <></>
+               : <Text style={[itemStyles.text]}>
+                     {item.invitationText}
+               </Text>}
+
+
+               { (item.status === "pending" || item.status === "pendiente") 
+               ?<View>
+                  {!isAccepted
+                  ? <View style={{ marginTop: 30}}>
+                        <TouchableOpacity style={[cardStyles.confirmButton, { backgroundColor: statusColor}]}
+                                       onPress={acceptHandler}>
+                           <Text style={[cardStyles.buttonTxt]}>{"Participar"}</Text>
+                        </TouchableOpacity>
+                        
+                        <View style={{ marginVertical: 10, flexDirection: "row"}}>
+                           <TouchableOpacity style={[cardStyles.cancelButton]} onPress={cancelHandler}>
+                              <Text style={[cardStyles.cancelTxt, {color: colorSet.error}]}>{"Cancelar"}</Text>
+                           </TouchableOpacity>
+                        </View>
+                  </View>
+                  : <View>
+                        <Text style={[itemStyles.text, {marginTop: 10}]}>
+                           Ya has confirmado tu participación
+                        </Text>
+                        <View style={{ marginVertical: 10, flexDirection: "row"}}>
+                           <TouchableOpacity style={[cardStyles.cancelButton]} onPress={cancelHandler}>
+                              <Text style={[cardStyles.cancelTxt, {color: colorSet.error}]}>{"Cancelar"}</Text>
+                           </TouchableOpacity>
+                        </View>
+                     </View>
+                  }
+               </View>
+               :<></> 
+               }
+
+               { (item.status === "active" || item.status === "lista") 
+               ?<View>
+                  <Text style={[itemStyles.text, {marginTop: 10}]}>
+                     Ya has confirmado tu participación
+                  </Text>
+                  <View style={{ marginVertical: 10, flexDirection: "row"}}>
+                  <TouchableOpacity style={[cardStyles.cancelButton]} onPress={cancelHandler}>
+                     <Text style={[cardStyles.cancelTxt, {color: colorSet.error}]}>{"Cancelar"}</Text>
+                  </TouchableOpacity>
+                  </View>
+               </View>
+               :<></> 
+               }
+
+               { (item.status === "result") 
+               ?<View>
+                  <View style={{ marginTop: 30, flexDirection: "row"}}>
+                        
+                     <TextInput style={[cardStyles.input, {height: 40, alignSelf: "center"}]}
+                                    name="text" keyboardType="default"
+                                    placeholder="Resultado"
+                                    value={result1} 
+                                    onChangeText={ text => setResult1(parseInt(text))}
+                     />
+                     
+                     <TouchableOpacity style={[cardStyles.confirmButton, { backgroundColor: statusColor}]}
+                                       onPress={resultHandler}>
+                        <Text style={[cardStyles.buttonTxt]}>{"Enviar"}</Text>
+                     </TouchableOpacity>
+
+                     <TextInput style={[cardStyles.input, {height: 40, alignSelf: "center"}]}
+                                    name="text" keyboardType="default"
+                                    placeholder="Resultado"
+                                    value={result2} 
+                                    onChangeText={ text => setResult2(parseInt(text))}
+                     />
+                  </View>
+                  <View style={{ marginVertical: 10, flexDirection: "row"}}>
+                  <TouchableOpacity style={[cardStyles.cancelButton]} onPress={cancelHandler}>
+                     <Text style={[cardStyles.cancelTxt, {color: colorSet.error}]}>{"Cancelar"}</Text>
+                  </TouchableOpacity>
+                  </View>
+               </View>
+               :<></> 
+               }
+
+               { (item.status === "completada") 
+               ?<View>
+                  
+               </View>
+               :<></> 
+               }
+
+               { (item.status === "confirmada") 
+               ?<View>
+                  
+               </View>
+               :<></> 
+               }
+         </View>
+         :<></> 
+         }
+         
+         
+      </TouchableOpacity> 
+  );
+};
+
+export default ItemRecord;
+
+
+
+/*<View>
                   {item.status !== "result"
                   ?<Text style={[itemStyles.text]}>
                      El partido se disputara a las {item.time}
@@ -118,6 +229,8 @@ const ItemRecord = ({ item }) => {
                         {item.invitationText}
                      </Text>
                   }
+
+
                   
                </View>
                   {!isAccepted || item.status === "result"
@@ -150,138 +263,4 @@ const ItemRecord = ({ item }) => {
                   : (<Text style={[itemStyles.text, {marginTop: 10, marginBottom: 16}]}>
                         Ya has confirmado tu participación
                      </Text>
-                  )}
-            </View>
-         :<></> 
-         }
-         
-         
-      </TouchableOpacity> 
-  );
-};
-
-
-
-{/*
-            
-               {!isAccepted 
-               ? (<>
-                  <Text style={[itemStyles.text]}>
-                     Debes confirmar tu participacion antes del {moment(item.date, "DD-MM-YYYY").format("DD [de] MMMM")}
-                  </Text>
-            <View style={{ height: 115 }}>
-                  <TouchableOpacity style={[leagueStyles.join, { backgroundColor: "#16a085" }]}
-                                    onPress={()=>{}/*acceptHandler}>
-                                    <Text style={[itemStyles.text]}>Participar</Text>
-                                    </TouchableOpacity>
-                              </View>
-                                 </>
-                                    ) 
-                                 : (<Text style={[itemStyles.text]}>
-                                       Ya has confirmado tu participación
-                                    </Text>
-                                 )}*/ }
-
-
-
-
-export default ItemRecord;
-{/*<ScrollView >
-         <View >
-            { item.team_1.map( (user, i) => {
-               return (
-                  <Text style={itemStyles.text}>
-                     {user.nickname}
-                  </Text>
-               )}
-            )}
-         </View>
-      </ScrollView>*/}
-
-{/*
-
-<View>
-      <TouchableOpacity style={[record2Styles.item]} onPress={() => dispatch(setMatch(item)) }>
-         
-         <View style={{flex:1, borderBottomRightRadius: 10, borderTopRightRadius: 10}}>
-            /* <View style={{ flexDirection: "row", height: 40, justifyContent: "center", alignItems: "center", borderTopRightRadius: 10}}>
-               
-               <View style={{flex:1,height: 40, justifyContent: "center", alignItems: "center"}}>
-                  <Text style={{color: item.color, fontWeight: "bold"}}>16</Text>
-               </View>
-               <View style={{flex:1,height: 40, justifyContent: "center", alignItems: "center", borderTopRightRadius: 10}}>
-                  <Text style={{color: item.color, fontWeight: "bold"}}>22</Text>
-               </View>
-            </View> 
-            
-         
-            <View style={{flex:1, flexDirection: "row", borderBottomRightRadius: 10 }}>
-               <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
-                  {item.team_1.map( (user, i, arr) => {
-                     if (i>2) return (<></>)
-                     return (
-                     <Text style={{color: '#FFFFFF'}} key= {user._id}>
-                        {arr.length > 3 && i === 2 
-                        ?  `${user.nickname}`+` y ${arr.length-3} mas` 
-                        : user.nickname }
-                     </Text>)
-                  })}
-               </View>
-
-               <View style={[record2Styles.date, {backgroundColor: "grey"}]}>
-                  <Text style={{color: '#FFFFFF'}}>{item.date} {item.status}</Text>
-               </View>
-               
-               <View style={{flex: 1, justifyContent: "center", alignItems: "center" , borderBottomRightRadius: 10}}>
-
-                  {item.team_2.map( (user, i, arr) => {
-                     if (i>2) return (<></>)
-                     return (
-                     <Text style={{color: '#FFFFFF'}} key= {i}>
-                        {arr.length > 3 && i === 2 
-                        ?  `${user.nickname}`+` y ${arr.length-3} mas` 
-                        : user.nickname }
-                     </Text>)
-                  })}
-               
-               </View>
-            </View>
-         
-         </View>
-         
-      </TouchableOpacity> 
-      </View>
-*/}
-
-
-
-
-
-
-
-
-
-
-{/* <View style={[record2Styles.group]}>
-               <Text style={{color: '#FFFFFF'}}>
-                  {item.nickname} - {item.nickname} - {item.nickname} ...
-               </Text>
-            </View>
-         
-            <View style={[record2Styles.group]}>
-               <Text style={{color: '#FFFFFF'}}>
-                  {item.nickname} - AleR - {item.nickname} ...
-               </Text>
-            </View>
-
-
-
-
-<View style={[record2Styles.group]}>
-<Text style={{color: item.color, fontWeight: "bold"}}>16</Text>
-</View>
-
-<View style={[record2Styles.group]}>
-<Text style={{color: item.color, fontWeight: "bold"}}>22</Text>
-</View> */}
-
+                  )}*/

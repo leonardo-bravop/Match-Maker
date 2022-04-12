@@ -28,9 +28,9 @@ import ListHead from "./MatchListHead";
 import { colorSet } from "../styles/colorSet";
 
 const Record = () => {
-    let [recordList, setRecordList] = useState([])
-    let [onDate, setOnDate] = useState(moment())
-    let [showAll, setShowAll] = useState(false)
+   let [recordList, setRecordList] = useState([])
+   let [onDate, setOnDate] = useState(moment())
+   let [showAll, setShowAll] = useState(false)
    let [dotList, setDotList] = useState([])
 
     const { manifest } = Constants
