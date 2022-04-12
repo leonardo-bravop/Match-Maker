@@ -43,6 +43,7 @@ const Record = () => {
 
 
     useEffect(()=>{
+       console.log(`EMPEZANDO USEEFFECT DE RECORD`);
       axios.get(`${uri}/api/user/getMatches/${user._id}`)
       .then(({data}) => {
           setRecordList(data.reverse())

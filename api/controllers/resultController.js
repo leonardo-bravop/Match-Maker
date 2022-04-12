@@ -4,13 +4,59 @@ const User = require("../models/Users");
 const Elo = require("../models/Elo");
 
 exports.updateResult = (req, res, next) => {
-  const { score_1, score_2 } = req.body;
-  const { resultId } = req.params;
-  Result.findById(resultId)
+  const { score } = req.body;
+  const { resultId, matchId, userId } = req.params;
+  let matchRef, team, equalResults, matchStatus;
+  Match.findById(matchId)
+    .then((match) => {
+      if (match) {
+        matchRef = match;
+        if (
+          match.status === "lista" ||
+          match.status === "completada" ||
+          match.status === "conflicto"
+        ) {
+          return Result.findById(resultId);
+        }
+      }
+    })
     .then((result) => {
-      result.score_1 = score_1;
-      result.score_2 = score_2;
-      result.save().then((updatedResult) => res.send(updatedResult));
+      if (result) {
+        if (matchRef.team_1.indexOf(userId) !== -1) team = 1;
+        else if (matchRef.team_2.indexOf(userId) !== -1) team = 2;
+        result[`score_${team}`] = score;
+        if (result.score_1 === result.score_2) equalResults = true;
+        return result.save();
+      }
+    })
+    .then((updatedResult) => {
+      if (updatedResult) {
+        if (matchRef.status === "lista") {
+          matchStatus = "completada";
+        } else if (
+          matchRef.status === "completada" ||
+          matchRef.status === "conflicto"
+        ) {
+          equalResults
+            ? (matchStatus = "confirmada")
+            : (matchStatus = "conflicto");
+        }
+        if (matchStatus) {
+          return Match.findByIdAndUpdate(
+            matchId,
+            { status: matchStatus },
+            { new: true }
+          );
+        }
+      }
+    })
+    .then((updatedMatch) => {
+      if (updatedMatch) {
+        res.send(updatedMatch);
+      } else {
+        res.status(400);
+        next(new Error("Match not found"));
+      }
     })
     .catch((error) => {
       res.status(400);
@@ -19,13 +65,20 @@ exports.updateResult = (req, res, next) => {
 };
 //entrar a update result desde el id del match
 
-//solo se puede confirmar si match status es active
+//solo se puede confirmar si match status es "completada"
+//recibir result 1 desde equipo 1 como string "3-1"
+//comparar result2 con result1
+
 exports.confirmResultTeam = (req, res, next) => {
   const { resultId, team, matchId } = req.params;
   let scorefinal;
   let result1;
   let result2;
   if (team === "1" || team === "2") {
+    // Match.findById(matchId).then(match=>{
+    //   if(match.status==="completada")
+    // })
+
     Result.findById(resultId)
       .populate("match")
       .then((result) => {
@@ -165,8 +218,8 @@ exports.confirmResultTeam = (req, res, next) => {
           } else {
             res.send(updatedResult);
           }
-        })
-      })
+        });
+      });
   } else {
     res.status(400);
     next(new Error("Enter a valid team number"));

@@ -39,7 +39,7 @@ exports.register = (req, res, next) => {
 
 exports.login = (req, res, next) => {
   const { email, password } = req.body;
-console.log(`req body es`, req.body);
+  console.log(`req body es`, req.body);
   User.findOne({ email }).then((user) => {
     if (user) {
       user
@@ -115,10 +115,13 @@ exports.changePassword = (req, res, next) => {
   const { _id } = req.params;
   const { password } = req.body;
 
-  User.findByIdAndUpdate(_id, { password })
-    .select("name nickname")
-    .then((result) => {
-      res.send(result);
+  User.findById(_id)
+    .then((user) => {
+      user.password = password;
+      return user.save();
+    })
+    .then((updatedUser) => {
+      res.send(`Cambio exitoso de contraseña de ${updatedUser.nickname}`);
     })
     .catch((error) => {
       res.status(400);
@@ -142,7 +145,7 @@ exports.me = (req, res, next) => {
             name: user.name,
             surname: user.surname,
             nickname: user.nickname,
-            leagues: user.leagues
+            leagues: user.leagues,
           })
         )
         .catch((error) => {
@@ -172,7 +175,7 @@ exports.getLeaguesAndRankByUserId = (req, res, next) => {
     .then((user) => {
       const userLeagues = user.leagues;
       const promisesArray = userLeagues.map((leagueId) => {
-        return League.findById(leagueId, "name isPrivate color img")
+        return League.findById(leagueId, "name isPrivate color img admin")
           .populate({
             path: "users",
             select: "nickname img elo",
@@ -237,45 +240,62 @@ exports.getLeaguesAndRankByUserId = (req, res, next) => {
 
 exports.getMatchesByUserId = (req, res, next) => {
   const { userId } = req.params;
-  User.findById(userId)
-    .populate({
-      path: "matches",
-      populate: [
-        { path: "team_1", select: "nickname" },
-        { path: "team_2", select: "nickname" },
-        { path: "invitations_team1" },
-        { path: "invitations_team2" },
-      ],
-    })
+  getUserAndMatches(userId)
     .then((user) => {
-      res.send(user.matches);
+      cancelUserMatches(user)
     })
+    .then(()=>{
+      return getUserAndMatches(userId)})
+    .then(user=>res.send(user.matches))
     .catch((error) => {
       res.status(400);
       next(new Error(error));
     });
 };
 
+const cancelUserMatches = (userAndMatches) => {
+  const canceledMatches = user.matches.filter(
+    (match) => !match.invitations_team1[0]
+  );
+  return Promise.all(
+    canceledMatches.map((cancelledMatch) => {
+      return cancelMatch(cancelledMatch._id.toString());
+    })
+  );
+}
+
+const cancelMatch = (matchId) => {
+  return Match.findByIdAndUpdate(matchId, { status: "canceled" }, { new: true }).then(
+    (updatedMatch) => updatedMatch
+  );
+};
+
+const getUserAndMatches = (userId, matchParams={}) => {
+  return User.findById(userId).populate({
+    path: "matches",
+    populate: [
+      { path: "team_1", select: "nickname" },
+      { path: "team_2", select: "nickname" },
+      { path: "invitations_team1" },
+      { path: "invitations_team2" },
+    ],
+    match: matchParams,
+  });
+};
+
 exports.getUserMatchesByDate = (req, res, next) => {
   const { userId, date } = req.params;
-  User.findById(userId)
-    .populate({
-      path: "matches",
-      populate: [
-        { path: "team_1", select: "nickname" },
-        { path: "team_2", select: "nickname" },
-        { path: "invitations_team1" },
-        { path: "invitations_team2" },
-      ],
-      match: { date },
-    })
-    .then((user) => {
-      res.send(user.matches);
-    })
-    .catch((error) => {
-      res.status(400);
-      next(new Error(error));
-    });
+  getUserAndMatches(userId, {date})
+  .then((user) => {
+    cancelUserMatches(user)
+  })
+  .then(()=>{
+    return getUserAndMatches(userId)})
+  .then(user=>res.send(user.matches))
+  .catch((error) => {
+    res.status(400);
+    next(new Error(error));
+  });
 };
 
 exports.verifyToken = (req, res, next) => {

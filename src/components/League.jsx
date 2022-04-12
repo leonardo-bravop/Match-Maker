@@ -45,6 +45,7 @@ import { CheckBox } from "react-native-elements";
 import { setUserMe } from "../state/user";
 import { colorSet } from "../styles/colorSet";
 import ListHead from "./MatchListHead";
+import autoMergeLevel1 from "redux-persist/es/stateReconciler/autoMergeLevel1";
 
 const LeagueHome = ({ navigation }) => {
   const { manifest } = Constants;
@@ -72,21 +73,30 @@ const LeagueHome = ({ navigation }) => {
         console.log("====================================");
         console.log(`EMPEZANDO EL USEEFFECT DE LEAGUE`);
         console.log("====================================");
-        console.log("lueage ides ", leagueId);
+        console.log("leaguelist es", leagueList);
+        console.log("league ides ", leagueId);
         console.log("userdata es ", userData);
+        // console.log(`memberlist es`, memberList);
+        // console.log(
+        //   `user rank es`,
+        //   memberList.reverse().findIndex((user) => user._id === userData._id)
+        // );
         // console.log('====================================');
         console.log("Paso 1: dispatch(setUserLeagues(");
         const resData = await dispatch(
           setUserLeagues({ userId: userData._id })
         );
-        console.log("Res data payload 0 es:", resData.payload[0].league);
+        console.log(`res data es`, resData.payload);
+        // console.log("Res data payload 0 es:", resData.payload[0].league);
         // console.log('====================================');
         console.log("Paso 2: dispatch(setLeagueId");
         console.log(
           "ESTE DISPATCH ES EL QUE HACE QUE SE EJECUTE EL USEEFFECT OTRA VEZ"
         );
-        if (leagueId === "") dispatch(setLeagueId(resData.payload[0].league._id));
+        if (leagueId === "" && resData.payload[0])
+          dispatch(setLeagueId(resData.payload[0].league._id));
         console.log("Paso 3: ");
+        // if (leagueList[0]) {
         let auxLeagueId = leagueId === "" ? leagueList[0].league._id : leagueId;
         const { payload } = await dispatch(setMembers(auxLeagueId));
         console.log("Paso 4: payload es ", payload);
@@ -102,6 +112,7 @@ const LeagueHome = ({ navigation }) => {
         console.log("Paso 6: actual league es", data);
 
         setActualLeague(data);
+        // }
         console.log(`TERMINANDO USEEFFECT DE LEAGUE`);
       } catch (error) {
         console.error(error);
@@ -200,8 +211,7 @@ const LeagueHome = ({ navigation }) => {
 
   return (
     <SafeAreaView style={newLeagueStyles.back}>
-     
-     <Modal animationType="fade" transparent={true} visible={showCard}>
+      <Modal animationType="fade" transparent={true} visible={showCard}>
         <Pressable
           onPress={() => {
             setShowCard(false);
@@ -227,25 +237,38 @@ const LeagueHome = ({ navigation }) => {
                 <View style={{ flex: 1 }}>
                   <ScrollView>
                     <View>
-                      {leagueList.map((item, i) => {
-                        return (
-                          <TouchableOpacity
-                            style={{ margin: 7 }}
-                            onPress={() => selectHandler(item.league._id)}
-                            key={i}
-                          >
-                            <Text
-                              style={{
-                                color: "#FFFFFF",
-                                fontSize: 16,
-                                textAlign: "center",
-                              }}
+                      {leagueList[0] ? (
+                        leagueList.map((item, i) => {
+                          return (
+                            <TouchableOpacity
+                              style={{ padding: 7 }}
+                              onPress={() => selectHandler(item.league._id)}
+                              key={i}
                             >
-                              {item.league.name}
-                            </Text>
-                          </TouchableOpacity>
-                        );
-                      })}
+                              <Text
+                                style={{
+                                  color: "#FFFFFF",
+                                  fontSize: 16,
+                                  textAlign: "center",
+                                }}
+                              >
+                                {item.league.name}
+                              </Text>
+                            </TouchableOpacity>
+                          );
+                        })
+                      ) : (
+                        <Text
+                          style={{
+                            fontSize: 18,
+                            color: "white",
+                            textAlign: "center",
+                            padding: 10,
+                          }}
+                        >
+                          Acá aparecerán tus ligas. Únete a una desde Home
+                        </Text>
+                      )}
                     </View>
                   </ScrollView>
                 </View>
@@ -336,41 +359,78 @@ const LeagueHome = ({ navigation }) => {
         </Pressable>
       </Modal>
 
-
-
-
-      <View style={[newLeagueStyles.head, {backgroundColor: actualleague.color}]}>
-      <ImageBackground
+      <View
+        style={[newLeagueStyles.head, { backgroundColor: actualleague.color }]}
+      >
+        <ImageBackground
           resizeMode="cover"
           source={{ uri: actualleague.img }}
           style={{ flex: 1 }}
         >
-            <View style={newLeagueStyles.info}>
-               <Text style={newLeagueStyles.title}>
-                  {actualleague.name}
-               </Text>
-               
-               <TouchableOpacity onPress={()=> setShowCard(true)} style={newLeagueStyles.pickerButton}>
-                  <Icon name="caret-down-circle" type="ionicon" color={colorSet.text} size = {32}/>
-               </TouchableOpacity>
-            </View>
-            
+          <View style={{ width: "100%", height: "100%" }}>
+            <ImageBackground
+              resizeMode="stretch"
+              source={require("../assets/gradient.png")}
+              style={{ flex: 1 }}
+            >
+              <View style={[newLeagueStyles.info, { paddingTop: "20%" }]}>
+                <Text style={newLeagueStyles.title}>{actualleague.name}</Text>
+
+                <TouchableOpacity
+                  onPress={() => setShowCard(true)}
+                  style={newLeagueStyles.pickerButton}
+                >
+                  <Icon
+                    name="caret-down-circle"
+                    type="ionicon"
+                    color={colorSet.text}
+                    size={32}
+                  />
+                </TouchableOpacity>
+              </View>
             </ImageBackground>
-         </View>
-
-        <View style={newLeagueStyles.body}>
-          <ListHead labels={["Rank", "Usuario", "ELO"]} styling={newLeagueStyles.listHead}/>
-
-          <View style={newLeagueStyles.list}>
-            <List list={memberList} Element={ItemLeague} marginNum={1} colorLeague= {actualleague.color}/>
           </View>
-        
+        </ImageBackground>
+      </View>
 
+      <View style={newLeagueStyles.body}>
+        <ListHead
+          labels={["Rank", "Usuario", "ELO"]}
+          styling={newLeagueStyles.listHead}
+        />
 
+        <View style={newLeagueStyles.list}>
+          {memberList[0] ? (
+            <List
+              list={memberList}
+              Element={ItemLeague}
+              marginNum={1}
+              colorLeague={actualleague.color}
+            />
+          ) : (
+            <View
+              style={{
+                height: "100%",
+                alignSelf: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 18,
+                  color: "white",
+                  textAlign: "center",
+                }}
+              >
+                Acá aparecerán los miembros cuando selecciones una liga. {"\n"}
+                {"\n"}
+                Prueba seleccionando una desde Home
+              </Text>
+            </View>
+          )}
+        </View>
 
-
-
-          <TouchableOpacity
+        <TouchableOpacity
           style={{
             marginVertical: 20,
             height: 50,
@@ -391,20 +451,20 @@ const LeagueHome = ({ navigation }) => {
         </TouchableOpacity>
 
         {userData.leagues.includes(leagueId) ? (
-          userData.rank > 1 ? (
+          (memberList.findIndex((user) => user._id === userData._id)) > 6 ? (
             <View style={leagueStyles.foot}>
               <View style={leagueStyles.user}>
                 <View style={leagueStyles.rank}>
-                  <Text style={{ color: "#FFFFFF" }}>{user.rank}</Text>
+                  <Text style={{ color: "#FFFFFF" }}>{"2"}</Text>
                 </View>
                 <View
                   style={[leagueStyles.img, { backgroundColor: user.color }]}
                 ></View>
                 <View style={leagueStyles.nick}>
-                  <Text style={{ color: "#FFFFFF" }}>{user.nickname}</Text>
+                  <Text style={{ color: "#FFFFFF" }}>{userData.nickname}</Text>
                 </View>
                 <View style={leagueStyles.elo}>
-                  <Text style={{ color: "#FFFFFF" }}>{user.elo}</Text>
+                  <Text style={{ color: "#FFFFFF" }}>{"user.elo"}</Text>
                 </View>
               </View>
             </View>
@@ -414,7 +474,10 @@ const LeagueHome = ({ navigation }) => {
         ) : (
           <View style={[leagueStyles.foot, { height: 100 }]}>
             <TouchableOpacity
-              style={[leagueStyles.join, { backgroundColor: actualleague.color /*"#16a085"*/ }]}
+              style={[
+                leagueStyles.join,
+                { backgroundColor: actualleague.color /*"#16a085"*/ },
+              ]}
               onPress={() => {
                 if (actualleague.isPrivate) {
                   setShowSecretkeyCard(true);
@@ -428,8 +491,6 @@ const LeagueHome = ({ navigation }) => {
           </View>
         )}
       </View>
-
-     
     </SafeAreaView>
   );
 };

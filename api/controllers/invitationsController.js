@@ -34,7 +34,7 @@ exports.matchInvitationAcepted = (req, res, next) => {
         if(invitation.status ==="accepted") acceptedNumber++
       })
       if(acceptedNumber === invitationsArray.length) {
-        return Match.findByIdAndUpdate(matchId, {status: "active"}, {new: true})
+        return Match.findByIdAndUpdate(matchId, {status: "lista"}, {new: true})
       }
       else {
        return match
