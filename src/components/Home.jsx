@@ -257,7 +257,7 @@ function Home({ navigation: { navigate } }) {
                   />
                 </View>
                 <Text style={home.itemName}>{item.name}</Text>
-                <Text style={home.itemCode}>{item.color}</Text>
+                {/* <Text style={home.itemCode}>{item.color}</Text> */}
               </TouchableOpacity>
             )}
           />

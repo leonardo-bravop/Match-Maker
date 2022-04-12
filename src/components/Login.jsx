@@ -35,7 +35,7 @@ function Login({ navigation }) {
       // const returnedUser = await AsyncStorage.getItem('userInfo')
       // console.log(`STORED USER ES`, returnedUser)
       result.status == 200 ? navigation.navigate("Home") : null;
-      resetForm()
+
     } catch (err) {
       setIsLoading(false)
       setErrorMessage(true)

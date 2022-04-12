@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-/* import { Icon } from "react-native-elements"; */
+import { Icon } from "react-native-elements";
 import { profile } from "../styles/profile";
-import { Avatar } from "@rneui/themed";
+import { Avatar, Input } from "@rneui/themed";
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Constants from "expo-constants";
 import axios from "axios";
@@ -19,6 +20,7 @@ import {
 } from "react-native";
 import { leagueStyles } from "../styles/league";
 import { setLeague } from "../state/selectLeague";
+import { setUserMe } from "../state/user";
 import { setMembers } from "../state/memberList";
 import { useDispatch, useSelector } from "react-redux";
 import { setLeagueId } from "../state/idLeague";
@@ -28,6 +30,9 @@ import { Button } from "react-native-elements";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 
+
+import { Formik } from "formik";
+import * as yup from "yup";
 import { Camera } from "expo-camera";
 import { AntDesign } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
@@ -228,16 +233,11 @@ const User = ({ navigation }) => {
             open={open}
             icon={open ? "close" : "cog"}
             actions={[
-              // {
-              //   icon: "bell",
-              //   label: "NOTIFICACIONES",
-              //   onPress: () => {},
-              // },
-              // {
-              //   icon: "account-cog",
-              //   label: "EDIT",
-              //   onPress: () => handleLogout(),
-              // },
+              {
+                icon: "account-edit",
+                label: "EDIT",
+                onPress: () => navigation.navigate("Edit user"),
+              },
               {
                 icon: "account-remove",
                 label: "LOGOUT",
@@ -266,7 +266,7 @@ function Add({ setEditImage, navigation }) {
   const [imageUri, setImageUri] = useState([]);
   const [type, setType] = useState(Camera.Constants.Type.back);
   const [imageArray, setImageArray] = useState([]);
-  const [dataImage, setDataImage] = useState({})
+  const [dataImage, setDataImage] = useState({});
 
   const permisionFunction = async () => {
     // here is how you can get the camera permission
@@ -296,7 +296,7 @@ function Add({ setEditImage, navigation }) {
     if (camera) {
       const data = await camera.takePictureAsync(null);
       console.log("DATA URI ===>", data);
-      setDataImage(data)
+      setDataImage(data);
       setImageUri(data.uri);
       setImageArray([data.uri]);
       setShowCamera(false);
@@ -305,41 +305,52 @@ function Add({ setEditImage, navigation }) {
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      //mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 1,
-      aspect: [1,1],
-      allowsEditing:true
+      aspect: [1, 1],
+      allowsEditing: true,
+      base64: true,
     });
 
     console.log("RESULT URI ===>", result);
     if (!result.cancelled) {
       //handleUpload(result)
-      setDataImage(result)
+      setDataImage(result);
       setImageArray([result.uri]);
     }
   };
 
-  const handleUpload = async(image) => {
-    try{
-      console.log('LA IMAGEN ANTES DE EDITAR ===r>', image)
+  const handleUpload = async (image) => {
+    try {
+      console.log("LA IMAGEN ANTES DE EDITAR ===r>", image);
       //image.uri.split('.').reverse()[0]
+
       const newfile = {
         uri: image.uri,
-        type: /* `test/${image.uri.split('.').reverse()[0]}` */image.type,
-        name: /* `test/${image.uri.split('.').reverse()[1]}` */"image.jpg"
-      }
-      console.log('LA IMAGEN DESPUES DE EDITAR ===r>', newfile)
-      const data = new FormData()
-      data.append('file', image)
-      data.append('upload_present', 'uwecgn8w')
-      //data.append('cluod_name', 'dbqdhlxvl')
-      console.log('LA DATA ANTES DE SUBIR ===>', data)
-      const res = await axios.post('https://api.cloudinary.com/v1_1/dbqdhlxvl/image/upload', data)
-      console.log('LA RESPUESTA ===>', res.data)
+        type: /* `test/${image.uri.split('.').reverse()[0]}` */ image.type,
+        name: /* `test/${image.uri.split('.').reverse()[1]}` */ "image.jpg",
+      };
+      console.log("LA IMAGEN DESPUES DE EDITAR ===r>", newfile);
+      let base64Img = `data:image/jpg;base64,${image.base64}`;
+
+      const data = new FormData();
+      data.append("file", base64Img);
+      data.append("upload_present", "match-maker");
+      data.append("cluod_name", "dbqdhlxvl");
+
+      console.log("LA DATA ANTES DE SUBIR ===>", data);
+
+      const res = await axios.post(
+        "https://api.cloudinary.com/v1_1/dbqdhlxvl/image/upload",
+        JSON.stringify(data),
+        { headers: { "content-type": "application/json" } }
+      );
+
+      console.log("LA RESPUESTA ===>", res.data);
     } catch (err) {
-      console.log('ALGO ROMPIO ===>', err)
+      console.log("ALGO ROMPIO ===>", err);
     }
-  }
+  };
 
   return (
     <View
@@ -352,7 +363,7 @@ function Add({ setEditImage, navigation }) {
             data={imageArray}
             renderItem={({ item }) => (
               <Image
-              key={1}
+                key={1}
                 source={{ uri: item }}
                 style={{
                   flex: 0.1,
@@ -428,17 +439,174 @@ function Add({ setEditImage, navigation }) {
               title={"Cancelar"}
               type="outline"
               color="#841584"
-              onPress={() => navigation.navigate("User")}
+              onPress={() => navigation.navigate("Edit user")}
             />
-             {imageArray.length > 0 && ( <Button
-              title={"Aceptar"}
-              type="outline"
-              color="#841584"
-              onPress={() => handleUpload(dataImage)}
-            />)}
+            {imageArray.length > 0 && (
+              <Button
+                title={"Aceptar"}
+                type="outline"
+                color="#841584"
+                onPress={() => handleUpload(dataImage)}
+              />
+            )}
           </View>
         </View>
       )}
+    </View>
+  );
+}
+
+function EditUser({ setEditImage, navigation }) {
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
+
+  const [nameLock, setNameLock] = useState(false);
+  const [surnameLock, setSurnameLock] = useState(false);
+  const [nicknameLock, setNicknameLock] = useState(false);
+
+  const { manifest } = Constants;
+  const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
+
+  const handleUpdateUser = (values) => {
+    axios.put(`${uri}/api/user/edit/${user._id}`, values);
+  };
+
+  const validationSchema = yup.object().shape({
+    name: yup.string("Ingresa tu nombre").required("*Campo requerido"),
+    surname: yup.string("Ingresa tu apellido").required("*Campo requerido"),
+
+    nickname: yup
+      .string("Ingresa tu nickname")
+      .required("*Campo requerido")
+      .max(10, "El nickname debe tener un maximo de 10 caracteres"),
+  });
+
+  return (
+    <View
+      style={{ flex: 4, justifyContent: "center", backgroundColor: "#0e0b29" }}
+    >
+      <View style={{ flexDirection: "column" }}>
+        <View
+          style={{
+            marginTop: 80,
+            height: "30%",
+            backgroundColor: "#9c9287",
+            justifyContent: "center",
+            alignItems: "center",
+            borderTopLeftRadius: 100,
+            borderBottomRightRadius: 100,
+          }}
+        >
+          <Avatar
+            size={160}
+            rounded
+            source={{
+              uri: `${user.img}`,
+            }}
+            title={`${user.name[0]}${user.surname[0]}`}
+            containerStyle={{
+              backgroundColor: "#9c9287",
+              borderColor: "white",
+              borderWidth: 2,
+            }}
+          >
+            <Avatar.Accessory
+              size={35}
+              onPress={() => navigation.navigate("Change image user")}
+            />
+          </Avatar>
+        </View>
+
+        <View
+          style={{ height: "70%", backgroundColor: "#0e0b29", paddingTop: 50 }}
+        >
+          <Formik
+            validateOnMount={true}
+            validationSchema={validationSchema}
+            initialValues={{
+              name: user.name,
+              surname: user.surname,
+              nickname: user.nickname,
+            }}
+            onSubmit={(values) => handleUpdateUser(values)}
+          >
+            {({
+              handleChange,
+              handleBlur,
+              handleSubmit,
+              values,
+              errors,
+              touched,
+              isValid,
+            }) => (
+              <>
+                <Input
+                  style={{ color: "white" }}
+                  placeholder="Nombre"
+                  onChangeText={handleChange("name")}
+                  leftIcon={
+                    <Icon
+                      name={nameLock ? "lock-open" : "lock"}
+                      size={24}
+                      color="white"
+                      onPress={() => setNameLock(nameLock ? false : true)}
+                    />
+                  }
+                  value={nameLock ? null : values.name}
+                  disabled={nameLock ? false : true}
+                />
+                <Input
+                  style={{ color: "white" }}
+                  placeholder="Apellido"
+                  leftIcon={
+                    <Icon
+                      name={surnameLock ? "lock-open" : "lock"}
+                      size={24}
+                      color="white"
+                      onPress={() => setSurnameLock(surnameLock ? false : true)}
+                    />
+                  }
+                  value={surnameLock ? null : values.surname}
+                  disabled={surnameLock ? false : true}
+                />
+                <Input
+                  style={{ color: "white" }}
+                  placeholder="Nickname"
+                  leftIcon={
+                    <Icon
+                      name={nicknameLock ? "lock-open" : "lock"}
+                      size={24}
+                      color="white"
+                      onPress={() =>
+                        setNicknameLock(nicknameLock ? false : true)
+                      }
+                    />
+                  }
+                  value={nicknameLock ? null : values.nickname}
+                  disabled={nicknameLock ? false : true}
+                />
+                <Button
+                  title="Actualizar"
+                  buttonStyle={{
+                    backgroundColor: "#9c9287",
+                    borderWidth: 1,
+                    borderColor: "white",
+                    borderRadius: 30,
+                  }}
+                  containerStyle={{
+                    width: 100,
+                    marginHorizontal: 50,
+                    marginVertical: 10,
+                    alignSelf: "center",
+                  }}
+                  titleStyle={{ fontWeight: "200" }}
+                  onPress={() => handleUpdateUser()}
+                />
+              </>
+            )}
+          </Formik>
+        </View>
+      </View>
     </View>
   );
 }
@@ -452,6 +620,7 @@ function MyStack() {
     >
       <Stack.Screen name="User" component={User} />
       <Stack.Screen name="Change image user" component={Add} />
+      <Stack.Screen name="Edit user" component={EditUser} />
     </Stack.Navigator>
   );
 }
