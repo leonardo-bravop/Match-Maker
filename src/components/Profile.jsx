@@ -15,7 +15,6 @@ import {
   FlatList,
   Dimensions,
   ScrollView,
-  Button,
   SafeAreaView,
 } from "react-native";
 import { leagueStyles } from "../styles/league";
@@ -24,11 +23,13 @@ import { setMembers } from "../state/memberList";
 import { useDispatch, useSelector } from "react-redux";
 import { setLeagueId } from "../state/idLeague";
 import { FAB, Portal, Provider } from "react-native-paper";
+import { Button } from "react-native-elements";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 
 import { Camera } from "expo-camera";
+import { AntDesign } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
@@ -53,12 +54,16 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     margin: 20,
   },
+  buttonBack: {
+    height: 48,
+    width: 48,
+    justifyContent: "flex-end",
+  },
   buttonReverse: {
     height: 48,
     width: 48,
     flex: 0.1,
     alignSelf: "flex-end",
-    alignItems: "center",
   },
   buttonPicture: {
     height: 48,
@@ -97,7 +102,6 @@ const User = ({ navigation }) => {
       .get(`${uri}/api/user/getLeaguesAndRank/${user._id}`)
       .then(({ data }) => {
         setUserLeagues(data);
-        console.log("ligas de usuario ===>", userLeagues);
       });
   }, []);
 
@@ -120,10 +124,10 @@ const User = ({ navigation }) => {
           size={160}
           rounded
           source={{
-            uri: "https://cdn.pixabay.com/photo/2017/02/23/13/05/profile-2092113_960_720.png",
+            uri: `${user.img}`,
           }}
-          title="Bj"
-          containerStyle={{ backgroundColor: "grey" }}
+          title={`${user.name[0]}${user.surname[0]}`}
+          containerStyle={{ backgroundColor: "#0e0b29" }}
         >
           <Avatar.Accessory
             size={48}
@@ -262,6 +266,7 @@ function Add({ setEditImage, navigation }) {
   const [imageUri, setImageUri] = useState([]);
   const [type, setType] = useState(Camera.Constants.Type.back);
   const [imageArray, setImageArray] = useState([]);
+  const [dataImage, setDataImage] = useState({})
 
   const permisionFunction = async () => {
     // here is how you can get the camera permission
@@ -290,9 +295,10 @@ function Add({ setEditImage, navigation }) {
   const takePicture = async () => {
     if (camera) {
       const data = await camera.takePictureAsync(null);
-      console.log("DATA URI ===>", data.uri);
+      console.log("DATA URI ===>", data);
+      setDataImage(data)
       setImageUri(data.uri);
-      setImageArray([...imageArray, data.uri]);
+      setImageArray([data.uri]);
       setShowCamera(false);
     }
   };
@@ -301,18 +307,66 @@ function Add({ setEditImage, navigation }) {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 1,
+      aspect: [1,1],
+      allowsEditing:true
     });
 
-    console.log("RESULT URI ===>", result.uri);
+    console.log("RESULT URI ===>", result);
     if (!result.cancelled) {
+      //handleUpload(result)
+      setDataImage(result)
       setImageArray([result.uri]);
     }
   };
+
+  const handleUpload = async(image) => {
+    try{
+      console.log('LA IMAGEN ANTES DE EDITAR ===r>', image)
+      //image.uri.split('.').reverse()[0]
+      const newfile = {
+        uri: image.uri,
+        //type: `test/${image.uri.split('.').reverse()[0]}`,
+        //name: `test/${image.uri.split('.').reverse()[0]}`
+      }
+      console.log('LA IMAGEN DESPUES DE EDITAR ===r>', newfile)
+      const data = new FormData()
+      data.append('file', image)
+      data.append('upload_present', 'uwecgn8w')
+      //data.append('cluod_name', 'dbqdhlxvl')
+      console.log('LA DATA ANTES DE SUBIR ===>', data)
+      const res = await axios.post('https://api.cloudinary.com/v1_1/dbqdhlxvl/image/upload', {body:data})
+      console.log('LA RESPUESTA ===>', res.data)
+    } catch (err) {
+      console.log('ALGO ROMPIO ===>', err)
+    }
+  }
 
   return (
     <View
       style={{ flex: 4, justifyContent: "center", backgroundColor: "#0e0b29" }}
     >
+      {imageArray.length > 0 && (
+        <View style={{ height: 250 }}>
+          <FlatList
+            horizontal
+            data={imageArray}
+            renderItem={({ item }) => (
+              <Image
+              key={1}
+                source={{ uri: item }}
+                style={{
+                  flex: 0.1,
+                  width: 175,
+                  height: 175,
+                  borderRadius: 85,
+                  alignSelf: "center",
+                  marginLeft: 120,
+                }}
+              />
+            )}
+          />
+        </View>
+      )}
       {showCamera && (
         <View style={styles.container}>
           <Camera
@@ -321,6 +375,12 @@ function Add({ setEditImage, navigation }) {
             ref={(ref) => setCamera(ref)}
           >
             <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={styles.buttonBack}
+                onPress={() => setShowCamera(false)}
+              >
+                <Entypo name="cross" size={36} color="white" />
+              </TouchableOpacity>
               <TouchableOpacity
                 style={styles.buttonReverse}
                 onPress={() => {
@@ -339,13 +399,7 @@ function Add({ setEditImage, navigation }) {
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.buttonPicture}
-                onPress={() => {
-                  setType(
-                    type === Camera.Constants.Type.back
-                      ? Camera.Constants.Type.front
-                      : Camera.Constants.Type.back
-                  );
-                }}
+                onPress={takePicture}
               >
                 <Entypo name="circle" size={48} color="white" />
               </TouchableOpacity>
@@ -354,41 +408,35 @@ function Add({ setEditImage, navigation }) {
         </View>
       )}
       {!showCamera && (
-        <View style={{ flexDirection: "row", justifyContent: "center"}}>
-          <View>
-              <Button
-                title={"Camera"}
-                color="#841584"
-                onPress={() => {
-                  setShowCamera(true);
-                }}
-              />
-              <Button title={"Gallery"} onPress={pickImage} color="#841584" />
-              <Button
-                title={"Cancelar"}
-                color="#841584"
-                onPress={() => navigation.navigate("User")}
-              />
-              </View>
-          {imageArray.length > 0 && (
-            <View style={{ height: 110 }}>
-              <FlatList
-                horizontal
-                data={imageArray}
-                renderItem={({ item }) => (
-                  <Image
-                    source={{ uri: item }}
-                    style={{
-                      width: 100,
-                      height: 100,
-                      borderRadius: 10,
-                      margin: 5,
-                    }}
-                  />
-                )}
-              />
-            </View>
-          )}
+        <View style={{ justifyContent: "center" }}>
+          <View style={{ width: "30%", alignSelf: "center" }}>
+            <Button
+              title={"Camera"}
+              type="outline"
+              color="#841584"
+              onPress={() => {
+                setShowCamera(true);
+              }}
+            />
+            <Button
+              title={"Gallery"}
+              onPress={pickImage}
+              color="#841584"
+              type="outline"
+            />
+            <Button
+              title={"Cancelar"}
+              type="outline"
+              color="#841584"
+              onPress={() => navigation.navigate("User")}
+            />
+             {imageArray.length > 0 && ( <Button
+              title={"Aceptar"}
+              type="outline"
+              color="#841584"
+              onPress={() => handleUpload(dataImage)}
+            />)}
+          </View>
         </View>
       )}
     </View>

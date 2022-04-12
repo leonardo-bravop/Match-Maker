@@ -177,7 +177,9 @@ function Home({ navigation: { navigate } }) {
             }}
           >
             <View style={home.lastItem}>
-              <Text style={home.lastText}>{matches.reverse()[0].team_1[0].nickname}</Text>
+              <Text style={home.lastText}>
+                {matches.reverse()[0].team_1[0].nickname}
+              </Text>
             </View>
             <View style={home.lastItem}>
               <Text
@@ -190,7 +192,9 @@ function Home({ navigation: { navigate } }) {
               </Text>
             </View>
             <View style={home.lastItem}>
-              <Text style={home.lastText}>{matches.reverse()[0].team_2[0].nickname}</Text>
+              <Text style={home.lastText}>
+                {matches.reverse()[0].team_2[0].nickname}
+              </Text>
             </View>
           </TouchableOpacity>
         ) : (
@@ -285,40 +289,74 @@ function Home({ navigation: { navigate } }) {
           <Text style={{ color: "white", textAlign: "center" }}>
             ──────────────────────────────────────
           </Text>
-
-          <FlatGrid
-            style={home.gridView}
-            itemDimension={120}
-            data={meLeagues ? userLeagues : leagues}
-            // staticDimension={300}
-            // fixed
-            spacing={10}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                onPress={() => {
-                  dispatch(setLeagueId(item._id));
-                  dispatch(setLeague(item));
-                  dispatch(setMembers(item._id));
-                  navigate("Liga", item);
-                }}
-                style={[home.itemContainer, { backgroundColor: item.color }]}
-              >
-                <View style={{ flex: 1, justifyContent: "flex-start" }}>
-                  <Image
-                    source={{
-                      uri: item.img
-                        ? item.img
-                        : "https://trome.pe/resizer/G8-kkwwutkrNacKh5S6TJplAluU=/980x0/smart/filters:format(jpeg):quality(75)/cloudfront-us-east-1.images.arcpublishing.com/elcomercio/OXHJSIF4SZDAJP6F5PHFZTLRYI.jpg",
-                    }}
-                    resizeMode="cover"
-                    style={{ height: "100%" }}
-                  />
-                </View>
-                <Text style={home.itemName}>{item.name}</Text>
-                <Text style={home.itemCode}>{item.color}</Text>
-              </TouchableOpacity>
-            )}
-          />
+          {meLeagues ? (
+            <FlatGrid
+              style={home.gridView}
+              itemDimension={120}
+              data={userLeagues}
+              spacing={10}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  onPress={() => {
+                    dispatch(setLeagueId(item._id));
+                    dispatch(setLeague(item));
+                    dispatch(setMembers(item._id));
+                    navigate("Liga", item);
+                  }}
+                  style={[home.itemContainer, { backgroundColor: item.league.color }]}
+                >
+                  <View style={{ flex: 1, justifyContent: "flex-start" }}>
+                    <Image
+                      source={{
+                        uri: item.league.img
+                          ? item.league.img
+                          : "https://trome.pe/resizer/G8-kkwwutkrNacKh5S6TJplAluU=/980x0/smart/filters:format(jpeg):quality(75)/cloudfront-us-east-1.images.arcpublishing.com/elcomercio/OXHJSIF4SZDAJP6F5PHFZTLRYI.jpg",
+                      }}
+                      resizeMode="cover"
+                      style={{ height: "100%" }}
+                    />
+                  </View>
+                  <Text style={home.itemName}>
+                    {item.league.name}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            />
+          ) : (
+            <FlatGrid
+              style={home.gridView}
+              itemDimension={120}
+              data={leagues}
+              spacing={10}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  onPress={() => {
+                    dispatch(setLeagueId(item._id));
+                    dispatch(setLeague(item));
+                    dispatch(setMembers(item._id));
+                    navigate("Liga", item);
+                  }}
+                  style={[home.itemContainer, { backgroundColor: item.color }]}
+                >
+                  <View style={{ flex: 1, justifyContent: "flex-start" }}>
+                    <Image
+                      source={{
+                        uri: item.img
+                          ? item.img
+                          : "https://trome.pe/resizer/G8-kkwwutkrNacKh5S6TJplAluU=/980x0/smart/filters:format(jpeg):quality(75)/cloudfront-us-east-1.images.arcpublishing.com/elcomercio/OXHJSIF4SZDAJP6F5PHFZTLRYI.jpg",
+                      }}
+                      resizeMode="cover"
+                      style={{ height: "100%" }}
+                    />
+                  </View>
+                  <Text style={home.itemName}>
+                    {item.name}
+                  </Text>
+                  {/* <Text style={home.itemCode}>{item.color}</Text> */}
+                </TouchableOpacity>
+              )}
+            />
+          )}
         </>
       )}
     </View>

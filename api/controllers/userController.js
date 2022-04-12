@@ -142,7 +142,8 @@ exports.me = (req, res, next) => {
             name: user.name,
             surname: user.surname,
             nickname: user.nickname,
-            leagues: user.leagues
+            leagues: user.leagues,
+            img: user.img,
           })
         )
         .catch((error) => {
