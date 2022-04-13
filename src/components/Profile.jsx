@@ -20,7 +20,7 @@ import {
 } from "react-native";
 import { leagueStyles } from "../styles/league";
 import { setLeague } from "../state/selectLeague";
-import { setUserMe } from "../state/user";
+import { setUserMe, updateUser } from "../state/user";
 import { setMembers } from "../state/memberList";
 import { useDispatch, useSelector } from "react-redux";
 import { setLeagueId } from "../state/idLeague";
@@ -29,7 +29,6 @@ import { Button } from "react-native-elements";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-
 
 import { Formik } from "formik";
 import * as yup from "yup";
@@ -124,6 +123,7 @@ const User = ({ navigation }) => {
 
   return (
     <View style={profile.container}>
+      
       <View style={{ borderColor: "#FFF", borderRadius: 85, borderWidth: 3 }}>
         <Avatar
           size={160}
@@ -458,7 +458,9 @@ function Add({ setEditImage, navigation }) {
 
 function EditUser({ setEditImage, navigation }) {
   const dispatch = useDispatch();
+
   const user = useSelector((state) => state.user);
+  console.log("me afuera", user);
 
   const [nameLock, setNameLock] = useState(false);
   const [surnameLock, setSurnameLock] = useState(false);
@@ -467,8 +469,16 @@ function EditUser({ setEditImage, navigation }) {
   const { manifest } = Constants;
   const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 
-  const handleUpdateUser = (values) => {
-    axios.put(`${uri}/api/user/edit/${user._id}`, values);
+  const handleUpdateUser = async (values) => {
+    try {
+      const userString = await AsyncStorage.getItem("userInfo");
+      await dispatch(
+        updateUser({ values: values, id: user._id, userString: userString })
+      );
+      navigation.navigate("User")
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const validationSchema = yup.object().shape({
@@ -558,6 +568,7 @@ function EditUser({ setEditImage, navigation }) {
                 <Input
                   style={{ color: "white" }}
                   placeholder="Apellido"
+                  onChangeText={handleChange("surname")}
                   leftIcon={
                     <Icon
                       name={surnameLock ? "lock-open" : "lock"}
@@ -572,6 +583,7 @@ function EditUser({ setEditImage, navigation }) {
                 <Input
                   style={{ color: "white" }}
                   placeholder="Nickname"
+                  onChangeText={handleChange("nickname")}
                   leftIcon={
                     <Icon
                       name={nicknameLock ? "lock-open" : "lock"}
@@ -600,11 +612,23 @@ function EditUser({ setEditImage, navigation }) {
                     alignSelf: "center",
                   }}
                   titleStyle={{ fontWeight: "200" }}
-                  onPress={() => handleUpdateUser()}
+                  onPress={handleSubmit}
                 />
               </>
             )}
           </Formik>
+          <Button
+                  containerStyle={{
+                    width: 200,
+                    marginHorizontal: 50,
+                    marginVertical: 10,
+                    alignSelf: "center",
+                  }}
+              title="Volver"
+              type="clear"
+              titleStyle={{ color: 'rgba(78, 116, 289, 1)' }}
+              onPress={() => navigation.navigate("User")}
+            />
         </View>
       </View>
     </View>

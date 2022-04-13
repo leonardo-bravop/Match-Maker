@@ -16,7 +16,7 @@ import { SearchBar } from "@rneui/themed";
 import { FlatGrid } from "react-native-super-grid";
 import axios from "axios";
 import Constants from "expo-constants";
-
+import { StatusBar } from "expo-status-bar";
 import { leagueStyles } from "../styles/league";
 import { profile } from "../styles/profile";
 import { useDispatch, useSelector } from "react-redux";
@@ -63,7 +63,7 @@ const home = StyleSheet.create({
     borderRadius: 15,
     alignItems: "center",
     marginTop: 20,
-    backgroundColor: "#57de21",
+    backgroundColor: "gray",
     paddingLeft: 5,
   },
   lastItem: {
@@ -137,25 +137,25 @@ function Home({ navigation: { navigate } }) {
 
   useEffect(async () => {
     try {
-      console.log(`Home Paso 1`);
+      // console.log(`Home Paso 1`);
       const userString = await AsyncStorage.getItem("userInfo");
-      console.log(`userString es`, userString);
+      // console.log(`userString es`, userString);
       if (!userString) return;
-      console.log(`Home Paso 2`);
+      // console.log(`Home Paso 2`);
       const result = await dispatch(setUserMe(userString));
-      console.log(`Home Paso 3`);
+      // console.log(`Home Paso 3`);
       const userLeagues = await dispatch(
         setUserLeagues({ userId: result.payload._id })
       );
-      console.log(`Home Paso 4`);
+      // console.log(`Home Paso 4`);
       const { payload } = await dispatch(setLeagues(false));
       // console.log(`result es`, result);
-      console.log(`Home Paso 5`);
+      // console.log(`Home Paso 5`);
       const { data } = await axios.get(
         `${uri}/api/user/getMatches/${result.payload._id}`
       );
       // console.log("DATA ===> ", data);
-      console.log(`Home Paso 6`);
+      // console.log(`Home Paso 6`);
       setMatches(data);
     } catch (err) {
       console.log(err);
@@ -164,11 +164,13 @@ function Home({ navigation: { navigate } }) {
 
   return (
     <View style={home.container}>
+      <StatusBar style="light" />
       <View style={home.tittle}>
         <Text style={home.tittleText}>MATCH MAKER</Text>
       </View>
       <View style={home.containerDos}>
         <Text style={home.lastTittle}>Ultima partida</Text>
+        {console.log("MATH ACA",matches)}
         {matches[0] ? (
           <TouchableOpacity
             style={home.lastContainer}
@@ -185,7 +187,7 @@ function Home({ navigation: { navigate } }) {
               <Text
                 style={[
                   home.lastText,
-                  { fontSize: 24, color: "#3498db", fontWeight: "normal" },
+                  { fontSize: 20, color: "black", fontWeight: "normal" },
                 ]}
               >
                 {matches[0].status}
@@ -257,7 +259,7 @@ function Home({ navigation: { navigate } }) {
                   />
                 </View>
                 <Text style={home.itemName}>{item.name}</Text>
-                {/* <Text style={home.itemCode}>{item.color}</Text> */}
+                <Text style={home.itemCode}>{item.sport}</Text>
               </TouchableOpacity>
             )}
           />
@@ -303,7 +305,10 @@ function Home({ navigation: { navigate } }) {
                     dispatch(setMembers(item._id));
                     navigate("Liga", item);
                   }}
-                  style={[home.itemContainer, { backgroundColor: item.league.color }]}
+                  style={[
+                    home.itemContainer,
+                    { backgroundColor: item.league.color },
+                  ]}
                 >
                   <View style={{ flex: 1, justifyContent: "flex-start" }}>
                     <Image
@@ -316,9 +321,8 @@ function Home({ navigation: { navigate } }) {
                       style={{ height: "100%" }}
                     />
                   </View>
-                  <Text style={home.itemName}>
-                    {item.league.name}
-                  </Text>
+                  <Text style={home.itemName}>{item.league.name}</Text>
+                  <Text style={home.itemCode}>{item.league.sport}</Text>
                 </TouchableOpacity>
               )}
             />
@@ -349,10 +353,8 @@ function Home({ navigation: { navigate } }) {
                       style={{ height: "100%" }}
                     />
                   </View>
-                  <Text style={home.itemName}>
-                    {item.name}
-                  </Text>
-                  {/* <Text style={home.itemCode}>{item.color}</Text> */}
+                  <Text style={home.itemName}>{item.name}</Text>
+                  <Text style={home.itemCode}>{item.sport}</Text>
                 </TouchableOpacity>
               )}
             />
