@@ -148,16 +148,24 @@ const updateResultConfirmation = (result, match, userId, team, score) => {
   else if (match.team_2.indexOf(userId) !== -1) team = 2;
   confirmation = `confirmation_${team}`;
   result[confirmation] = true;
+  console.log(`result es`, result);
   result[`score_${team}`] = score;
   if (result.score_1 && result.score_2 && result.score_1 === result.score_2) {
-    // equalResults = true;
+    console.log(`entre al primer if`);
     result["confirmation_1"] = true;
     result["confirmation_2"] = true;
-  } else if (result.score_1 && !result.score_2) {
-    result["confirmation_1"] = true;
-  } else if (!result.score_1 && result.score_2) {
-    result["confirmation_2"] = true;
-  } else {
+  }
+  // else if (result.score_1 && !result.score_2) {
+  //   result["confirmation_1"] = true;
+  // } else if (!result.score_1 && result.score_2) {
+  //   result["confirmation_2"] = true;
+  // }
+  else if (
+    result["confirmation_1"] &&
+    result["confirmation_2"] &&
+    result.score_1 !== result.score_2
+  ) {
+    console.log(`entre al else if`);
     result["confirmation_1"] = false;
     result["confirmation_2"] = false;
   }
