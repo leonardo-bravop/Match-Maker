@@ -17,6 +17,7 @@ import {
   Dimensions,
   ScrollView,
   SafeAreaView,
+  ActivityIndicator,
 } from "react-native";
 import { leagueStyles } from "../styles/league";
 import { setLeague } from "../state/selectLeague";
@@ -30,6 +31,7 @@ import { Button } from "react-native-elements";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 
+import * as ImageManipulator from "expo-image-manipulator";
 import { Formik } from "formik";
 import * as yup from "yup";
 import { Camera } from "expo-camera";
@@ -37,6 +39,14 @@ import { AntDesign } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
+import firebase, { initializeApp } from "firebase/app";
+import "firebase/storage";
+import {
+  getStorage,
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+} from "firebase/storage";
 
 const { width, height } = Dimensions.get("screen");
 
@@ -123,7 +133,6 @@ const User = ({ navigation }) => {
 
   return (
     <View style={profile.container}>
-      
       <View style={{ borderColor: "#FFF", borderRadius: 85, borderWidth: 3 }}>
         <Avatar
           size={160}
@@ -258,9 +267,29 @@ const User = ({ navigation }) => {
 };
 
 function Add({ setEditImage, navigation }) {
+  const user = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+
+  const { manifest } = Constants;
+  const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAGu-jYfZcOJ9YdaaSbaFMmxXlf5owk72o",
+    authDomain: "match-maker2022.firebaseapp.com",
+    projectId: "match-maker2022",
+    storageBucket: "match-maker2022.appspot.com",
+    messagingSenderId: "557226986706",
+    appId: "1:557226986706:web:b108737cb61fe4fe04b10b",
+    measurementId: "G-TCYVKY24CZ",
+  };
+
+  const firebaseApp = initializeApp(firebaseConfig);
+  const storage = getStorage(firebaseApp);
+
   const [cameraPermission, setCameraPermission] = useState(null);
   const [galleryPermission, setGalleryPermission] = useState(null);
   const [showCamera, setShowCamera] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   const [camera, setCamera] = useState(null);
   const [imageUri, setImageUri] = useState([]);
@@ -294,7 +323,12 @@ function Add({ setEditImage, navigation }) {
 
   const takePicture = async () => {
     if (camera) {
-      const data = await camera.takePictureAsync(null);
+      const prevData = await camera.takePictureAsync(null);
+      const data = await ImageManipulator.manipulateAsync(
+        prevData.uri,
+        [],
+        { compress: 0.5, format: ImageManipulator.SaveFormat.PNG }
+      );
       console.log("DATA URI ===>", data);
       setDataImage(data);
       setImageUri(data.uri);
@@ -309,7 +343,7 @@ function Add({ setEditImage, navigation }) {
       quality: 1,
       aspect: [1, 1],
       allowsEditing: true,
-      base64: true,
+      //base64: true,
     });
 
     console.log("RESULT URI ===>", result);
@@ -320,36 +354,92 @@ function Add({ setEditImage, navigation }) {
     }
   };
 
-  const handleUpload = async (image) => {
-    try {
-      console.log("LA IMAGEN ANTES DE EDITAR ===r>", image);
-      //image.uri.split('.').reverse()[0]
-
-      const newfile = {
-        uri: image.uri,
-        type: /* `test/${image.uri.split('.').reverse()[0]}` */ image.type,
-        name: /* `test/${image.uri.split('.').reverse()[1]}` */ "image.jpg",
+  const handleUploadImage = async (file) => {
+    const userString = await AsyncStorage.getItem("userInfo");
+    const blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        resolve(xhr.response);
       };
-      console.log("LA IMAGEN DESPUES DE EDITAR ===r>", newfile);
-      let base64Img = `data:image/jpg;base64,${image.base64}`;
+      xhr.onerror = function () {
+        reject(new TypeError("Network request failed"));
+      };
+      xhr.responseType = "blob";
+      xhr.open("GET", file.uri, true);
+      xhr.send(null);
+    });
 
-      const data = new FormData();
-      data.append("file", base64Img);
-      data.append("upload_present", "match-maker");
-      data.append("cluod_name", "dbqdhlxvl");
+    const storage = getStorage();
 
-      console.log("LA DATA ANTES DE SUBIR ===>", data);
+    // Create the file metadata
+    const metadata = {
+      contentType: "image/jpg",
+    };
 
-      const res = await axios.post(
-        "https://api.cloudinary.com/v1_1/dbqdhlxvl/image/upload",
-        JSON.stringify(data),
-        { headers: { "content-type": "application/json" } }
-      );
+    // Upload file and metadata to the object 'images/mountains.jpg'
+    const storageRef = ref(
+      storage,
+      "images/" + file.uri.split("/").reverse()[0]
+    );
+    console.log("FILE ====>", file);
+    const uploadTask = uploadBytesResumable(storageRef, blob, metadata);
 
-      console.log("LA RESPUESTA ===>", res.data);
-    } catch (err) {
-      console.log("ALGO ROMPIO ===>", err);
-    }
+    // Listen for state changes, errors, and completion of the upload.
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        setUploading(true)
+        // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+        const progress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log("Upload is " + progress + "% done");
+        switch (snapshot.state) {
+          case "paused":
+            console.log("Upload is paused");
+            break;
+          case "running":
+            console.log("Upload is running");
+            break;
+        }
+      },
+      (error) => {
+        // A full list of error codes is available at
+        // https://firebase.google.com/docs/storage/web/handle-errors
+        switch (error.code) {
+          case "storage/unauthorized":
+            // User doesn't have permission to access the object
+            break;
+          case "storage/canceled":
+            // User canceled the upload
+            break;
+
+          // ...
+
+          case "storage/unknown":
+            // Unknown error occurred, inspect error.serverResponse
+            break;
+        }
+      },
+      () => {
+        // Upload completed successfully, now we can get the download URL
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          // console.log('EL USER VIejo', user.img)
+          // user.img = downloadURL
+          // console.log('EL USER NUEVO', user.img)
+          dispatch(
+            updateUser({
+              values: { img: downloadURL },
+              id: user._id,
+              userString: userString,
+            })
+          );
+          setUploading(false)
+          console.log("File available at", downloadURL);
+          console.log("USER IMAGE", user.img);
+          navigation.navigate("User");
+        });
+      }
+    );
   };
 
   return (
@@ -421,33 +511,43 @@ function Add({ setEditImage, navigation }) {
       {!showCamera && (
         <View style={{ justifyContent: "center" }}>
           <View style={{ width: "30%", alignSelf: "center" }}>
-            <Button
-              title={"Camera"}
-              type="outline"
-              color="#841584"
-              onPress={() => {
-                setShowCamera(true);
-              }}
-            />
-            <Button
-              title={"Gallery"}
-              onPress={pickImage}
-              color="#841584"
-              type="outline"
-            />
-            <Button
-              title={"Cancelar"}
-              type="outline"
-              color="#841584"
-              onPress={() => navigation.navigate("Edit user")}
-            />
-            {imageArray.length > 0 && (
-              <Button
-                title={"Aceptar"}
-                type="outline"
-                color="#841584"
-                onPress={() => handleUpload(dataImage)}
-              />
+            {!uploading ? (
+              <>
+                <Button
+                  title={"Camera"}
+                  type="outline"
+                  color="#841584"
+                  onPress={() => {
+                    setShowCamera(true);
+                  }}
+                />
+                <Button
+                  title={"Gallery"}
+                  onPress={pickImage}
+                  color="#841584"
+                  type="outline"
+                />
+                <Button
+                  title={"Cancelar"}
+                  type="outline"
+                  color="#841584"
+                  onPress={() => navigation.navigate("Edit user")}
+                />
+                {imageArray.length > 0 && (
+                  <Button
+                    title={"Aceptar"}
+                    type="outline"
+                    color="#841584"
+                    onPress={() => handleUploadImage(dataImage)}
+                  />
+                )}
+                {}
+              </>
+            ) : (
+              <ActivityIndicator
+                size={"large"}
+                color={"green"}
+              ></ActivityIndicator>
             )}
           </View>
         </View>
@@ -475,7 +575,7 @@ function EditUser({ setEditImage, navigation }) {
       await dispatch(
         updateUser({ values: values, id: user._id, userString: userString })
       );
-      navigation.navigate("User")
+      navigation.navigate("User");
     } catch (err) {
       console.log(err);
     }
@@ -618,17 +718,17 @@ function EditUser({ setEditImage, navigation }) {
             )}
           </Formik>
           <Button
-                  containerStyle={{
-                    width: 200,
-                    marginHorizontal: 50,
-                    marginVertical: 10,
-                    alignSelf: "center",
-                  }}
-              title="Volver"
-              type="clear"
-              titleStyle={{ color: 'rgba(78, 116, 289, 1)' }}
-              onPress={() => navigation.navigate("User")}
-            />
+            containerStyle={{
+              width: 200,
+              marginHorizontal: 50,
+              marginVertical: 10,
+              alignSelf: "center",
+            }}
+            title="Volver"
+            type="clear"
+            titleStyle={{ color: "rgba(78, 116, 289, 1)" }}
+            onPress={() => navigation.navigate("User")}
+          />
         </View>
       </View>
     </View>
