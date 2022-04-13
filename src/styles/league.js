@@ -38,7 +38,7 @@ export const newLeagueStyles = StyleSheet.create({
       marginBottom: 6,
       flexDirection: "row",
       justifyContent: "space-evenly",
-      backgroundColor: colorSet.content
+      //backgroundColor: colorSet.content
    },
 
    body: {
