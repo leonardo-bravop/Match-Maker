@@ -16,7 +16,7 @@ import { SearchBar } from "@rneui/themed";
 import { FlatGrid } from "react-native-super-grid";
 import axios from "axios";
 import Constants from "expo-constants";
-import { StatusBar } from 'expo-status-bar';
+import { StatusBar } from "expo-status-bar";
 import { leagueStyles } from "../styles/league";
 import { profile } from "../styles/profile";
 import { useDispatch, useSelector } from "react-redux";
@@ -63,7 +63,7 @@ const home = StyleSheet.create({
     borderRadius: 15,
     alignItems: "center",
     marginTop: 20,
-    backgroundColor: "#57de21",
+    backgroundColor: "gray",
     paddingLeft: 5,
   },
   lastItem: {
@@ -170,6 +170,7 @@ function Home({ navigation: { navigate } }) {
       </View>
       <View style={home.containerDos}>
         <Text style={home.lastTittle}>Ultima partida</Text>
+        {console.log("MATH ACA",matches)}
         {matches[0] ? (
           <TouchableOpacity
             style={home.lastContainer}
@@ -186,7 +187,7 @@ function Home({ navigation: { navigate } }) {
               <Text
                 style={[
                   home.lastText,
-                  { fontSize: 24, color: "#3498db", fontWeight: "normal" },
+                  { fontSize: 20, color: "black", fontWeight: "normal" },
                 ]}
               >
                 {matches[0].status}
@@ -258,7 +259,7 @@ function Home({ navigation: { navigate } }) {
                   />
                 </View>
                 <Text style={home.itemName}>{item.name}</Text>
-                {/* <Text style={home.itemCode}>{item.color}</Text> */}
+                <Text style={home.itemCode}>{item.sport}</Text>
               </TouchableOpacity>
             )}
           />
@@ -304,7 +305,10 @@ function Home({ navigation: { navigate } }) {
                     dispatch(setMembers(item._id));
                     navigate("Liga", item);
                   }}
-                  style={[home.itemContainer, { backgroundColor: item.league.color }]}
+                  style={[
+                    home.itemContainer,
+                    { backgroundColor: item.league.color },
+                  ]}
                 >
                   <View style={{ flex: 1, justifyContent: "flex-start" }}>
                     <Image
@@ -317,9 +321,8 @@ function Home({ navigation: { navigate } }) {
                       style={{ height: "100%" }}
                     />
                   </View>
-                  <Text style={home.itemName}>
-                    {item.league.name}
-                  </Text>
+                  <Text style={home.itemName}>{item.league.name}</Text>
+                  <Text style={home.itemCode}>{item.league.sport}</Text>
                 </TouchableOpacity>
               )}
             />
@@ -350,10 +353,8 @@ function Home({ navigation: { navigate } }) {
                       style={{ height: "100%" }}
                     />
                   </View>
-                  <Text style={home.itemName}>
-                    {item.name}
-                  </Text>
-                  {/* <Text style={home.itemCode}>{item.color}</Text> */}
+                  <Text style={home.itemName}>{item.name}</Text>
+                  <Text style={home.itemCode}>{item.sport}</Text>
                 </TouchableOpacity>
               )}
             />
