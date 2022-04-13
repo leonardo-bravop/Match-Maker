@@ -41,7 +41,6 @@ exports.register = (req, res, next) => {
 
 exports.login = (req, res, next) => {
   const { email, password } = req.body;
-  console.log(`req body es`, req.body);
   User.findOne({ email }).then((user) => {
     if (user) {
       user
@@ -101,10 +100,8 @@ exports.login = (req, res, next) => {
 exports.edit = (req, res, next) => {
   const { _id } = req.params;
   //const { name, surname, nickname, age, image } = req.body;
-  console.log('REQ BODY ======>', req.body)
   User.updateOne({ _id }, req.body)
     .then((result) => {
-      console.log('RESULT ====>', result)
       res.send(result);
     })
     .catch((error) => {
@@ -178,7 +175,7 @@ exports.getLeaguesAndRankByUserId = (req, res, next) => {
     .then((user) => {
       const userLeagues = user.leagues;
       const promisesArray = userLeagues.map((leagueId) => {
-        return League.findById(leagueId, "name isPrivate color img admin")
+        return League.findById(leagueId)
           .populate({
             path: "users",
             select: "nickname img elo",
@@ -227,6 +224,7 @@ exports.getLeaguesAndRankByUserId = (req, res, next) => {
             isPrivate: object.league.isPrivate,
             color: object.league.color,
             img: object.league.img,
+            sport: object.league.sport,
           },
           user: object.rankedUsers.filter((user) => {
             return user._id.toString() === userId;
@@ -287,7 +285,6 @@ exports.getUserMatchesByDate = (req, res, next) => {
   const { userId, date } = req.params;
   getUserAndMatches(userId, { date })
     .then((user) => {
-      console.log("user matches son", user.matches);
       return cancelUserMatches(user);
     })
     .then(() => {

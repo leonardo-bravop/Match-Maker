@@ -139,6 +139,7 @@ function Home({ navigation: { navigate } }) {
   const updateSearch = (search) => {
     if (!search) setResults([]);
     setSearch(search);
+    if(!search) return
     axios.get(`${uri}/api/league/findLeague/${search}`).then(({ data }) => {
       setResults(data);
     });
@@ -343,10 +344,10 @@ function Home({ navigation: { navigate } }) {
               renderItem={({ item }) => (
                 <TouchableOpacity
                   onPress={() => {
-                    dispatch(setLeagueId(item._id));
+                    dispatch(setLeagueId(item.league._id));
                     dispatch(setLeague(item));
-                    dispatch(setMembers(item._id));
-                    navigate("Liga", item);
+                    dispatch(setMembers(item.league._id));
+                    navigate("Liga");
                   }}
                   style={[
                     home.itemContainer,
@@ -364,6 +365,7 @@ function Home({ navigation: { navigate } }) {
                       style={{ height: "100%" }}
                     />
                   </View>
+                  {console.log(item.league)}
                   <Text style={home.itemName}>{item.league.name}</Text>
                   <Text style={home.itemCode}>{item.league.sport}</Text>
                 </TouchableOpacity>

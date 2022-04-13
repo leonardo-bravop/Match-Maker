@@ -111,10 +111,8 @@ exports.addUser = (req, res, next) => {
       }
     })
     .then((updatedUser) => {
-      console.log(`updateduser es`, updatedUser);
       if (updatedLeague) {
         if (updatedLeague._id) {
-          // console.log(`te voy a mandar`, updatedLeague);
           res.send(updatedLeague);
         }
       }
@@ -173,8 +171,6 @@ exports.getUserByLeagueId = (req, res, next) => {
       .then((league) => {
         if (league.users) {
           const leagueUsers = league.users;
-          console.log(`pedido a league users`);
-          // console.log(`league es`, league);
           leagueUsers.sort((a, b) => {
             if (a["elo"][0] && b["elo"][0]) {
               return a["elo"]["0"]["value"] > b["elo"]["0"]["value"]

@@ -14,7 +14,6 @@ const sizeAndIdValidator = (team1, team2, res, next) => {
       return false;
     }
     team1.concat(team2).forEach((userid) => {
-      console.log(`userid es`, userid);
       if (!userid) {
         res.status(400);
         next(new Error("Id not valid"));

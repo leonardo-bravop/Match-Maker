@@ -70,50 +70,24 @@ const LeagueHome = ({ navigation }) => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        console.log("====================================");
-        console.log(`EMPEZANDO EL USEEFFECT DE LEAGUE`);
-        console.log("====================================");
-        console.log("leaguelist es", leagueList);
-        console.log("league ides ", leagueId);
-        console.log("userdata es ", userData);
-        // console.log(`memberlist es`, memberList);
-        // console.log(
-        //   `user rank es`,
-        //   memberList.reverse().findIndex((user) => user._id === userData._id)
-        // );
-        // console.log('====================================');
-        console.log("Paso 1: dispatch(setUserLeagues(");
+        if (!leagueId && !leagueList.length) return;
         const resData = await dispatch(
           setUserLeagues({ userId: userData._id })
         );
-        console.log(`res data es`, resData.payload);
-        // console.log("Res data payload 0 es:", resData.payload[0].league);
-        // console.log('====================================');
-        console.log("Paso 2: dispatch(setLeagueId");
-        console.log(
-          "ESTE DISPATCH ES EL QUE HACE QUE SE EJECUTE EL USEEFFECT OTRA VEZ"
-        );
         if (leagueId === "" && resData.payload[0])
           dispatch(setLeagueId(resData.payload[0].league._id));
-        console.log("Paso 3: ");
-        // if (leagueList[0]) {
+
         let auxLeagueId = leagueId === "" ? leagueList[0].league._id : leagueId;
+
         const { payload } = await dispatch(setMembers(auxLeagueId));
-        console.log("Paso 4: payload es ", payload);
 
         setMemberList(payload);
-        // console.log('====================================');
-        console.log("Paso 5: memberlist es payload");
 
         const { data } = await axios.get(
           `${uri}/api/league/showLeague/${auxLeagueId}`
         );
-        // console.log('====================================');
-        console.log("Paso 6: actual league es", data);
 
         setActualLeague(data);
-        // }
-        console.log(`TERMINANDO USEEFFECT DE LEAGUE`);
       } catch (error) {
         console.error(error);
       }
@@ -123,27 +97,18 @@ const LeagueHome = ({ navigation }) => {
   }, [leagueId, userData]);
 
   const selectHandler = (id) => {
-    console.log("select handler paso 1");
     dispatch(setLeagueId(id));
-    console.log("select handler paso 2");
     setShowCard(!showCard);
   };
 
   const joinHandler = () => {
-    console.log("====================================");
-    console.log(`EMPEZANDO JOIN HANDLER`);
     if (actualleague.isPrivate) {
       setShowSecretkeyCard(true);
     }
     const loadData = async () => {
       try {
-        console.log("====================================");
-        console.log(`EMPEZANDO LOADDATA`);
-        console.log(`en loadData`);
-        console.log(`atnes del dispatch de user, userdata es`, userData);
         const userString = await AsyncStorage.getItem("userInfo");
         await dispatch(setUserMe(userString));
-        console.log(`luego del dispatch de user, userdata es`, userData);
         const resData = await dispatch(
           setUserLeagues({ userId: userData._id })
         );
@@ -154,7 +119,6 @@ const LeagueHome = ({ navigation }) => {
         const { payload } = await dispatch(
           setMembers(leagueId === "" ? leagueList[0]._id : leagueId)
         );
-        // console.log(`payload es`, payload);
         setMemberList(payload);
 
         const { data } = await axios.get(
@@ -162,7 +126,6 @@ const LeagueHome = ({ navigation }) => {
         );
 
         setActualLeague(data);
-        console.log(`TERMINANDO LOADDATA`);
       } catch (error) {
         console.error(`Error: ${error.message}`);
         setSecretError("Hubo un problema, por favor intenta de nuevo");
@@ -171,24 +134,14 @@ const LeagueHome = ({ navigation }) => {
 
     const addUserFunc = async () => {
       try {
-        console.log("====================================");
-        console.log(`EMPEZANDO ADDUSERFUNC`);
-        console.log("adduserfunc paso 1");
         const result = await axios.put(
           `${uri}/api/league/${leagueId}/addUser/${userData._id}`,
           {
             enteredKey: secretKey,
           }
         );
-        console.log("adduserfunc paso 2");
-        if (result) console.log(`result es`, result.request.status);
-        console.log("adduserfunc paso 3");
-
         await loadData();
-        console.log("adduserfunc paso 4");
         setSecretError("");
-        console.log(`user data es`, userData);
-        console.log(`league id es`, leagueId);
 
         if (result && result.request.status === 200) {
           Alert.alert(
@@ -198,8 +151,6 @@ const LeagueHome = ({ navigation }) => {
           setSecretKey = "";
           setShowSecretkeyCard(false);
         } else setSecretError("Clave secreta inválida");
-
-        console.log(`TERMINANDO ADDUSERFUNC`);
       } catch (error) {
         setSecretError("Clave secreta inválida");
         console.error(`Error: ${error.message}`);
@@ -400,7 +351,7 @@ const LeagueHome = ({ navigation }) => {
         />
 
         <View style={newLeagueStyles.list}>
-          {memberList[0] || leagueId? (
+          {memberList[0] || leagueId ? (
             <List
               list={memberList}
               Element={ItemLeague}
@@ -451,7 +402,7 @@ const LeagueHome = ({ navigation }) => {
         </TouchableOpacity>
 
         {userData.leagues.includes(leagueId) ? (
-          (memberList.findIndex((user) => user._id === userData._id)) > 6 ? (
+          memberList.findIndex((user) => user._id === userData._id) > 6 ? (
             <View style={leagueStyles.foot}>
               <View style={leagueStyles.user}>
                 <View style={leagueStyles.rank}>
@@ -472,23 +423,27 @@ const LeagueHome = ({ navigation }) => {
             <></>
           )
         ) : (
-          <View style={[leagueStyles.foot, { height: 100 }]}>
-            <TouchableOpacity
-              style={[
-                leagueStyles.join,
-                { backgroundColor: actualleague.color /*"#16a085"*/ },
-              ]}
-              onPress={() => {
-                if (actualleague.isPrivate) {
-                  setShowSecretkeyCard(true);
-                } else {
-                  joinHandler(leagueId);
-                }
-              }}
-            >
-              <Text style={leagueStyles.joinTxt}>Unirse</Text>
-            </TouchableOpacity>
-          </View>
+          <>
+            {leagueId ? (
+              <View style={[leagueStyles.foot, { height: 100 }]}>
+                <TouchableOpacity
+                  style={[
+                    leagueStyles.join,
+                    { backgroundColor: actualleague.color /*"#16a085"*/ },
+                  ]}
+                  onPress={() => {
+                    if (actualleague.isPrivate) {
+                      setShowSecretkeyCard(true);
+                    } else {
+                      joinHandler(leagueId);
+                    }
+                  }}
+                >
+                  <Text style={leagueStyles.joinTxt}>Unirse</Text>
+                </TouchableOpacity>
+              </View>
+            ) : null}
+          </>
         )}
       </View>
     </SafeAreaView>
@@ -521,7 +476,7 @@ const HomeScreen = ({ navigation }) => {
       .then((res) => {
         setIsLoading(false);
         if (res.status == 201) {
-          console.log("user data es", userData);
+          dispatch(setLeagueId(res.data._id));
           return dispatch(setUserLeagues({ userId: userData._id }));
         }
       })
@@ -697,7 +652,7 @@ const HomeScreen = ({ navigation }) => {
                 onBlur={handleBlur("color")}
                 value={values.color}
                 keyboardType="default"
-                placeholder="Color en formato: #FFFFFF"
+                placeholder="Color"
                 name="color"
               />
 

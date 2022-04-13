@@ -178,12 +178,12 @@ const User = ({ navigation }) => {
               return (
                 <View key={i}>
                   <TouchableOpacity
-                    onPress={() => {
-                      dispatch(setLeague(item.league));
-                      dispatch(setMembers(item.league._id));
-                      dispatch(setLeagueId(item.league._id));
-                      navigation.navigate("Liga", item);
-                    }}
+                    // onPress={() => {
+                    //   dispatch(setLeague(item.league));
+                    //   dispatch(setMembers(item.league._id));
+                    //   dispatch(setLeagueId(item.league._id));
+                    //   navigation.navigate("Liga", item);
+                    // }}
                   >
                     <View
                       style={[
@@ -302,12 +302,10 @@ function Add({ setEditImage, navigation }) {
   const permisionFunction = async () => {
     // here is how you can get the camera permission
     const cameraPermission = await Camera.requestCameraPermissionsAsync();
-    console.log("camera permission:", cameraPermission.status);
 
     setCameraPermission(cameraPermission.status === "granted");
 
     const imagePermission = await ImagePicker.getMediaLibraryPermissionsAsync();
-    console.log("permission:", imagePermission.status);
 
     setGalleryPermission(imagePermission.status === "granted");
 
@@ -331,7 +329,6 @@ function Add({ setEditImage, navigation }) {
         [],
         { compress: 0.5, format: ImageManipulator.SaveFormat.PNG }
       );
-      console.log("DATA URI ===>", data);
       setDataImage(data);
       setImageUri(data.uri);
       setImageArray([data.uri]);
@@ -348,7 +345,6 @@ function Add({ setEditImage, navigation }) {
       //base64: true,
     });
 
-    console.log("RESULT URI ===>", result);
     if (!result.cancelled) {
       //handleUpload(result)
       setDataImage(result);
@@ -383,7 +379,6 @@ function Add({ setEditImage, navigation }) {
       storage,
       "images/" + file.uri.split("/").reverse()[0]
     );
-    console.log("FILE ====>", file);
     const uploadTask = uploadBytesResumable(storageRef, blob, metadata);
 
     // Listen for state changes, errors, and completion of the upload.
@@ -425,9 +420,6 @@ function Add({ setEditImage, navigation }) {
       () => {
         // Upload completed successfully, now we can get the download URL
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          // console.log('EL USER VIejo', user.img)
-          // user.img = downloadURL
-          // console.log('EL USER NUEVO', user.img)
           dispatch(
             updateUser({
               values: { img: downloadURL },
@@ -436,8 +428,8 @@ function Add({ setEditImage, navigation }) {
             })
           );
           setUploading(false)
-          console.log("File available at", downloadURL);
-          console.log("USER IMAGE", user.img);
+          // console.log("File available at", downloadURL);
+          // console.log("USER IMAGE", user.img);
           navigation.navigate("User");
         });
       }
@@ -533,7 +525,7 @@ function Add({ setEditImage, navigation }) {
                   title={"Cancelar"}
                   type="outline"
                   color="#841584"
-                  onPress={() => navigation.navigate("Edit user")}
+                  onPress={() => navigation.navigate("User")}
                 />
                 {imageArray.length > 0 && (
                   <Button
@@ -562,7 +554,6 @@ function EditUser({ setEditImage, navigation }) {
   const dispatch = useDispatch();
 
   const user = useSelector((state) => state.user);
-  console.log("me afuera", user);
 
   const [nameLock, setNameLock] = useState(false);
   const [surnameLock, setSurnameLock] = useState(false);

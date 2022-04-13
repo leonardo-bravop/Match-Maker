@@ -31,7 +31,6 @@ const HeadLeague = ({screen, leagueId, userData, navi}) => {
       axios
       .get(`${uri}/api/league/showLeague/${itemValue}`)
       .then( ({ data }) => {
-         console.log("showleague: ", data)
          navi()
       })
    }

@@ -12,7 +12,7 @@ const ListHead = ({labels, styling}) => {
             
             <View style={{width: 150, alignItems: "center"}}>
                <Text style={{ fontSize: 18, color: '#FFFFFF'}}>
-                  {labels[1]}
+                  {labels[1]? labels[1]:null}
                </Text>
             </View>
             

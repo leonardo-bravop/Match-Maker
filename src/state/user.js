@@ -11,7 +11,7 @@ export const setUserMe = createAsyncThunk("ME", (userString) => {
 });
 
 export const updateUser = createAsyncThunk("UPDATE_USER", ({values, id, userString}) => {
-    return axios.put(`${uri}/api/user/edit/${id}`, values).then(() => axios.post(`${uri}/api/user/me`,{},{headers: {Authorization: `Bearer ${userString}`,},}).then((res) => res.data))
+    return axios.put(`${uri}/api/user/edit/${id}`, values, {headers: {Authorization: `Bearer ${userString}`,},}).then(() => axios.post(`${uri}/api/user/me`,{},{headers: {Authorization: `Bearer ${userString}`,},}).then((res) => res.data))
 });
 
 const initialState = {};

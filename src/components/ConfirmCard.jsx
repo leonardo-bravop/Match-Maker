@@ -21,12 +21,6 @@ const ConfirmCard = () => {
       (invitation) => invitation.toId === user._id
     );
     if (!arrayInvit[0]) return;
-    console.log("====================================");
-    console.log(`is accepted e`, isAccepted);
-    console.log("====================================");
-    console.log(arrayInvit[0].status);
-    console.log("====================================");
-    // console.log(`match es`, match);
     if (arrayInvit[0].status === "accepted") setIsAccepted(true);
   }, [match]);
 
@@ -35,8 +29,6 @@ const ConfirmCard = () => {
       .put(`${uri}/api/invitation/invitAcepted/${match._id}/user/${user._id}`)
       .then(({ data }) => {
         setIsAccepted(true)
-        // console.log(`data es`, data);
-        // console.log(`match es`, match);
       });
   };
 

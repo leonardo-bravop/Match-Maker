@@ -32,8 +32,6 @@ function Login({ navigation }) {
       const result = await axios.post(`${uri}/api/user/login`, values);
       const userStored = result.data.token;
       await AsyncStorage.setItem("userInfo", userStored);
-      // const returnedUser = await AsyncStorage.getItem('userInfo')
-      // console.log(`STORED USER ES`, returnedUser)
       result.status == 200 ? navigation.navigate("Home") : null;
 
     } catch (err) {

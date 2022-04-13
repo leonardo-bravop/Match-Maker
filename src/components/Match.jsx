@@ -79,9 +79,11 @@ const Match = ({navigation}) => {
       const loadData = async () => {
 
          const resData = await dispatch(setUserLeagues({ userId: userData._id }))
-
-         if (selectedValue === "") 
-            setSelectedValue(resData.payload[0].league._id)
+         if(!resData.payload.length) return
+         if (selectedValue === "" && resData.payload.length) {
+            console.log(`entre al if vacio`);
+            console.log(`res data=======`, resData.payload);
+            setSelectedValue(resData.payload[0].league._id)}
 
          const {payload} = await dispatch(setMembers(selectedValue === "" ? resData.payload[0].league._id : selectedValue ))
          

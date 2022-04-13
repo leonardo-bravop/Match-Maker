@@ -104,9 +104,6 @@ function Welcome({ navigation }) {
   const [userString, setUserString] = useState("")
 
   useEffect(() => {
-    // console.log(`user string es`, userString);
-    // console.log(`user data es`, userData);
-    // console.log(`user string es`, userString);
     const asyncUser = async () => {
       const result = await AsyncStorage.getItem("userInfo");
       setUserString(result)
@@ -115,17 +112,11 @@ function Welcome({ navigation }) {
         navigation.navigate("Home")
         return
       };
-      // console.log(`luego de naigate`);
-      // console.log(`result es`, result);
       const { payload } = await dispatch(setUserMe(userString));
-      // if (payload._id) navigation.navigate("Home");
     };
     asyncUser();
   }, []);
 
-  // useEffect(()=>{
-
-  // })
   return (
     <>
       {userString===null ? (

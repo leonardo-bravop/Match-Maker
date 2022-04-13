@@ -43,7 +43,6 @@ const Record = () => {
 
 
     useEffect(()=>{
-       console.log(`EMPEZANDO USEEFFECT DE RECORD`);
       axios.get(`${uri}/api/user/getMatches/${user._id}`)
       .then(({data}) => {
           setRecordList(data.reverse())
@@ -86,12 +85,12 @@ const Record = () => {
                   minDate={moment("01-01-2022", "MM-DD-YYYY")}
                   maxDate={moment().add(6, "M")}
                   startingDate={moment().subtract(3, 'd')}
-                  markedDates = {dotList.map( item =>{
+                  markedDates = {dotList[0]? dotList.map( item =>{
                          return {
                            date: moment(item.date, "DD-MM-YYYY"),
                            dots: [ { color: colorSet.text } ]
                          }
-                        })}
+                        }):null}
                   selectedDate={onDate}
                   onDateSelected={ selected => {
                      matchDateHandler(moment(selected, "YYYY-MM-DDTHH:mm:ss.SSSZ").format("DD-MM-YYYY"))
