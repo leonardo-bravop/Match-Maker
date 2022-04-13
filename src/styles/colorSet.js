@@ -11,5 +11,6 @@ export const colorSet = {
    completada: "#8C37C4",
    win: "#37C45D",
    lost: "#C43737",
-   cancelada: "grey"
+   cancelada: "#B1B1C2",
+   confirmada: "green"
 }
