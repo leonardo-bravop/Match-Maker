@@ -465,10 +465,6 @@ const HomeScreen = ({ navigation }) => {
   const handleRegister = (values) => {
     values.admin = userData._id;
     values.isPrivate = select;
-    console.log("====================================");
-    console.log(`values es`, values);
-    console.log("====================================");
-
     if (values.secretKey === "") delete values.secretKey;
     setIsLoading(true);
     axios
@@ -547,7 +543,7 @@ const HomeScreen = ({ navigation }) => {
             handleRegister({ ...values, select });
           else if (!select && !values.secretKey) {
             handleRegister({ ...values, select });
-          } else console.log(`que onda`);
+          } 
         }}
       >
         {({
