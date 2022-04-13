@@ -7,7 +7,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
-  Keyboard 
+  Keyboard,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SearchBar } from "@rneui/themed";
@@ -22,6 +22,7 @@ import { setLeagues } from "../state/league";
 import { setLeague } from "../state/selectLeague";
 import { setMembers } from "../state/memberList";
 import { setLeagueId } from "../state/idLeague";
+import ItemRecord from "./ItemRecord";
 
 const screen = Dimensions.get("screen");
 
@@ -40,7 +41,7 @@ const home = StyleSheet.create({
     fontWeight: "bold",
   },
   containerDos: {
-    marginTop: 50,
+    marginTop: 20,
     height: "25%",
   },
   lastTittle: {
@@ -133,13 +134,15 @@ function Home({ navigation: { navigate } }) {
   const [select, setSelect] = useState();
   const [selectMeLeagues, setSelectMeLeagues] = useState({ color: "#39424d" });
 
+  const [openedMatch, setOpenedMatch] = useState(false);
+
   const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
   const match = matches.reverse()[0];
 
   const updateSearch = (search) => {
     if (!search) setResults([]);
     setSearch(search);
-    if(!search) return
+    if (!search) return;
     axios.get(`${uri}/api/league/findLeague/${search}`).then(({ data }) => {
       setResults(data);
     });
@@ -147,16 +150,16 @@ function Home({ navigation: { navigate } }) {
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
-      'keyboardDidShow',
+      "keyboardDidShow",
       () => {
         setKeyboardVisible(true); // or some other action
-      },
+      }
     );
     const keyboardDidHideListener = Keyboard.addListener(
-      'keyboardDidHide',
+      "keyboardDidHide",
       () => {
         setKeyboardVisible(false); // or some other action
-      },
+      }
     );
 
     return () => {
@@ -190,222 +193,253 @@ function Home({ navigation: { navigate } }) {
         <Text style={home.tittleText}>MATCH MAKER</Text>
       </View>
       <View style={home.containerDos}>
-        {isKeyboardVisible ? <Text style={{ color: "white", textAlign: "center" }}>
-        ────────────────Search────────────────
-          </Text> : (
+        {isKeyboardVisible ? (
+          <Text style={{ color: "white", textAlign: "center" }}>
+            ────────────────Search────────────────
+          </Text>
+        ) : (
           <>
-            <Text style={home.lastTittle}>Ultima partida</Text>
+            {/* <Text style={home.lastTittle}>Ultima partida</Text> */}
             {matches.reverse()[0] ? (
-              <TouchableOpacity
-                style={home.lastContainer}
-                onPress={() => {
-                  navigate("Historial");
-                }}
+              <View
+                onPress={() => console.log(`esto es magia`)}
+                
+                style={{ marginTop: openedMatch? 100 : 20 }}
               >
-                <View style={home.lastItem}>
-                  {match.team_1.map((item, i) => {
-                    if (i == 2)
-                      return (
-                        <Text key={i} style={home.lastText}>{`y ${
-                          match.team_1.length - 2
-                        } más`}</Text>
-                      );
-                    if (i > 1) return;
-                    return (
-                      <Text key={i} style={home.lastText}>
-                        {item.nickname}
-                      </Text>
-                    );
-                  })}
-                </View>
-                <View style={home.lastResultItem}>
-                <Text style={home.lastResult}>{match.date}</Text>
-                  <Text style={home.lastResult}>{match.status}</Text>
-                </View>
-                <View style={home.lastItem}>
-                  {match.team_2.map((item, i) => {
-                    if (i == 2)
-                      return (
-                        <Text key={i} style={home.lastText}>{`y ${
-                          match.team_2.length - 2
-                        } más`}</Text>
-                      );
-                    if (i > 1) return;
-                    return (
-                      <Text key={i} style={home.lastText}>
-                        {item.nickname}
-                      </Text>
-                    );
-                  })}
-                </View>
-              </TouchableOpacity>
+                <ItemRecord
+                  item={matches.reverse()[0]}
+                  setOpenedMatch={setOpenedMatch}
+                  openedMatch={openedMatch}
+                />
+              </View>
             ) : (
+              // <TouchableOpacity
+              //   style={home.lastContainer}
+              //   onPress={() => {
+              //     navigate("Historial");
+              //   }}
+              // >
+              //   <View style={home.lastItem}>
+              //     {match.team_1.map((item, i) => {
+              //       if (i == 2)
+              //         return (
+              //           <Text key={i} style={home.lastText}>{`y ${
+              //             match.team_1.length - 2
+              //           } más`}</Text>
+              //         );
+              //       if (i > 1) return;
+              //       return (
+              //         <Text key={i} style={home.lastText}>
+              //           {item.nickname}
+              //         </Text>
+              //       );
+              //     })}
+              //   </View>
+              //   <View style={home.lastResultItem}>
+              //   <Text style={home.lastResult}>{match.date}</Text>
+              //     <Text style={home.lastResult}>{match.status}</Text>
+              //   </View>
+              //   <View style={home.lastItem}>
+              //     {match.team_2.map((item, i) => {
+              //       if (i == 2)
+              //         return (
+              //           <Text key={i} style={home.lastText}>{`y ${
+              //             match.team_2.length - 2
+              //           } más`}</Text>
+              //         );
+              //       if (i > 1) return;
+              //       return (
+              //         <Text key={i} style={home.lastText}>
+              //           {item.nickname}
+              //         </Text>
+              //       );
+              //     })}
+              //   </View>
+              // </TouchableOpacity>
               <Text
-                style={{ color: "white", fontSize: 16, alignSelf: "center" }}
+                style={{
+                  color: "white",
+                  fontSize: 16,
+                  alignSelf: "center",
+                }}
               >
                 Aun no tienes matches registradas
               </Text>
             )}
           </>
         )}
-        <View style={{ marginTop: 10 }}>
-          <SearchBar
-            placeholder="Escribe aca..."
-            onChangeText={updateSearch}
-            value={search}
-            lightTheme={true}
-            containerStyle={{
-              backgroundColor: "#0e0b29",
-              borderBottomColor: "transparent",
-              borderTopColor: "transparent",
-            }}
-            round={true}
-            onClear={() => setResults([])}
-            onCancel={() => setResults([])}
-          />
-        </View>
-      </View>
-
-      {results[0] ? (
-        <>
-          <View style={[home.ligaContainer, { marginTop: 20 }]}>
-            <Text style={[home.ligaTittle, { width: "100%" }]}>RESULTADO</Text>
-          </View>
-          <Text style={{ color: "white", textAlign: "center" }}>
-            ──────────────────────────────────────
-          </Text>
-          <FlatGrid
-            style={home.gridView}
-            itemDimension={120}
-            data={results}
-            // staticDimension={300}
-            // fixed
-            spacing={10}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                onPress={() => {
-                  dispatch(setLeagueId(item._id));
-                  dispatch(setLeague(item));
-                  dispatch(setMembers(item._id));
-                  navigate("Liga", item);
+        {!openedMatch ? (
+          <>
+            <View style={{ marginTop: 10 }}>
+              <SearchBar
+                placeholder="Escribe aca..."
+                onChangeText={updateSearch}
+                value={search}
+                lightTheme={true}
+                containerStyle={{
+                  backgroundColor: "#0e0b29",
+                  borderBottomColor: "transparent",
+                  borderTopColor: "transparent",
                 }}
-                style={[home.itemContainer, { backgroundColor: item.color }]}
-              >
-                <View style={{ flex: 1, justifyContent: "flex-start" }}>
-                  <Image
-                    source={{
-                      uri: item.img
-                        ? item.img
-                        : "https://trome.pe/resizer/G8-kkwwutkrNacKh5S6TJplAluU=/980x0/smart/filters:format(jpeg):quality(75)/cloudfront-us-east-1.images.arcpublishing.com/elcomercio/OXHJSIF4SZDAJP6F5PHFZTLRYI.jpg",
-                    }}
-                    resizeMode="cover"
-                    style={{ height: "100%" }}
-                  />
-                </View>
-                <Text style={home.itemName}>{item.name}</Text>
-                <Text style={home.itemCode}>{item.sport}</Text>
-              </TouchableOpacity>
-            )}
-          />
-        </>
-      ) : (
+                round={true}
+                onClear={() => setResults([])}
+                onCancel={() => setResults([])}
+              />
+            </View>
+          </>
+        ) : null}
+      </View>
+      {!openedMatch ? (
         <>
-          <View style={[home.ligaContainer, { marginTop: 20 }]}>
-            <Text
-              style={[home.ligaTittle, select]}
-              onPress={() => {
-                setSelect({ color: "white" });
-                setSelectMeLeagues({ color: "#39424d" });
-                setMeLeagues(false);
-              }}
-            >
-              LIGAS
-            </Text>
-            <Text
-              style={[home.ligaTittle, selectMeLeagues]}
-              onPress={() => {
-                setSelectMeLeagues({ color: "white" });
-                setSelect({ color: "#39424d" });
-                setMeLeagues(true);
-              }}
-            >
-              TUS LIGAS
-            </Text>
-          </View>
-          <Text style={{ color: "white", textAlign: "center" }}>
-            ──────────────────────────────────────
-          </Text>
-          {meLeagues ? (
-            <FlatGrid
-              style={home.gridView}
-              itemDimension={120}
-              data={userLeagues}
-              spacing={10}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  onPress={() => {
-                    dispatch(setLeagueId(item.league._id));
-                    dispatch(setLeague(item));
-                    dispatch(setMembers(item.league._id));
-                    navigate("Liga");
-                  }}
-                  style={[
-                    home.itemContainer,
-                    { backgroundColor: item.league.color },
-                  ]}
-                >
-                  <View style={{ flex: 1, justifyContent: "flex-start" }}>
-                    <Image
-                      source={{
-                        uri: item.league.img
-                          ? item.league.img
-                          : "https://trome.pe/resizer/G8-kkwwutkrNacKh5S6TJplAluU=/980x0/smart/filters:format(jpeg):quality(75)/cloudfront-us-east-1.images.arcpublishing.com/elcomercio/OXHJSIF4SZDAJP6F5PHFZTLRYI.jpg",
-                      }}
-                      resizeMode="cover"
-                      style={{ height: "100%" }}
-                    />
-                  </View>
-                  {console.log(item.league)}
-                  <Text style={home.itemName}>{item.league.name}</Text>
-                  <Text style={home.itemCode}>{item.league.sport}</Text>
-                </TouchableOpacity>
-              )}
-            />
+          {results[0] ? (
+            <>
+              <View style={[home.ligaContainer, { marginTop: 80 }]}>
+                <Text style={[home.ligaTittle, { width: "100%" }]}>
+                  RESULTADO
+                </Text>
+              </View>
+              <Text style={{ color: "white", textAlign: "center" }}>
+                ──────────────────────────────────────
+              </Text>
+              <FlatGrid
+                style={home.gridView}
+                itemDimension={120}
+                data={results}
+                // staticDimension={300}
+                // fixed
+                spacing={10}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    onPress={() => {
+                      dispatch(setLeagueId(item._id));
+                      dispatch(setLeague(item));
+                      dispatch(setMembers(item._id));
+                      navigate("Liga", item);
+                    }}
+                    style={[
+                      home.itemContainer,
+                      { backgroundColor: item.color },
+                    ]}
+                  >
+                    <View style={{ flex: 1, justifyContent: "flex-start" }}>
+                      <Image
+                        source={{
+                          uri: item.img
+                            ? item.img
+                            : "https://trome.pe/resizer/G8-kkwwutkrNacKh5S6TJplAluU=/980x0/smart/filters:format(jpeg):quality(75)/cloudfront-us-east-1.images.arcpublishing.com/elcomercio/OXHJSIF4SZDAJP6F5PHFZTLRYI.jpg",
+                        }}
+                        resizeMode="cover"
+                        style={{ height: "100%" }}
+                      />
+                    </View>
+                    <Text style={home.itemName}>{item.name}</Text>
+                    <Text style={home.itemCode}>{item.sport}</Text>
+                  </TouchableOpacity>
+                )}
+              />
+            </>
           ) : (
-            <FlatGrid
-              style={home.gridView}
-              itemDimension={120}
-              data={leagues}
-              spacing={10}
-              renderItem={({ item }) => (
-                <TouchableOpacity
+            <>
+              <View style={[home.ligaContainer, { marginTop: 80 }]}>
+                <Text
+                  style={[home.ligaTittle, select]}
                   onPress={() => {
-                    dispatch(setLeagueId(item._id));
-                    dispatch(setLeague(item));
-                    dispatch(setMembers(item._id));
-                    navigate("Liga", item);
+                    setSelect({ color: "white" });
+                    setSelectMeLeagues({ color: "#39424d" });
+                    setMeLeagues(false);
                   }}
-                  style={[home.itemContainer, { backgroundColor: item.color }]}
                 >
-                  <View style={{ flex: 1, justifyContent: "flex-start" }}>
-                    <Image
-                      source={{
-                        uri: item.img
-                          ? item.img
-                          : "https://trome.pe/resizer/G8-kkwwutkrNacKh5S6TJplAluU=/980x0/smart/filters:format(jpeg):quality(75)/cloudfront-us-east-1.images.arcpublishing.com/elcomercio/OXHJSIF4SZDAJP6F5PHFZTLRYI.jpg",
+                  LIGAS
+                </Text>
+                <Text
+                  style={[home.ligaTittle, selectMeLeagues]}
+                  onPress={() => {
+                    setSelectMeLeagues({ color: "white" });
+                    setSelect({ color: "#39424d" });
+                    setMeLeagues(true);
+                  }}
+                >
+                  TUS LIGAS
+                </Text>
+              </View>
+              <Text style={{ color: "white", textAlign: "center" }}>
+                ──────────────────────────────────────
+              </Text>
+              {meLeagues ? (
+                <FlatGrid
+                  style={home.gridView}
+                  itemDimension={120}
+                  data={userLeagues}
+                  spacing={10}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity
+                      onPress={() => {
+                        dispatch(setLeagueId(item.league._id));
+                        dispatch(setLeague(item));
+                        dispatch(setMembers(item.league._id));
+                        navigate("Liga");
                       }}
-                      resizeMode="cover"
-                      style={{ height: "100%" }}
-                    />
-                  </View>
-                  <Text style={home.itemName}>{item.name}</Text>
-                  <Text style={home.itemCode}>{item.sport}</Text>
-                </TouchableOpacity>
+                      style={[
+                        home.itemContainer,
+                        { backgroundColor: item.league.color },
+                      ]}
+                    >
+                      <View style={{ flex: 1, justifyContent: "flex-start" }}>
+                        <Image
+                          source={{
+                            uri: item.league.img
+                              ? item.league.img
+                              : "https://trome.pe/resizer/G8-kkwwutkrNacKh5S6TJplAluU=/980x0/smart/filters:format(jpeg):quality(75)/cloudfront-us-east-1.images.arcpublishing.com/elcomercio/OXHJSIF4SZDAJP6F5PHFZTLRYI.jpg",
+                          }}
+                          resizeMode="cover"
+                          style={{ height: "100%" }}
+                        />
+                      </View>
+                      <Text style={home.itemName}>{item.league.name}</Text>
+                      <Text style={home.itemCode}>{item.league.sport}</Text>
+                    </TouchableOpacity>
+                  )}
+                />
+              ) : (
+                <FlatGrid
+                  style={home.gridView}
+                  itemDimension={120}
+                  data={leagues}
+                  spacing={10}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity
+                      onPress={() => {
+                        dispatch(setLeagueId(item._id));
+                        dispatch(setLeague(item));
+                        dispatch(setMembers(item._id));
+                        navigate("Liga", item);
+                      }}
+                      style={[
+                        home.itemContainer,
+                        { backgroundColor: item.color },
+                      ]}
+                    >
+                      <View style={{ flex: 1, justifyContent: "flex-start" }}>
+                        <Image
+                          source={{
+                            uri: item.img
+                              ? item.img
+                              : "https://trome.pe/resizer/G8-kkwwutkrNacKh5S6TJplAluU=/980x0/smart/filters:format(jpeg):quality(75)/cloudfront-us-east-1.images.arcpublishing.com/elcomercio/OXHJSIF4SZDAJP6F5PHFZTLRYI.jpg",
+                          }}
+                          resizeMode="cover"
+                          style={{ height: "100%" }}
+                        />
+                      </View>
+                      <Text style={home.itemName}>{item.name}</Text>
+                      <Text style={home.itemCode}>{item.sport}</Text>
+                    </TouchableOpacity>
+                  )}
+                />
               )}
-            />
+            </>
           )}
         </>
-      )}
+      ) : null}
     </View>
   );
 }
