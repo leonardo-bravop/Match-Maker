@@ -22,7 +22,7 @@ const ItemRecord = ({ item }) => {
 
    const [isScored, setIsScored] = useState(false)
 
-   const [customStatus, setCustomStatus] = useState(item.status)
+   //const [item.status, setitem.status] = useState(item.status)
    const [score, setScore] = useState([0, 0])
 
    const match = useSelector((state) => state.match);
@@ -38,10 +38,10 @@ const ItemRecord = ({ item }) => {
       asyncUser()
 
       if(item.status==="conflicto") {
-         setCustomStatus("completada")
+         item.status="completada"
       }
 
-      if (customStatus === "completada") {
+      if (item.status === "completada") {
          axios
          .get(`${uri}/api/result/getResultByMatchId/${item._id}`)
          .then(({ data }) => {
@@ -53,28 +53,28 @@ const ItemRecord = ({ item }) => {
             }
          })
       }
-      if (customStatus === "confirmada") {
+      if (item.status === "confirmada") {
          axios
          .get(`${uri}/api/result/getResultByMatchId/${item._id}`)
          .then(({ data }) => {
             let result = data.score_1.split("-")
             if (item.team_1.filter(element => element._id === user._id).length === 1){
                   setScore([result[0], result[1]])
-                  setCustomStatus(result[0] > result[1] ? "win" : "lost")
+                  item.status = result[0] > result[1] ? "win" : "lost"
             }
             else {
                setScore([result[1], result[0]])
-               setCustomStatus(result[1] > result[0] ? "win" : "lost")
+               item.status = result[1] > result[0] ? "win" : "lost"
             }
          })
       }
       
-      if (customStatus === "lista" && moment().isSameOrAfter(moment(`${item.date} ${item.time}`, "DD-MM-YYYY H:mm"))) {
-         setCustomStatus("completada")
+      if (item.status === "lista" && moment().isSameOrAfter(moment(`${item.date} ${item.time}`, "DD-MM-YYYY H:mm"))) {
+         item.status = "completada"
       }
 
 
-      if (customStatus === "pendiente") {
+      if (item.status === "pendiente") {
          const equipos = item.invitations_team1.concat(item.invitations_team2);
          const arrayInvit = equipos.filter(
             (invitation) => invitation.toId === user._id
@@ -95,16 +95,8 @@ const ItemRecord = ({ item }) => {
    };
 
    const resultHandler = () => {
-      let finalScore
-      if (item.team_1.filter(element => element._id === user._id).length === 1){
-         finalScore = `${result1}-${result2}`
-      }
-      else {
-         finalScore = `${result2}-${result1}`
-      }
-
       axios
-      .put(`${uri}/api/result/updateResult/match/${item._id}/user/${user._id}`, {score: finalScore}, {headers: {Authorization: `Bearer ${userString}`,},})
+      .put(`${uri}/api/result/updateResult/match/${item._id}/user/${user._id}`, {score: `${result1}-${result2}`}, {headers: {Authorization: `Bearer ${userString}`,},})
       .then(({ data }) => {
          item = data
       });
@@ -114,7 +106,7 @@ const ItemRecord = ({ item }) => {
       axios
       .put(`${uri}/api/invitation/invitRejected/${item._id}/user/${user._id}`, {}, {headers: {Authorization: `Bearer ${userString}`,},})
       .then(({ data }) => {
-         setCustomStatus("cancelada")
+         item.status = "cancelada"
       });
       
    }
@@ -122,7 +114,7 @@ const ItemRecord = ({ item }) => {
 
    return (
       <TouchableOpacity onPress={() => setShowInfo(!showInfo)} 
-                        style={[itemStyles.item, {borderColor: colorSet[customStatus] , borderWidth:1.5}]}>
+                        style={[itemStyles.item, {borderColor: colorSet[item.status] , borderWidth:1.5}]}>
          <View style={[itemStyles.head]}>
             <View style={[itemStyles.team, {borderColor: "blue" , borderWidth:0}]}>
                {item[item.team_1.filter(element => element._id === user._id).length === 1 ? "team_1" : "team_2"]
@@ -138,15 +130,15 @@ const ItemRecord = ({ item }) => {
             
             <View style={[itemStyles.info, {borderColor: "red" , borderWidth:0}]}>
                
-                  {customStatus === "win" || customStatus === "lost"
-                  ?<Text style={[itemStyles.text, { fontSize: 25, color: colorSet[customStatus] }]}> 
+                  {item.status === "win" || item.status === "lost"
+                  ?<Text style={[itemStyles.text, { fontSize: 25, color: colorSet[item.status] }]}> 
                      {`${score[0]} - ${score[1]}`}
                   </Text>
                   :<>
-                     <Text style={[itemStyles.text, { textTransform: "uppercase", color: colorSet[customStatus] }]}>
-                        {customStatus === "completada" ? "completa" : customStatus}
+                     <Text style={[itemStyles.text, { textTransform: "uppercase", color: colorSet[item.status] }]}>
+                        {item.status === "completada" ? "completa" : item.status}
                      </Text>
-                     <Text style={[itemStyles.text, { textTransform: "uppercase", color: colorSet[customStatus] }]}>
+                     <Text style={[itemStyles.text, { textTransform: "uppercase", color: colorSet[item.status] }]}>
                         {moment(item.date, "DD-MM-YYYY").format("DD-MM")}
                      </Text>
                   </>
@@ -170,9 +162,9 @@ const ItemRecord = ({ item }) => {
          
          { showInfo
          ? <View>
-            <View style={{marginBottom: customStatus === "completada" || customStatus === "pendiente"? 0 : 16}}>
+            <View style={{marginBottom: item.status === "completada" || item.status === "pendiente"? 0 : 16}}>
                <Text style={[itemStyles.text]}>
-                  El partido se { customStatus === "pendiente" || customStatus === "lista" ? "disputara" : "disputo"} a las {item.time}
+                  El partido se { item.status === "pendiente" || item.status === "lista" ? "disputara" : "disputo"} a las {item.time}
                </Text>
                {item.invitationText === ""
                ? <></>
@@ -181,11 +173,11 @@ const ItemRecord = ({ item }) => {
                </Text>}
             </View>
 
-               { (customStatus === "pendiente") 
+               { (item.status === "pendiente") 
                ?<View>
                   {!isAccepted
                   ? <View style={{ marginTop: 30}}>
-                        <TouchableOpacity style={[cardStyles.confirmButton, { backgroundColor: colorSet[customStatus]}]}
+                        <TouchableOpacity style={[cardStyles.confirmButton, { backgroundColor: colorSet[item.status]}]}
                                        onPress={acceptHandler}>
                            <Text style={[cardStyles.buttonTxt]}>{"Participar"}</Text>
                         </TouchableOpacity>
@@ -211,7 +203,7 @@ const ItemRecord = ({ item }) => {
                :<></> 
                }
 
-               { (customStatus === "lista") 
+               { (item.status === "lista") 
                ?<View>
                   <Text style={[itemStyles.text, {marginTop: 10}]}>
                      Ya has confirmado tu participación
@@ -225,7 +217,7 @@ const ItemRecord = ({ item }) => {
                :<></> 
                }
 
-               { (customStatus === "completada") 
+               { (item.status === "completada") 
                ?<View>
                   { !isScored 
                   ? <View style={{ marginTop: 30, flexDirection: "row"}}>
@@ -237,7 +229,7 @@ const ItemRecord = ({ item }) => {
                                     onChangeText={ text => setResult1(parseInt(text))}
                      />
                      
-                     <TouchableOpacity style={[cardStyles.confirmButton, { backgroundColor: colorSet[customStatus]}]}
+                     <TouchableOpacity style={[cardStyles.confirmButton, { backgroundColor: colorSet[item.status]}]}
                                        onPress={resultHandler}>
                         <Text style={[cardStyles.buttonTxt]}>{"Enviar"}</Text>
                      </TouchableOpacity>
