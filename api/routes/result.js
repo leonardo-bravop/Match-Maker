@@ -9,10 +9,10 @@ router.put(
   resultController.updateResult
 );
 
-router.put(
-  "/confirmationTeam/:team/:resultId/:matchId",
-  resultController.confirmResultTeam
-);
+// router.put(
+//   "/confirmationTeam/:team/:resultId/:matchId",
+//   resultController.confirmResultTeam
+// );
 
 router.get("/getResultByMatchId/:matchId", resultController.getResultByMatchId)
 
