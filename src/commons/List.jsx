@@ -2,13 +2,13 @@ import React from "react";
 import { View} from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 
-const List = ({list, Element}) => {
+const List = ({list, Element, marginNum, colorLeague}) => {
    return (
       <ScrollView >
-         <View style={ { marginLeft:16, marginRight:16 } }>
+         <View style={ { marginHorizontal: marginNum || 16 } }>
             { list.map( (item, i) => {
                return (
-                  <Element item={item} key={i} i={i}/>
+                  <Element item={item} key={i} i={i} colorLeague={colorLeague} />
                )}
             )}
          </View>

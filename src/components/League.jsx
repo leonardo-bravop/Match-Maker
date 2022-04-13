@@ -22,7 +22,7 @@ import Constants from "expo-constants";
 import "moment/locale/es";
 import { Icon } from "react-native-elements";
 
-import { leagueStyles } from "../styles/league";
+import { leagueStyles, newLeagueStyles } from "../styles/league";
 
 import List from "../commons/List";
 import { useDispatch, useSelector } from "react-redux";
@@ -43,6 +43,9 @@ import { formR } from "../styles/form";
 
 import { CheckBox } from "react-native-elements";
 import { setUserMe } from "../state/user";
+import { colorSet } from "../styles/colorSet";
+import ListHead from "./MatchListHead";
+import autoMergeLevel1 from "redux-persist/es/stateReconciler/autoMergeLevel1";
 
 const LeagueHome = ({ navigation }) => {
   const { manifest } = Constants;
@@ -65,32 +68,55 @@ const LeagueHome = ({ navigation }) => {
   const leagueList = useSelector((state) => state.userLeagues);
 
   useEffect(() => {
-
     const loadData = async () => {
+      try {
+        console.log("====================================");
+        console.log(`EMPEZANDO EL USEEFFECT DE LEAGUE`);
+        console.log("====================================");
+        console.log("leaguelist es", leagueList);
+        console.log("league ides ", leagueId);
+        console.log("userdata es ", userData);
+        // console.log(`memberlist es`, memberList);
+        // console.log(
+        //   `user rank es`,
+        //   memberList.reverse().findIndex((user) => user._id === userData._id)
+        // );
+        // console.log('====================================');
+        console.log("Paso 1: dispatch(setUserLeagues(");
+        const resData = await dispatch(
+          setUserLeagues({ userId: userData._id })
+        );
+        console.log(`res data es`, resData.payload);
+        // console.log("Res data payload 0 es:", resData.payload[0].league);
+        // console.log('====================================');
+        console.log("Paso 2: dispatch(setLeagueId");
+        console.log(
+          "ESTE DISPATCH ES EL QUE HACE QUE SE EJECUTE EL USEEFFECT OTRA VEZ"
+        );
+        if (leagueId === "" && resData.payload[0])
+          dispatch(setLeagueId(resData.payload[0].league._id));
+        console.log("Paso 3: ");
+        // if (leagueList[0]) {
+        let auxLeagueId = leagueId === "" ? leagueList[0].league._id : leagueId;
+        const { payload } = await dispatch(setMembers(auxLeagueId));
+        console.log("Paso 4: payload es ", payload);
 
-      console.log("lueage ides ", leagueId);
-      console.log("userdata es ", userData);
+        setMemberList(payload);
+        // console.log('====================================');
+        console.log("Paso 5: memberlist es payload");
 
-      console.log("Paso 1: ");
-      const resData = await dispatch(setUserLeagues({ userId: userData._id }));
-      console.log("Paso 2: ");
-      if (leagueId === "") dispatch(setLeagueId(resData.payload[0]._id));
-      console.log("Paso 3: ");
+        const { data } = await axios.get(
+          `${uri}/api/league/showLeague/${auxLeagueId}`
+        );
+        // console.log('====================================');
+        console.log("Paso 6: actual league es", data);
 
-      const { payload } = await dispatch(
-        setMembers(leagueId === "" ? leagueList[0]._id : leagueId)
-      );
-      console.log("Paso 4: ");
-
-      setMemberList(payload);
-      console.log("Paso 5: ");
-
-      const { data } = await axios.get(
-        `${uri}/api/league/showLeague/${leagueId}`
-      );
-      console.log("Paso 6: ");
-
-      setActualLeague(data);
+        setActualLeague(data);
+        // }
+        console.log(`TERMINANDO USEEFFECT DE LEAGUE`);
+      } catch (error) {
+        console.error(error);
+      }
     };
 
     loadData();
@@ -104,11 +130,15 @@ const LeagueHome = ({ navigation }) => {
   };
 
   const joinHandler = () => {
+    console.log("====================================");
+    console.log(`EMPEZANDO JOIN HANDLER`);
     if (actualleague.isPrivate) {
       setShowSecretkeyCard(true);
     }
     const loadData = async () => {
       try {
+        console.log("====================================");
+        console.log(`EMPEZANDO LOADDATA`);
         console.log(`en loadData`);
         console.log(`atnes del dispatch de user, userdata es`, userData);
         const userString = await AsyncStorage.getItem("userInfo");
@@ -132,6 +162,7 @@ const LeagueHome = ({ navigation }) => {
         );
 
         setActualLeague(data);
+        console.log(`TERMINANDO LOADDATA`);
       } catch (error) {
         console.error(`Error: ${error.message}`);
         setSecretError("Hubo un problema, por favor intenta de nuevo");
@@ -140,6 +171,8 @@ const LeagueHome = ({ navigation }) => {
 
     const addUserFunc = async () => {
       try {
+        console.log("====================================");
+        console.log(`EMPEZANDO ADDUSERFUNC`);
         console.log("adduserfunc paso 1");
         const result = await axios.put(
           `${uri}/api/league/${leagueId}/addUser/${userData._id}`,
@@ -148,8 +181,6 @@ const LeagueHome = ({ navigation }) => {
           }
         );
         console.log("adduserfunc paso 2");
-
-        console.log(`je`);
         if (result) console.log(`result es`, result.request.status);
         console.log("adduserfunc paso 3");
 
@@ -160,10 +191,15 @@ const LeagueHome = ({ navigation }) => {
         console.log(`league id es`, leagueId);
 
         if (result && result.request.status === 200) {
-          Alert.alert("Bienvenido!", `Te uniste a la liga ${actualleague.name}`);
+          Alert.alert(
+            "Bienvenido!",
+            `Te uniste a la liga ${actualleague.name}`
+          );
           setSecretKey = "";
           setShowSecretkeyCard(false);
         } else setSecretError("Clave secreta inválida");
+
+        console.log(`TERMINANDO ADDUSERFUNC`);
       } catch (error) {
         setSecretError("Clave secreta inválida");
         console.error(`Error: ${error.message}`);
@@ -174,13 +210,14 @@ const LeagueHome = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={leagueStyles.back}>
+    <SafeAreaView style={newLeagueStyles.back}>
       <Modal animationType="fade" transparent={true} visible={showCard}>
         <Pressable
           onPress={() => {
             setShowCard(false);
           }}
           style={{
+            color: "white",
             height: "100%",
             backgroundColor: "rgba(30,30,50,0.85)",
             justifyContent: "center",
@@ -200,24 +237,38 @@ const LeagueHome = ({ navigation }) => {
                 <View style={{ flex: 1 }}>
                   <ScrollView>
                     <View>
-                      {leagueList.map((item, i) => {
-                        return (
-                          <TouchableOpacity
-                            style={{ margin: 7 }}
-                            onPress={() => selectHandler(item._id)}
-                          >
-                            <Text
-                              style={{
-                                color: "#FFFFFF",
-                                fontSize: 16,
-                                textAlign: "center",
-                              }}
+                      {leagueList[0] ? (
+                        leagueList.map((item, i) => {
+                          return (
+                            <TouchableOpacity
+                              style={{ padding: 7 }}
+                              onPress={() => selectHandler(item.league._id)}
+                              key={i}
                             >
-                              {item.name}
-                            </Text>
-                          </TouchableOpacity>
-                        );
-                      })}
+                              <Text
+                                style={{
+                                  color: "#FFFFFF",
+                                  fontSize: 16,
+                                  textAlign: "center",
+                                }}
+                              >
+                                {item.league.name}
+                              </Text>
+                            </TouchableOpacity>
+                          );
+                        })
+                      ) : (
+                        <Text
+                          style={{
+                            fontSize: 18,
+                            color: "white",
+                            textAlign: "center",
+                            padding: 10,
+                          }}
+                        >
+                          Acá aparecerán tus ligas. Únete a una desde Home
+                        </Text>
+                      )}
                     </View>
                   </ScrollView>
                 </View>
@@ -309,69 +360,75 @@ const LeagueHome = ({ navigation }) => {
       </Modal>
 
       <View
-        style={[leagueStyles.head, { backgroundColor: actualleague.color }]}
+        style={[newLeagueStyles.head, { backgroundColor: actualleague.color }]}
       >
         <ImageBackground
           resizeMode="cover"
           source={{ uri: actualleague.img }}
           style={{ flex: 1 }}
         >
-          <TouchableOpacity
-            style={[
-              leagueStyles.menu,
-              { alignSelf: "flex-end", justifyContent: "center" },
-            ]}
-            onPress={() => setShowCard(true)}
-          >
-            <Icon
-              name="caret-down-circle"
-              type="ionicon"
-              color="green"
-              size={32}
-            />
-          </TouchableOpacity>
+          <View style={{ width: "100%", height: "100%" }}>
+            <ImageBackground
+              resizeMode="stretch"
+              source={require("../assets/gradient.png")}
+              style={{ flex: 1 }}
+            >
+              <View style={[newLeagueStyles.info, { paddingTop: "20%" }]}>
+                <Text style={newLeagueStyles.title}>{actualleague.name}</Text>
 
-          <View style={leagueStyles.info}>
-            <Text style={leagueStyles.title}>{actualleague.name}</Text>
+                <TouchableOpacity
+                  onPress={() => setShowCard(true)}
+                  style={newLeagueStyles.pickerButton}
+                >
+                  <Icon
+                    name="caret-down-circle"
+                    type="ionicon"
+                    color={colorSet.text}
+                    size={32}
+                  />
+                </TouchableOpacity>
+              </View>
+            </ImageBackground>
           </View>
         </ImageBackground>
       </View>
 
-      <View style={leagueStyles.body}>
-        <View style={leagueStyles.listHead}>
-          <View style={leagueStyles.enum}>
-            <View
-              style={{ width: 50, alignItems: "center", marginVertical: 5 }}
-            >
-              <Text style={{ color: "#FFFFFF" }}>Rank</Text>
-            </View>
+      <View style={newLeagueStyles.body}>
+        <ListHead
+          labels={["Rank", "Usuario", "ELO"]}
+          styling={newLeagueStyles.listHead}
+        />
 
-            <View
-              style={{ width: 50, alignItems: "center", marginVertical: 5 }}
-            >
-              <Text style={{ color: "#FFFFFF" }}></Text>
-            </View>
-
+        <View style={newLeagueStyles.list}>
+          {memberList[0] || leagueId? (
+            <List
+              list={memberList}
+              Element={ItemLeague}
+              marginNum={1}
+              colorLeague={actualleague.color}
+            />
+          ) : (
             <View
               style={{
-                flex: 1,
-                width: "auto",
-                alignItems: "center",
-                marginVertical: 5,
+                height: "100%",
+                alignSelf: "center",
+                justifyContent: "center",
               }}
             >
-              <Text style={{ color: "#FFFFFF" }}>Nick</Text>
+              <Text
+                style={{
+                  fontSize: 18,
+                  color: "white",
+                  textAlign: "center",
+                }}
+              >
+                Acá aparecerán los miembros cuando selecciones una liga. {"\n"}
+                {"\n"}
+                Prueba seleccionando una desde Home
+              </Text>
             </View>
-
-            <View
-              style={{ width: 100, alignItems: "center", marginVertical: 5 }}
-            >
-              <Text style={{ color: "#FFFFFF" }}>ELO</Text>
-            </View>
-          </View>
+          )}
         </View>
-
-        <List list={memberList} Element={ItemLeague} />
 
         <TouchableOpacity
           style={{
@@ -394,20 +451,20 @@ const LeagueHome = ({ navigation }) => {
         </TouchableOpacity>
 
         {userData.leagues.includes(leagueId) ? (
-          userData.rank > 1 ? (
+          (memberList.findIndex((user) => user._id === userData._id)) > 6 ? (
             <View style={leagueStyles.foot}>
               <View style={leagueStyles.user}>
                 <View style={leagueStyles.rank}>
-                  <Text style={{ color: "#FFFFFF" }}>{user.rank}</Text>
+                  <Text style={{ color: "#FFFFFF" }}>{"2"}</Text>
                 </View>
                 <View
                   style={[leagueStyles.img, { backgroundColor: user.color }]}
                 ></View>
                 <View style={leagueStyles.nick}>
-                  <Text style={{ color: "#FFFFFF" }}>{user.nickname}</Text>
+                  <Text style={{ color: "#FFFFFF" }}>{userData.nickname}</Text>
                 </View>
                 <View style={leagueStyles.elo}>
-                  <Text style={{ color: "#FFFFFF" }}>{user.elo}</Text>
+                  <Text style={{ color: "#FFFFFF" }}>{"user.elo"}</Text>
                 </View>
               </View>
             </View>
@@ -417,7 +474,10 @@ const LeagueHome = ({ navigation }) => {
         ) : (
           <View style={[leagueStyles.foot, { height: 100 }]}>
             <TouchableOpacity
-              style={[leagueStyles.join, { backgroundColor: "#16a085" }]}
+              style={[
+                leagueStyles.join,
+                { backgroundColor: actualleague.color /*"#16a085"*/ },
+              ]}
               onPress={() => {
                 if (actualleague.isPrivate) {
                   setShowSecretkeyCard(true);
@@ -440,33 +500,45 @@ const HomeScreen = ({ navigation }) => {
   const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 
   const [isLoading, setIsLoading] = useState(false);
+  const userData = useSelector((state) => state.user);
 
   let [select, setSelect] = useState(false);
+  let [requiredSecretkey, setRequiredSecretKey] = useState("");
+
+  const dispatch = useDispatch();
 
   const handleRegister = (values) => {
-    console.log("values son", values);
-    // console.log(`check es`, check);
-    if (values.isPrivate.toLowerCase() !== "no") {
-      values.isPrivate = !!values.isPrivate;
-    } else {
-      values.isPrivate = false;
-    }
+    values.admin = userData._id;
+    values.isPrivate = select;
+    console.log("====================================");
+    console.log(`values es`, values);
+    console.log("====================================");
+
     if (values.secretKey === "") delete values.secretKey;
-    console.log("values son", values);
     setIsLoading(true);
-    // axios
-    //   .post(`${uri}/api/league/new`, values)
-    //   .then((res) => {
-    //     setIsLoading(false);
-    //     console.log("====================================");
-    //     console.log("antes de navigate");
-    //     console.log("====================================");
-    //     res.status == 201 ? navigation.navigate("Leagues") : null;
-    //   })
-    //   .catch((error) => {
-    //     setIsLoading(false);
-    //     console.log("error es", error);
-    //   });
+    axios
+      .post(`${uri}/api/league/new`, values)
+      .then((res) => {
+        setIsLoading(false);
+        if (res.status == 201) {
+          console.log("user data es", userData);
+          return dispatch(setUserLeagues({ userId: userData._id }));
+        }
+      })
+      .then(() => {
+        return AsyncStorage.getItem("userInfo");
+      })
+      .then((userString) => {
+        return dispatch(setUserMe(userString));
+      })
+      .then(() => {
+        navigation.navigate("Leagues");
+        Alert.alert("Liga creada!", `Se ha creado la liga ${values.name}`);
+      })
+      .catch((error) => {
+        setIsLoading(false);
+        console.log("error es", error);
+      });
   };
 
   const validationSchema = yup.object().shape({
@@ -478,14 +550,17 @@ const HomeScreen = ({ navigation }) => {
     //   .required("*Campo requerido")
     //   .max(10, "El nickname debe tener un maximo de 10 caracteres"),
 
-    // password: yup
-    //   .string("Ingresa tu eontraseña")
-    //   .min(8, "La contraseña debe tener al menos 8 caracteres")
-    //   .required("*Campo requerido")
-    //   .matches(
-    //     /^(?=(.*[A-Z]){1,})(?=(.*[0-9]){1,}).{8,}$/,
-    //     "La contraseña debe tener al menos una mayúscula y un número"
-    //   ),
+    secretKey: yup
+      .string("Ingrese una clave")
+      .min(5, "La clave debe tener 5 caracteres")
+      .matches(
+        /^(?=(.*[A-Z]){1,}).*$/,
+        "La contraseña debe tener al menos una mayúscula"
+      )
+      .matches(
+        /^(?=(.*[0-9]){1,}).*$/,
+        "La contraseña debe tener al menos un número"
+      ),
   });
 
   const checker = () => {
@@ -508,13 +583,17 @@ const HomeScreen = ({ navigation }) => {
           name: "",
           sport: "",
           description: "",
-          isPrivate: "",
           secretKey: "",
           color: "",
           img: "",
-          selected: false
         }}
-        onSubmit={(values) => handleRegister({...values, select})}
+        onSubmit={(values) => {
+          if (select && values.secretKey && values.secretKey.length === 5)
+            handleRegister({ ...values, select });
+          else if (!select && !values.secretKey) {
+            handleRegister({ ...values, select });
+          } else console.log(`que onda`);
+        }}
       >
         {({
           handleChange,
@@ -561,40 +640,56 @@ const HomeScreen = ({ navigation }) => {
                 name="description"
               />
 
-              <TextInput
-                style={formR.inputs}
-                placeholder="¿Es privada?"
-                name="email"
-                onChangeText={handleChange("isPrivate")}
-                onBlur={handleBlur("isPrivate")}
-                value={values.isPrivate}
-                keyboardType="default"
-              />
-              <CheckBox
-                checked={select}
-                onPress={checker}
-                iconType="ionicon"
-                uncheckedIcon="checkbox-outline"
-                checkedIcon="checkbox"
-                uncheckedColor="white"
-                checkedColor="#45fc03"
-              />
+              <View style={formR.customInput}>
+                <Text style={formR.textCustomInput}>¿Es privada?</Text>
+                <View
+                  style={[formR.customInput, { width: "auto", marginLeft: 5 }]}
+                >
+                  <CheckBox
+                    checked={select}
+                    onPress={checker}
+                    iconType="ionicon"
+                    uncheckedIcon="radio-button-off-outline"
+                    checkedIcon="radio-button-on-outline"
+                    uncheckedColor="white"
+                    checkedColor="#44ebdf"
+                  />
+                  <Text style={[formR.textCustomInput, { left: -12 }]}>Si</Text>
+                </View>
+                <View style={[formR.customInput, { width: "auto", left: -15 }]}>
+                  <CheckBox
+                    checked={!select}
+                    onPress={checker}
+                    iconType="ionicon"
+                    uncheckedIcon="radio-button-off-outline"
+                    checkedIcon="radio-button-on-outline"
+                    uncheckedColor="white"
+                    checkedColor="#44ebdf"
+                  />
+                  <Text style={[formR.textCustomInput, { left: -12 }]}>No</Text>
+                </View>
+              </View>
 
-              <TextInput
-                style={formR.inputs}
-                onChangeText={handleChange("secretKey")}
-                onBlur={handleBlur("secretKey")}
-                value={values.secretKey}
-                keyboardType="default"
-                secureTextEntry={true}
-                placeholder="Clave Secreta"
-                name="secretKey"
-              />
-
-              {values.isPrivate &&
-              values.isPrivate.toString().toLowerCase() !== "no" ? (
-                <Text>Ingrese una clave secreta</Text>
+              {select ? (
+                <TextInput
+                  style={formR.inputs}
+                  onChangeText={handleChange("secretKey")}
+                  onBlur={handleBlur("secretKey")}
+                  value={values.secretKey}
+                  keyboardType="default"
+                  secureTextEntry={true}
+                  placeholder="Clave Secreta (5)"
+                  name="secretKey"
+                  maxLength={5}
+                />
               ) : null}
+
+              {select && values.secretKey === "" ? (
+                <Text style={formR.error}>Por favor, ingrese una clave</Text>
+              ) : null}
+              {errors.secretKey && touched.secretKey && (
+                <Text style={formR.error}>{errors.secretKey}</Text>
+              )}
 
               <TextInput
                 style={formR.inputs}
@@ -615,15 +710,21 @@ const HomeScreen = ({ navigation }) => {
                 placeholder="Imagen (opcional)"
                 name="img"
               />
-              <Image
-                style={{
-                  marginTop: 20,
-                  height: "15%",
-                  backgroundColor: "transparent",
-                  resizeMode: "center",
-                }}
-                source={{ uri: values.img }}
-              />
+              {
+                <Image
+                  style={{
+                    marginTop: 20,
+                    height: "15%",
+                    backgroundColor: "transparent",
+                    resizeMode: "center",
+                  }}
+                  source={{
+                    uri:
+                      values.img ||
+                      "https://www.tibs.org.tw/images/default.jpg",
+                  }}
+                />
+              }
             </View>
             <View style={{ display: "flex", flexDirection: "row" }}>
               <TouchableOpacity

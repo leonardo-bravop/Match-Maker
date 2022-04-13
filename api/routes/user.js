@@ -6,9 +6,9 @@ router.post("/register", userController.register);
 
 router.post("/login", userController.login);
 
-router.put("/edit/:_id", userController.edit);
+router.put("/edit/:_id", userController.verifyToken ,userController.edit);
 
-router.put("/changePassword/:_id", userController.changePassword);
+router.put("/changePassword/:_id", userController.verifyToken ,userController.changePassword);
 
 router.post("/logout", userController.logOut)
 

@@ -1,92 +1,269 @@
 import axios from "axios";
-import React, { useEffect } from "react";
-import { View, TouchableOpacity, Text } from "react-native";
-import { useDispatch } from "react-redux";
+import moment from 'moment';
+import React, { useEffect, useState } from "react";
+import { View, TouchableOpacity, Text, TextInput } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
 import { setMatch } from "../state/record";
+import { colorSet } from "../styles/colorSet";
+import Constants from "expo-constants";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import { record2Styles } from "../styles/record";
+import { cardStyles, itemStyles} from "../styles/record";
 
 const ItemRecord = ({ item }) => {
+   const { manifest } = Constants;
+   const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 
-   const dispatch = useDispatch();
+   let [showInfo, setShowInfo] = useState(false)
+   const [isAccepted, setIsAccepted] = useState(false);
+   const [result1, setResult1] = useState(0);
+   const [result2, setResult2] = useState(0);
+   const [userString, setUserString] = useState("")
+
+   const [isScored, setIsScored] = useState(false)
+
+   //const [item.status, setitem.status] = useState(item.status)
+   const [score, setScore] = useState([0, 0])
+
+   const match = useSelector((state) => state.match);
+   const user = useSelector((state) => state.user);
+ 
+ 
+   useEffect(() => {
+      const asyncUser = async () => {
+         const result = await AsyncStorage.getItem("userInfo");
+         setUserString(result)
+      }
+
+      asyncUser()
+
+      if(item.status==="conflicto") {
+         item.status="completada"
+      }
+
+      if (item.status === "completada") {
+         axios
+         .get(`${uri}/api/result/getResultByMatchId/${item._id}`)
+         .then(({ data }) => {
+            if (item.team_1.filter(element => element._id === user._id).length === 1){
+                  setIsScored(data.confirmation_1)
+            }
+            else {
+               setIsScored(data.confirmation_2)
+            }
+         })
+      }
+      if (item.status === "confirmada") {
+         axios
+         .get(`${uri}/api/result/getResultByMatchId/${item._id}`)
+         .then(({ data }) => {
+            let result = data.score_1.split("-")
+            if (item.team_1.filter(element => element._id === user._id).length === 1){
+                  setScore([result[0], result[1]])
+                  item.status = result[0] > result[1] ? "win" : "lost"
+            }
+            else {
+               setScore([result[1], result[0]])
+               item.status = result[1] > result[0] ? "win" : "lost"
+            }
+         })
+      }
+      
+      if (item.status === "lista" && moment().isSameOrAfter(moment(`${item.date} ${item.time}`, "DD-MM-YYYY H:mm"))) {
+         item.status = "completada"
+      }
+
+
+      if (item.status === "pendiente") {
+         const equipos = item.invitations_team1.concat(item.invitations_team2);
+         const arrayInvit = equipos.filter(
+            (invitation) => invitation.toId === user._id
+         );
+         if (!arrayInvit[0]) return;
+         if (arrayInvit[0].status === "accepted") setIsAccepted(true);
+      }
+    
+   }, [item]);
+ 
+   const acceptHandler = () => {
+     axios
+      .put(`${uri}/api/invitation/invitAcepted/${item._id}/user/${user._id}`, {}, {headers: {Authorization: `Bearer ${userString}`,},})
+      .then(({ data }) => {
+         item = data  
+         setIsAccepted(true)
+      });
+   };
+
+   const resultHandler = () => {
+      let finalScore
+      if (item.team_1.filter(element => element._id === user._id).length === 1){
+         finalScore = `${result1}-${result2}`
+      }
+      else {
+         finalScore = `${result2}-${result1}`
+      }
+      axios
+      .put(`${uri}/api/result/updateResult/match/${item._id}/user/${user._id}`, {score: finalScore}, {headers: {Authorization: `Bearer ${userString}`,},})
+      .then(({ data }) => {
+         item = data
+      });
+   };
+
+   const cancelHandler = () => {
+      axios
+      .put(`${uri}/api/invitation/invitRejected/${item._id}/user/${user._id}`, {}, {headers: {Authorization: `Bearer ${userString}`,},})
+      .then(({ data }) => {
+         item.status = "cancelada"
+      });
+      
+   }
+
 
    return (
-      <View>
-      <TouchableOpacity style={[record2Styles.item]} onPress={() => dispatch(setMatch(item)) }>
-         
-         <View style={{flex:1, borderBottomRightRadius: 10, borderTopRightRadius: 10}}>
-            {/* <View style={{ flexDirection: "row", height: 40, justifyContent: "center", alignItems: "center", borderTopRightRadius: 10}}>
-               
-               <View style={{flex:1,height: 40, justifyContent: "center", alignItems: "center"}}>
-                  <Text style={{color: item.color, fontWeight: "bold"}}>16</Text>
-               </View>
-               <View style={{flex:1,height: 40, justifyContent: "center", alignItems: "center", borderTopRightRadius: 10}}>
-                  <Text style={{color: item.color, fontWeight: "bold"}}>22</Text>
-               </View>
-            </View> */}
-            
-         
-            <View style={{flex:1, flexDirection: "row", borderBottomRightRadius: 10 }}>
-               <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
-                  {item.team_1.map( (user, i, arr) => {
-                     if (i>2) return (<></>)
-                     return (
-                     <Text style={{color: '#FFFFFF'}} key= {i}>
-                        {arr.length > 3 && i === 2 
-                        ?  `${user.nickname}`+` y ${arr.length-3} mas` 
+      <TouchableOpacity onPress={() => setShowInfo(!showInfo)} 
+                        style={[itemStyles.item, {borderColor: colorSet[item.status] , borderWidth:1.5}]}>
+         <View style={[itemStyles.head]}>
+            <View style={[itemStyles.team, {borderColor: "blue" , borderWidth:0}]}>
+               {item[item.team_1.filter(element => element._id === user._id).length === 1 ? "team_1" : "team_2"]
+               .slice(0,3).map( (user, i) => {
+                  return (
+                     <Text style={[itemStyles.text, {marginBottom: 3}]} key= {i}>
+                        {item.team_1.length > 3 && i === 2 
+                        ? `y ${item.team_1.length-2} mas` 
                         : user.nickname }
                      </Text>)
                   })}
-               </View>
-
-               <View style={[record2Styles.date, {backgroundColor: "grey"}]}>
-                  <Text style={{color: '#FFFFFF'}}>{item.date} {item.status}</Text>
-               </View>
-               
-               <View style={{flex: 1, justifyContent: "center", alignItems: "center" , borderBottomRightRadius: 10}}>
-
-                  {item.team_2.map( (user, i, arr) => {
-                     if (i>2) return (<></>)
-                     return (
-                     <Text style={{color: '#FFFFFF'}} key= {i}>
-                        {arr.length > 3 && i === 2 
-                        ?  `${user.nickname}`+` y ${arr.length-3} mas` 
-                        : user.nickname }
-                     </Text>)
-                  })}
-               
-               </View>
             </View>
-         
+            
+            <View style={[itemStyles.info, {borderColor: "red" , borderWidth:0}]}>
+               
+                  {item.status === "win" || item.status === "lost"
+                  ?<Text style={[itemStyles.text, { fontSize: 25, color: colorSet[item.status] }]}> 
+                     {`${score[0]} - ${score[1]}`}
+                  </Text>
+                  :<>
+                     <Text style={[itemStyles.text, { textTransform: "uppercase", color: colorSet[item.status] }]}>
+                        {item.status === "completada" ? "completa" : item.status}
+                     </Text>
+                     <Text style={[itemStyles.text, { textTransform: "uppercase", color: colorSet[item.status] }]}>
+                        {moment(item.date, "DD-MM-YYYY").format("DD-MM")}
+                     </Text>
+                  </>
+                  }
+            
+               
+            </View>
+
+            <View style={[itemStyles.team, {borderColor: "blue" , borderWidth:0}]}>
+               {item[item.team_1.filter(element => element._id === user._id).length === 1 ? "team_2" : "team_1"]
+               .slice(0,3).map( (user, i) => {
+                  return (
+                     <Text style={[itemStyles.text, {marginBottom: 3}]} key= {i}>
+                        {item.team_2.length > 3 && i === 2 
+                        ? `y ${item.team_2.length-2} mas` 
+                        : user.nickname }
+                     </Text>)
+                  })}
+            </View>
          </View>
          
+         { showInfo
+         ? <View>
+            <View style={{marginBottom: item.status === "completada" || item.status === "pendiente"? 0 : 16}}>
+               <Text style={[itemStyles.text]}>
+                  El partido se { item.status === "pendiente" || item.status === "lista" ? "disputara" : "disputo"} a las {item.time}
+               </Text>
+               {item.invitationText === ""
+               ? <></>
+               : <Text style={[itemStyles.text]}>
+                     {item.invitationText}
+               </Text>}
+            </View>
+
+               { (item.status === "pendiente") 
+               ?<View>
+                  {!isAccepted
+                  ? <View style={{ marginTop: 30}}>
+                        <TouchableOpacity style={[cardStyles.confirmButton, { backgroundColor: colorSet[item.status]}]}
+                                       onPress={acceptHandler}>
+                           <Text style={[cardStyles.buttonTxt]}>{"Participar"}</Text>
+                        </TouchableOpacity>
+                        
+                        <View style={{ marginVertical: 10, flexDirection: "row"}}>
+                           <TouchableOpacity style={[cardStyles.cancelButton]} onPress={cancelHandler}>
+                              <Text style={[cardStyles.cancelTxt, {color: colorSet.error}]}>{"Cancelar"}</Text>
+                           </TouchableOpacity>
+                        </View>
+                  </View>
+                  : <View>
+                        <Text style={[itemStyles.text, {marginTop: 10}]}>
+                           Ya has confirmado tu participación
+                        </Text>
+                        <View style={{ marginVertical: 10, flexDirection: "row"}}>
+                           <TouchableOpacity style={[cardStyles.cancelButton]} onPress={cancelHandler}>
+                              <Text style={[cardStyles.cancelTxt, {color: colorSet.error}]}>{"Cancelar"}</Text>
+                           </TouchableOpacity>
+                        </View>
+                     </View>
+                  }
+               </View>
+               :<></> 
+               }
+
+               { (item.status === "lista") 
+               ?<View>
+                  <Text style={[itemStyles.text, {marginTop: 10}]}>
+                     Ya has confirmado tu participación
+                  </Text>
+                  <View style={{ marginVertical: 10, flexDirection: "row"}}>
+                  <TouchableOpacity style={[cardStyles.cancelButton]} onPress={cancelHandler}>
+                     <Text style={[cardStyles.cancelTxt, {color: colorSet.error}]}>{"Cancelar"}</Text>
+                  </TouchableOpacity>
+                  </View>
+               </View>
+               :<></> 
+               }
+
+               { (item.status === "completada") 
+               ?<View>
+                  { !isScored 
+                  ? <View style={{ marginTop: 30, flexDirection: "row"}}>
+
+                     <TextInput style={[cardStyles.input, {height: 40, alignSelf: "center"}]}
+                                    name="text" keyboardType="default"
+                                    placeholder="Resultado"
+                                    value={result1} 
+                                    onChangeText={ text => setResult1(parseInt(text))}
+                     />
+                     
+                     <TouchableOpacity style={[cardStyles.confirmButton, { backgroundColor: colorSet[item.status]}]}
+                                       onPress={resultHandler}>
+                        <Text style={[cardStyles.buttonTxt]}>{"Enviar"}</Text>
+                     </TouchableOpacity>
+
+                     <TextInput style={[cardStyles.input, {height: 40, alignSelf: "center"}]}
+                                    name="text" keyboardType="default"
+                                    placeholder="Resultado"
+                                    value={result2} 
+                                    onChangeText={ text => setResult2(parseInt(text))}
+                     />
+                  </View>
+                  :<></>}
+                  <View style={{ marginVertical: 10, flexDirection: "row"}}>
+                  <TouchableOpacity style={[cardStyles.cancelButton]} onPress={cancelHandler}>
+                     <Text style={[cardStyles.cancelTxt, {color: colorSet.error}]}>{"Cancelar"}</Text>
+                  </TouchableOpacity>
+                  </View>
+               </View>
+               :<></> 
+               }
+         </View>
+         :<></> 
+         }
+         
+         
       </TouchableOpacity> 
-      </View>
   );
 };
 
 export default ItemRecord;
-
-{/* <View style={[record2Styles.group]}>
-               <Text style={{color: '#FFFFFF'}}>
-                  {item.nickname} - {item.nickname} - {item.nickname} ...
-               </Text>
-            </View>
-         
-            <View style={[record2Styles.group]}>
-               <Text style={{color: '#FFFFFF'}}>
-                  {item.nickname} - AleR - {item.nickname} ...
-               </Text>
-            </View>
-
-
-
-
-<View style={[record2Styles.group]}>
-<Text style={{color: item.color, fontWeight: "bold"}}>16</Text>
-</View>
-
-<View style={[record2Styles.group]}>
-<Text style={{color: item.color, fontWeight: "bold"}}>22</Text>
-</View> */}
-

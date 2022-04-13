@@ -1,4 +1,106 @@
 import { StyleSheet } from "react-native";
+import { colorSet } from "./colorSet";
+
+
+export const newLeagueStyles = StyleSheet.create({
+   back: {
+      flex: 1,
+      backgroundColor: colorSet.background
+   },
+   head: {
+      /*flexDirection: "row",*/
+      height: 250,
+      paddingTop: 30,
+   },
+   info: {
+      flex: 1,
+      justifyContent: "flex-end"
+   },
+   title:{
+      marginBottom: 0,
+      fontSize: 32,
+      alignSelf: "center",
+      fontStyle: "italic",
+      fontWeight: "bold",
+      color: colorSet.text
+   },
+   pickerButton: {
+      height: 50, 
+      marginHorizontal: 8,
+      marginBottom: 0,
+      alignSelf: "center"/*"flex-end"*/, 
+      justifyContent:"center"
+   },
+   listHead:{
+      paddingVertical: 8,
+      borderTopLeftRadius: 10,
+      borderTopRightRadius: 10,
+      marginBottom: 6,
+      flexDirection: "row",
+      justifyContent: "space-evenly",
+      //backgroundColor: colorSet.content
+   },
+
+   body: {
+      flex: 1,
+      marginHorizontal:16,
+      marginVertical: 10
+   },
+   list: {
+      flex: 1,
+      borderBottomLeftRadius: 10,
+      borderBottomRightRadius: 10
+   },
+
+
+   item: {
+      height: 70,
+      marginBottom: 6,
+      borderRadius: 10,
+      flexDirection: "row",
+      justifyContent: "space-evenly",
+      backgroundColor: colorSet.content
+   },
+   text: {
+      fontSize: 18, 
+      alignSelf: "center",
+      color: colorSet.text,
+   },
+
+   team: {
+      justifyContent: "center",
+      alignContent: "center",
+      borderRadius: 10
+   },
+   info: {
+      flex:1,
+      justifyContent: "center",
+      alignItems: "center",
+      //backgroundColor: colorSet.button
+    },
+    img: {
+      height: 46,
+      aspectRatio:1,
+      borderRadius: 92,
+      alignSelf: "center"
+   },
+   nickContainer: {
+      justifyContent: "center",
+      alignItems: "center"
+   },
+   nick: { 
+      width: 182,
+      flexDirection: "row",
+      paddingHorizontal:10,
+      alignContent: "center"
+   },
+})
+
+
+
+
+
+
 
 
 export const leagueStyles = StyleSheet.create({
@@ -18,7 +120,7 @@ export const leagueStyles = StyleSheet.create({
    },
    foot: {
       height: 58,
-      backgroundColor: "#090717",
+      //backgroundColor: "#090717",
    },
 
    menu: {

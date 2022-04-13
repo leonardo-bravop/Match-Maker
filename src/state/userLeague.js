@@ -13,7 +13,9 @@ export const setUserLeagues = createAsyncThunk("USER_LEAGUES", ({userId}) => {
 const initialState = [];
 
 const userLeaguesReducer = createReducer(initialState, {
-    [setUserLeagues.fulfilled]: (state, action) => action.payload,
+    [setUserLeagues.fulfilled]: (state, action) => {
+        console.log(`Setee user leagues con action.payload`, action.payload);
+        return action.payload},
 })
 
 export default userLeaguesReducer
