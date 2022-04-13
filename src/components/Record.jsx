@@ -58,6 +58,7 @@ const Record = () => {
       axios.get(`${uri}/api/user/${user._id}/getMatchesByDate/${matchDate}`)
       .then(({data}) => {
           setRecordList(data.reverse())
+          console.log("showbyDate Record-----------\n\n", data)
       })
     }
     
