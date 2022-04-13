@@ -100,11 +100,11 @@ exports.login = (req, res, next) => {
 
 exports.edit = (req, res, next) => {
   const { _id } = req.params;
-  const { name, surname, nickname, age } = req.body;
-
-  User.updateOne({ _id }, { name, surname, nickname, age })
-    .select("name nickname")
+  //const { name, surname, nickname, age, image } = req.body;
+  console.log('REQ BODY ======>', req.body)
+  User.updateOne({ _id }, req.body)
     .then((result) => {
+      console.log('RESULT ====>', result)
       res.send(result);
     })
     .catch((error) => {
@@ -148,6 +148,7 @@ exports.me = (req, res, next) => {
             surname: user.surname,
             nickname: user.nickname,
             leagues: user.leagues,
+            img: user.img,
           })
         )
         .catch((error) => {

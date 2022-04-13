@@ -10,12 +10,15 @@ export const setUserMe = createAsyncThunk("ME", (userString) => {
     return axios.post(`${uri}/api/user/me`,{},{headers: {Authorization: `Bearer ${userString}`,},}).then((res) => res.data);
 });
 
+export const updateUser = createAsyncThunk("UPDATE_USER", ({values, id, userString}) => {
+    return axios.put(`${uri}/api/user/edit/${id}`, values).then(() => axios.post(`${uri}/api/user/me`,{},{headers: {Authorization: `Bearer ${userString}`,},}).then((res) => res.data))
+});
+
 const initialState = {};
 
 const usersReducer = createReducer(initialState, {
-    [setUserMe.fulfilled]: (state, action) => {
-        console.log(`action payload es`, action.payload);
-        return action.payload},
+    [setUserMe.fulfilled]: (state, action) => action.payload,
+    [updateUser.fulfilled]: (state, action) => action.payload,
 })
 
 export default usersReducer

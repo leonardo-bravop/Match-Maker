@@ -106,7 +106,8 @@ export const newLeagueStyles = StyleSheet.create({
 export const leagueStyles = StyleSheet.create({
    back: {
       flex: 1,
-      paddingTop: 30
+      paddingTop: 40,
+      backgroundColor:"#0e0b29"
     },
 
    head: {
