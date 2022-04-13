@@ -50,6 +50,7 @@ const AppNavigator = createBottomTabNavigator(
         tabBarIcon: <Icon name="ios-person" type="ionicon" color="white" />,
       },
     },
+    
   },
   {
     tabBarOptions: {

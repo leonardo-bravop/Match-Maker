@@ -48,6 +48,8 @@ import {
   getDownloadURL,
 } from "firebase/storage";
 
+import * as Updates from 'expo-updates';
+
 const { width, height } = Dimensions.get("screen");
 
 const styles = StyleSheet.create({
@@ -125,7 +127,7 @@ const User = ({ navigation }) => {
       await AsyncStorage.setItem("userInfo", "");
       const emptyUser = result.data;
       setUserData(emptyUser);
-      navigation.navigate("Welcome");
+      await Updates.reloadAsync()
     } catch (err) {
       console.log(err);
     }
