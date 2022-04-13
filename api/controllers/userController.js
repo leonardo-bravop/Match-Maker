@@ -101,7 +101,6 @@ exports.edit = (req, res, next) => {
   const { name, surname, nickname, age } = req.body;
 
   User.updateOne({ _id }, { name, surname, nickname, age })
-    .select("name nickname")
     .then((result) => {
       res.send(result);
     })
