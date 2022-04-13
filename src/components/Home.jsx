@@ -178,7 +178,6 @@ function Home({ navigation: { navigate } }) {
             }}
           >
             <View style={home.lastItem}>
-              {console.log('MATCHES ======>', matches.reverse()[0])}
               {matches.reverse()[0].team_1.map((item, i) => {
                 //if(i > 1) return
                 return (
