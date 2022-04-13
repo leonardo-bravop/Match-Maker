@@ -7,9 +7,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
-  ImageBackground,
-  ScrollView,
-  KeyboardAvoidingView,
+  Keyboard 
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SearchBar } from "@rneui/themed";
@@ -17,8 +15,6 @@ import { FlatGrid } from "react-native-super-grid";
 import axios from "axios";
 import Constants from "expo-constants";
 import { StatusBar } from "expo-status-bar";
-import { leagueStyles } from "../styles/league";
-import { profile } from "../styles/profile";
 import { useDispatch, useSelector } from "react-redux";
 import { setUserMe } from "../state/user";
 import { setUserLeagues } from "../state/userLeague";
@@ -54,26 +50,37 @@ const home = StyleSheet.create({
     color: "white",
   },
   lastContainer: {
+    backgroundColor: "#53525d",
     alignSelf: "center",
     flexDirection: "row",
     width: "80%",
     height: "40%",
-    borderWidth: 3,
-    borderColor: "white",
-    borderRadius: 15,
+    borderRadius: 10,
     alignItems: "center",
     marginTop: 20,
-    backgroundColor: "gray",
     paddingLeft: 5,
+  },
+  lastResultItem: {
+    height: "100%",
+    justifyContent: "center",
+    width: "33%",
+    backgroundColor: "#808080",
+    flexDirection: "column",
+  },
+  lastResult: {
+    width: "100%",
+    textAlign: "center",
+    color: "#FFFFFF",
   },
   lastItem: {
     width: "33%",
+    flexDirection: "column",
   },
   lastText: {
+    width: "100%",
+    height: "33%",
     textAlign: "center",
-    fontSize: 14,
-    fontWeight: "bold",
-    color: "#34495e",
+    color: "#FFFFFF",
   },
   ligaContainer: {
     flexDirection: "row",
@@ -121,11 +128,13 @@ function Home({ navigation: { navigate } }) {
   const [meLeagues, setMeLeagues] = useState(false);
   const [results, setResults] = useState({});
   const [matches, setMatches] = useState([]);
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
   const [select, setSelect] = useState();
   const [selectMeLeagues, setSelectMeLeagues] = useState({ color: "#39424d" });
 
   const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
+  const match = matches.reverse()[0];
 
   const updateSearch = (search) => {
     if (!search) setResults([]);
@@ -135,27 +144,38 @@ function Home({ navigation: { navigate } }) {
     });
   };
 
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setKeyboardVisible(true); // or some other action
+      },
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setKeyboardVisible(false); // or some other action
+      },
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
+
   useEffect(async () => {
     try {
-      // console.log(`Home Paso 1`);
       const userString = await AsyncStorage.getItem("userInfo");
-      // console.log(`userString es`, userString);
       if (!userString) return;
-      // console.log(`Home Paso 2`);
       const result = await dispatch(setUserMe(userString));
-      // console.log(`Home Paso 3`);
       const userLeagues = await dispatch(
         setUserLeagues({ userId: result.payload._id })
       );
-      // console.log(`Home Paso 4`);
       const { payload } = await dispatch(setLeagues(false));
-      // console.log(`result es`, result);
-      // console.log(`Home Paso 5`);
       const { data } = await axios.get(
         `${uri}/api/user/getMatches/${result.payload._id}`
       );
-      // console.log("DATA ===> ", data);
-      // console.log(`Home Paso 6`);
       setMatches(data);
     } catch (err) {
       console.log(err);
@@ -169,50 +189,63 @@ function Home({ navigation: { navigate } }) {
         <Text style={home.tittleText}>MATCH MAKER</Text>
       </View>
       <View style={home.containerDos}>
-        <Text style={home.lastTittle}>Ultima partida</Text>
-        {matches[0] ? (
-          <TouchableOpacity
-            style={home.lastContainer}
-            onPress={() => {
-              navigate("Historial");
-            }}
-          >
-            <View style={home.lastItem}>
-              {console.log('MATCHES ======>', matches.reverse()[0])}
-              {matches.reverse()[0].team_1.map((item, i) => {
-                //if(i > 1) return
-                return (
-                  <Text key={i} style={home.lastText}>
-                    {item.nickname}
-                  </Text>
-                );
-              })}
-            </View>
-            <View style={home.lastItem}>
-              <Text
-                style={[
-                  home.lastText,
-                  { fontSize: 20, color: "black", fontWeight: "normal" },
-                ]}
+        {isKeyboardVisible ? <Text style={{ color: "white", textAlign: "center" }}>
+        ────────────────Search────────────────
+          </Text> : (
+          <>
+            <Text style={home.lastTittle}>Ultima partida</Text>
+            {matches.reverse()[0] ? (
+              <TouchableOpacity
+                style={home.lastContainer}
+                onPress={() => {
+                  navigate("Historial");
+                }}
               >
-                {matches[0].status}
+                <View style={home.lastItem}>
+                  {match.team_1.map((item, i) => {
+                    if (i == 2)
+                      return (
+                        <Text key={i} style={home.lastText}>{`y ${
+                          match.team_1.length - 2
+                        } más`}</Text>
+                      );
+                    if (i > 1) return;
+                    return (
+                      <Text key={i} style={home.lastText}>
+                        {item.nickname}
+                      </Text>
+                    );
+                  })}
+                </View>
+                <View style={home.lastResultItem}>
+                <Text style={home.lastResult}>{match.date}</Text>
+                  <Text style={home.lastResult}>{match.status}</Text>
+                </View>
+                <View style={home.lastItem}>
+                  {match.team_2.map((item, i) => {
+                    if (i == 2)
+                      return (
+                        <Text key={i} style={home.lastText}>{`y ${
+                          match.team_2.length - 2
+                        } más`}</Text>
+                      );
+                    if (i > 1) return;
+                    return (
+                      <Text key={i} style={home.lastText}>
+                        {item.nickname}
+                      </Text>
+                    );
+                  })}
+                </View>
+              </TouchableOpacity>
+            ) : (
+              <Text
+                style={{ color: "white", fontSize: 16, alignSelf: "center" }}
+              >
+                Aun no tienes matches registradas
               </Text>
-            </View>
-            <View style={home.lastItem}>
-              {matches.reverse()[0].team_2.map((item, i) => {
-                //if(i > 1) return
-                return (
-                  <Text key={i} style={home.lastText}>
-                    {item.nickname}
-                  </Text>
-                );
-              })}
-            </View>
-          </TouchableOpacity>
-        ) : (
-          <Text style={{ color: "white", fontSize: 16, alignSelf: "center" }}>
-            Aun no tienes matches registradas
-          </Text>
+            )}
+          </>
         )}
         <View style={{ marginTop: 10 }}>
           <SearchBar

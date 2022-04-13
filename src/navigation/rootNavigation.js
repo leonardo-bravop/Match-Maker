@@ -50,6 +50,7 @@ const AppNavigator = createBottomTabNavigator(
         tabBarIcon: <Icon name="ios-person" type="ionicon" color="white" />,
       },
     },
+    
   },
   {
     tabBarOptions: {
@@ -80,6 +81,12 @@ const AuthNavigator = createStackNavigator({
     }),
   },
   Register: {
+    screen: Register,
+    navigationOptions: () => ({
+      headerShown: false,
+    }),
+  },
+  Edit: {
     screen: Register,
     navigationOptions: () => ({
       headerShown: false,
