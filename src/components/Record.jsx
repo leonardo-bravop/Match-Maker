@@ -111,7 +111,7 @@ const Record = () => {
             <ListHead labels={["Aliados", "Info", "Rivales"]} styling={recordStyles.listHead}/>
                
             <View style={recordStyles.list}>
-               <List list={recordList} Element={ItemRecord} marginNum={0.1} />
+              {!!recordList.length && <List list={recordList} Element={ItemRecord} marginNum={0.1} />}
             </View>
 
          </View>

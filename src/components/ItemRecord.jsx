@@ -37,6 +37,10 @@ const ItemRecord = ({ item }) => {
 
       asyncUser()
 
+      if(item.status==="conflicto") {
+         setCustomStatus("completada")
+      }
+
       if (customStatus === "completada") {
          axios
          .get(`${uri}/api/result/getResultByMatchId/${item._id}`)

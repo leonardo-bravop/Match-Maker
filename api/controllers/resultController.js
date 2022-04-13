@@ -65,16 +65,22 @@ exports.updateResult = (req, res, next) => {
       }
     })
     .then((sumelo1) => {
-      eloTeam1 = Math.max(...sumelo1);
-      return sumElo(2, eloTeam2, matchRef);
+      if (sumelo1) {
+        eloTeam1 = Math.max(...sumelo1);
+        return sumElo(2, eloTeam2, matchRef);
+      }
     })
     .then((sumelo2) => {
-      eloTeam2 = Math.max(...sumelo2);
-      eloDiff = calculateEloDiff(eloTeam1, eloTeam2, score1, score2);
-      return updateEloWithDiff(matchRef, 1, eloDiff);
+      if (sumelo2) {
+        eloTeam2 = Math.max(...sumelo2);
+        eloDiff = calculateEloDiff(eloTeam1, eloTeam2, score1, score2);
+        return updateEloWithDiff(matchRef, 1, eloDiff);
+      }
     })
-    .then(() => {
-      return updateEloWithDiff(matchRef, 2, eloDiff);
+    .then((result) => {
+      if (result) {
+        return updateEloWithDiff(matchRef, 2, eloDiff);
+      }
     })
     .then(() => {
       res.send(matchRef);
@@ -416,7 +422,6 @@ exports.getResultByMatchId = (req, res, next) => {
 // /*score final  = score 1 - score 2
 //                       5 - 3
 
-
 //         elo + (cuanto afecta *(scorefinal - probabilidad de ganar))
 //         800 +        5       *(   11      -   0,5 )
 
@@ -426,7 +431,7 @@ exports.getResultByMatchId = (req, res, next) => {
 
 // elo caracter 2 -= eloDif
 
-// 800 805 701 500 = 2806/4 = 701,5 
+// 800 805 701 500 = 2806/4 = 701,5
 
 // 900 1000 500 300 = 2700/4 = 675
 

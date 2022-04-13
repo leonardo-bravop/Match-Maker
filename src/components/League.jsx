@@ -400,7 +400,7 @@ const LeagueHome = ({ navigation }) => {
         />
 
         <View style={newLeagueStyles.list}>
-          {memberList[0] ? (
+          {memberList[0] || leagueId? (
             <List
               list={memberList}
               Element={ItemLeague}
