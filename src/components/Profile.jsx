@@ -48,7 +48,7 @@ import {
   getDownloadURL,
 } from "firebase/storage";
 
-import * as Updates from 'expo-updates';
+import * as Updates from "expo-updates";
 
 const { width, height } = Dimensions.get("screen");
 
@@ -127,7 +127,7 @@ const User = ({ navigation }) => {
       await AsyncStorage.setItem("userInfo", "");
       const emptyUser = result.data;
       setUserData(emptyUser);
-      await Updates.reloadAsync()
+      await Updates.reloadAsync();
     } catch (err) {
       console.log(err);
     }
@@ -159,16 +159,16 @@ const User = ({ navigation }) => {
         <View style={leagueStyles.listHead}>
           <View style={leagueStyles.enum}>
             <View style={{ width: 50, alignItems: "center" }}>
-              <Text style={{ color: "#FFFFFF" }}>Rank</Text>
+              <Text style={{ color: "#FFFFFF", fontSize: 18 }}>Rank</Text>
             </View>
             <View style={{ width: 50, alignItems: "center" }}>
-              <Text style={{ color: "#FFFFFF" }}>Foto</Text>
+              <Text style={{ color: "#FFFFFF", fontSize: 18 }}>Foto</Text>
             </View>
             <View style={{ flex: 1, width: "auto", alignItems: "center" }}>
-              <Text style={{ color: "#FFFFFF" }}>Nick</Text>
+              <Text style={{ color: "#FFFFFF", fontSize: 18 }}>Nick</Text>
             </View>
             <View style={{ width: 100, alignItems: "center" }}>
-              <Text style={{ color: "#FFFFFF" }}>ELO</Text>
+              <Text style={{ color: "#FFFFFF", fontSize: 18 }}>ELO</Text>
             </View>
           </View>
         </View>
@@ -178,21 +178,33 @@ const User = ({ navigation }) => {
               return (
                 <View key={i}>
                   <TouchableOpacity
-                    // onPress={() => {
-                    //   dispatch(setLeague(item.league));
-                    //   dispatch(setMembers(item.league._id));
-                    //   dispatch(setLeagueId(item.league._id));
-                    //   navigation.navigate("Liga", item);
-                    // }}
+                  // onPress={() => {
+                  //   dispatch(setLeague(item.league));
+                  //   dispatch(setMembers(item.league._id));
+                  //   dispatch(setLeagueId(item.league._id));
+                  //   navigation.navigate("Liga", item);
+                  // }}
                   >
                     <View
                       style={[
                         leagueStyles.item,
-                        { backgroundColor: `${item.league.color}` },
+                        {
+                          backgroundColor: `${item.league.color}`,
+                          borderWidth: 1.5,
+                          marginTop: -3,
+                        },
                       ]}
                     >
                       <View style={leagueStyles.rank}>
-                        <Text style={{ color: "#FFFFFF" }}>
+                        <Text
+                          style={{
+                            color: "#FFFFFF",
+                            // textShadowColor: "#000000",
+                            // textShadowOffset: { width: 1, height: 1 },
+                            // textShadowRadius: 0.1,
+                            fontSize: 18,
+                          }}
+                        >
                           {item.user.rank}
                         </Text>
                       </View>
@@ -208,12 +220,28 @@ const User = ({ navigation }) => {
                         />
                       </View>
                       <View style={leagueStyles.nick}>
-                        <Text style={{ color: "#FFFFFF" }}>
+                        <Text
+                          style={{
+                            color: "#FFFFFF",
+                            // textShadowColor: "#000000",
+                            // textShadowOffset: { width: 1, height: 1 },
+                            // textShadowRadius: 0.1,
+                            fontSize: 18,
+                          }}
+                        >
                           {item.league.name}
                         </Text>
                       </View>
                       <View style={leagueStyles.elo}>
-                        <Text style={{ color: "#FFFFFF" }}>
+                        <Text
+                          style={{
+                            color: "#FFFFFF",
+                            // textShadowColor: "#000000",
+                            // textShadowOffset: { width: 1, height: 1 },
+                            // textShadowRadius: 0.1,
+                            fontSize: 18,
+                          }}
+                        >
                           {item.user.elo[0].value}
                         </Text>
                       </View>
@@ -324,11 +352,10 @@ function Add({ setEditImage, navigation }) {
   const takePicture = async () => {
     if (camera) {
       const prevData = await camera.takePictureAsync(null);
-      const data = await ImageManipulator.manipulateAsync(
-        prevData.uri,
-        [],
-        { compress: 0.5, format: ImageManipulator.SaveFormat.PNG }
-      );
+      const data = await ImageManipulator.manipulateAsync(prevData.uri, [], {
+        compress: 0.5,
+        format: ImageManipulator.SaveFormat.PNG,
+      });
       setDataImage(data);
       setImageUri(data.uri);
       setImageArray([data.uri]);
@@ -385,7 +412,7 @@ function Add({ setEditImage, navigation }) {
     uploadTask.on(
       "state_changed",
       (snapshot) => {
-        setUploading(true)
+        setUploading(true);
         // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
         const progress =
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
@@ -427,7 +454,7 @@ function Add({ setEditImage, navigation }) {
               userString: userString,
             })
           );
-          setUploading(false)
+          setUploading(false);
           // console.log("File available at", downloadURL);
           // console.log("USER IMAGE", user.img);
           navigation.navigate("User");

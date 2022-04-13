@@ -271,6 +271,7 @@ const LeagueHome = ({ navigation }) => {
                       fontSize: 18,
                       textAlign: "center",
                     }}
+                    secureTextEntry={true}
                     maxLength={5}
                     onChangeText={setSecretKey}
                     onSubmitEditing={() => {
