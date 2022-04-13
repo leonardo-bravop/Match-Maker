@@ -41,7 +41,7 @@ const matchSchema = new Schema({
   },
   status: {
     type: String,
-    default: "pending",
+    default: "pendiente",
   },
   result: {
     type: Schema.Types.ObjectId,

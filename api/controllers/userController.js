@@ -244,7 +244,7 @@ exports.getMatchesByUserId = (req, res, next) => {
   const { userId } = req.params;
   getUserAndMatches(userId)
     .then((user) => {
-      cancelUserMatches(user);
+      return cancelUserMatches(user);
     })
     .then(() => {
       return getUserAndMatches(userId);
@@ -286,10 +286,11 @@ exports.getUserMatchesByDate = (req, res, next) => {
   const { userId, date } = req.params;
   getUserAndMatches(userId, { date })
     .then((user) => {
-      cancelUserMatches(user);
+      console.log("user matches son", user.matches);
+      return cancelUserMatches(user);
     })
     .then(() => {
-      return getUserAndMatches(userId);
+      return getUserAndMatches(userId, {date});
     })
     .then((user) => res.send(user.matches))
     .catch((error) => {
