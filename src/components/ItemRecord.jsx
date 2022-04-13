@@ -95,8 +95,16 @@ const ItemRecord = ({ item }) => {
    };
 
    const resultHandler = () => {
+      let finalScore
+      if (item.team_1.filter(element => element._id === user._id).length === 1){
+         finalScore = `${result1}-${result2}`
+      }
+      else {
+         finalScore = `${result2}-${result1}`
+      }
+
       axios
-      .put(`${uri}/api/result/updateResult/match/${item._id}/user/${user._id}`, {score: `${result1}-${result2}`}, {headers: {Authorization: `Bearer ${userString}`,},})
+      .put(`${uri}/api/result/updateResult/match/${item._id}/user/${user._id}`, {score: finalScore}, {headers: {Authorization: `Bearer ${userString}`,},})
       .then(({ data }) => {
          item = data
       });
