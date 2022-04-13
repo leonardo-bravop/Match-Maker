@@ -26,16 +26,20 @@ const ItemRecord = ({ item }) => {
  
  
    useEffect(() => {
-      
+      console.log("Esto es match ---------------", item)
       const asyncUser = async () => {
          const result = await AsyncStorage.getItem("userInfo");
          setUserString(result)
       }
 
       asyncUser()
+
+      //if (item.status === "completada") {
+         //setIsAResult
+      //}
       
       if (item.status === "lista" && moment().isSameOrAfter(moment(`${item.date} ${item.time}`, "DD-MM-YYYY H:mm"))) {
-            item.status = "result"
+            item.status = "completada"
       }
 
       setStatusColor(colorSet[item.status])
@@ -50,13 +54,13 @@ const ItemRecord = ({ item }) => {
          if (arrayInvit[0].status === "accepted") setIsAccepted(true);
       }
     
-   }, [item]);
+   }, [item, item]);
  
    const acceptHandler = () => {
      axios
       .put(`${uri}/api/invitation/invitAcepted/${item._id}/user/${user._id}`, {}, {headers: {Authorization: `Bearer ${userString}`,},})
       .then(({ data }) => {
-         item = data   
+         item = data  
          setIsAccepted(true)
       });
    };
@@ -65,7 +69,7 @@ const ItemRecord = ({ item }) => {
       axios
       .put(`${uri}/api/result/updateResult/match/${item._id}/user/${user._id}`, {score: `${result1}-${result2}`}, {headers: {Authorization: `Bearer ${userString}`,},})
       .then(({ data }) => {
-         console.log(`updated match es`, data)
+         item = data
       });
    };
 
@@ -73,6 +77,7 @@ const ItemRecord = ({ item }) => {
       axios
       .put(`${uri}/api/invitation/invitRejected/${item._id}/user/${user._id}`, {}, {headers: {Authorization: `Bearer ${userString}`,},})
       .then(({ data }) => {
+         item = data 
       });
       
    }
@@ -95,7 +100,7 @@ const ItemRecord = ({ item }) => {
             
             <View style={[itemStyles.info, {borderColor: "red" , borderWidth:0}]}>
                <Text style={[itemStyles.text, { textTransform: "uppercase", color: statusColor }]}>
-                  {item.status}
+                  {item.status === "completada" ? "completa" : item.status}
                </Text>
             
                <Text style={[itemStyles.text, { textTransform: "uppercase", color: statusColor }]}>
@@ -117,15 +122,16 @@ const ItemRecord = ({ item }) => {
          
          { showInfo
          ? <View>
+            <View style={{marginBottom: item.status === "cancelada" ? 16 : 0}}>
                <Text style={[itemStyles.text]}>
-                  El partido se { item.status === "pending" || item.status === "active" ? "disputara" : "disputo"} a las {item.time}
+                  El partido se { item.status === "pendiente" || item.status === "lista" ? "disputara" : "disputo"} a las {item.time}
                </Text>
                {item.invitationText === ""
                ? <></>
                : <Text style={[itemStyles.text]}>
                      {item.invitationText}
                </Text>}
-
+            </View>
 
                { (item.status === "pending" || item.status === "pendiente") 
                ?<View>
@@ -171,7 +177,7 @@ const ItemRecord = ({ item }) => {
                :<></> 
                }
 
-               { (item.status === "result") 
+               { (item.status === "completada") 
                ?<View>
                   <View style={{ marginTop: 30, flexDirection: "row"}}>
                         
@@ -199,13 +205,6 @@ const ItemRecord = ({ item }) => {
                      <Text style={[cardStyles.cancelTxt, {color: colorSet.error}]}>{"Cancelar"}</Text>
                   </TouchableOpacity>
                   </View>
-               </View>
-               :<></> 
-               }
-
-               { (item.status === "completada") 
-               ?<View>
-                  
                </View>
                :<></> 
                }
