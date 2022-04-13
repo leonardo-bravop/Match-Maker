@@ -8,7 +8,7 @@ import { colorSet } from "../styles/colorSet";
 import Constants from "expo-constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import { cardStyles, itemStyles, record2Styles, recordStyles } from "../styles/record";
+import { cardStyles, itemStyles} from "../styles/record";
 
 const ItemRecord = ({ item }) => {
    const { manifest } = Constants;
@@ -127,7 +127,7 @@ const ItemRecord = ({ item }) => {
             <View style={[itemStyles.info, {borderColor: "red" , borderWidth:0}]}>
                
                   {customStatus === "win" || customStatus === "lost"
-                  ?<Text style={[itemStyles.text, { fontSize: 30, color: colorSet[customStatus] }]}> 
+                  ?<Text style={[itemStyles.text, { fontSize: 25, color: colorSet[customStatus] }]}> 
                      {`${score[0]} - ${score[1]}`}
                   </Text>
                   :<>

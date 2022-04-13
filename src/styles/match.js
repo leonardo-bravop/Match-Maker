@@ -25,7 +25,6 @@ export const matchStyles = StyleSheet.create({
 
    ///////////////////////////////
    head: {
-      /*flexDirection: "row",*/
       height: 200,
       paddingTop: 30,
       paddingHorizontal: 16
@@ -45,7 +44,7 @@ export const matchStyles = StyleSheet.create({
    pickerButton: {
       height: 50, 
       marginHorizontal: 8,
-      alignSelf: "center"/*"flex-end"*/, 
+      alignSelf: "center", 
       justifyContent:"center"
    },
    listHead:{
@@ -147,7 +146,6 @@ export const itemStyles = StyleSheet.create({
       paddingHorizontal:10,
       alignContent: "center",
       borderRadius: 10,
-      //backgroundColor: colorSet.item
    },
    text: {
       fontSize: 18, 
