@@ -57,7 +57,7 @@ const home = StyleSheet.create({
     alignSelf: "center",
     flexDirection: "row",
     width: "80%",
-    height: "30%",
+    height: "40%",
     borderWidth: 3,
     borderColor: "white",
     borderRadius: 15,
@@ -170,7 +170,6 @@ function Home({ navigation: { navigate } }) {
       </View>
       <View style={home.containerDos}>
         <Text style={home.lastTittle}>Ultima partida</Text>
-        {console.log("MATH ACA",matches)}
         {matches[0] ? (
           <TouchableOpacity
             style={home.lastContainer}
@@ -179,9 +178,15 @@ function Home({ navigation: { navigate } }) {
             }}
           >
             <View style={home.lastItem}>
-              <Text style={home.lastText}>
-                {matches.reverse()[0].team_1[0].nickname}
-              </Text>
+              {console.log('MATCHES ======>', matches.reverse()[0])}
+              {matches.reverse()[0].team_1.map((item, i) => {
+                //if(i > 1) return
+                return (
+                  <Text key={i} style={home.lastText}>
+                    {item.nickname}
+                  </Text>
+                );
+              })}
             </View>
             <View style={home.lastItem}>
               <Text
@@ -194,9 +199,14 @@ function Home({ navigation: { navigate } }) {
               </Text>
             </View>
             <View style={home.lastItem}>
-              <Text style={home.lastText}>
-                {matches.reverse()[0].team_2[0].nickname}
-              </Text>
+              {matches.reverse()[0].team_2.map((item, i) => {
+                //if(i > 1) return
+                return (
+                  <Text key={i} style={home.lastText}>
+                    {item.nickname}
+                  </Text>
+                );
+              })}
             </View>
           </TouchableOpacity>
         ) : (
