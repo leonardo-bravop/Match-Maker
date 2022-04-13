@@ -23,7 +23,7 @@ router.get("/getUsers/:leagueId", leagueController.getUserByLeagueId);
 
 router.delete(
   "/deleteLeague/:id",
-  userController.verifyToken,
+  // userController.verifyToken,
   leagueController.deleteLeague
 );
 

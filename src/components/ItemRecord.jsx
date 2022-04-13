@@ -10,7 +10,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { cardStyles, itemStyles} from "../styles/record";
 
-const ItemRecord = ({ item }) => {
+
+const ItemRecord = ({ item, setOpenedMatch, openedMatch }) => {
    const { manifest } = Constants;
    const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 
@@ -130,7 +131,10 @@ const ItemRecord = ({ item }) => {
 
 
    return (
-      <TouchableOpacity onPress={() => setShowInfo(!showInfo)} 
+      <TouchableOpacity  onPress={() => {
+        if (setOpenedMatch) setOpenedMatch(!openedMatch);
+        setShowInfo(!showInfo || false);
+      }}
                         style={[itemStyles.item, {borderColor: colorSet[statusIs(item.status)] , borderWidth:1.5}]}>
          <View style={[itemStyles.head]}>
             <View style={[itemStyles.team, {borderColor: "blue" , borderWidth:0}]}>
