@@ -8,9 +8,10 @@ export const colorSet = {
    modalBack: 'rgba(9,10,28,0.85)'/*'rgba(30,30,50,0.85)'*/,
    pendiente: "#C49337",
    lista: "#3774C4",
-   completada: "#8C37C4",
+   completa: "#8C37C4",
    win: "#37C45D",
    lost: "#C43737",
    cancelada: "#B1B1C2",
-   confirmada: "green"
+   confirmada: "green",
+   warning: "orange"
 }

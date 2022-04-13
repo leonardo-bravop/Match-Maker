@@ -90,7 +90,7 @@ const Record = () => {
                            date: moment(item.date, "DD-MM-YYYY"),
                            dots: [ { color: colorSet.text } ]
                          }
-                        }):null}
+                        }):[]}
                   selectedDate={onDate}
                   onDateSelected={ selected => {
                      matchDateHandler(moment(selected, "YYYY-MM-DDTHH:mm:ss.SSSZ").format("DD-MM-YYYY"))

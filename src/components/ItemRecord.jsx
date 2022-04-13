@@ -37,9 +37,9 @@ const ItemRecord = ({ item }) => {
 
       asyncUser()
 
-      if(item.status==="conflicto") {
-         item.status="completada"
-      }
+      // if(item.status==="conflicto") {
+      //    item.status="completada"
+      // }
 
       if (item.status === "completada") {
          axios
@@ -60,18 +60,18 @@ const ItemRecord = ({ item }) => {
             let result = data.score_1.split("-")
             if (item.team_1.filter(element => element._id === user._id).length === 1){
                   setScore([result[0], result[1]])
-                  item.status = result[0] > result[1] ? "win" : "lost"
+                  //item.status = result[0] > result[1] ? "win" : "lost"
             }
             else {
                setScore([result[1], result[0]])
-               item.status = result[1] > result[0] ? "win" : "lost"
+               //item.status = result[1] > result[0] ? "win" : "lost"
             }
          })
       }
       
-      if (item.status === "lista" && moment().isSameOrAfter(moment(`${item.date} ${item.time}`, "DD-MM-YYYY H:mm"))) {
-         item.status = "completada"
-      }
+      // if (item.status === "lista" && moment().isSameOrAfter(moment(`${item.date} ${item.time}`, "DD-MM-YYYY H:mm"))) {
+      //    item.status = "completada"
+      // }
 
 
       if (item.status === "pendiente") {
@@ -117,11 +117,21 @@ const ItemRecord = ({ item }) => {
       });
       
    }
+   
+   const statusIs = (status) => {
+      if ( status === "completada" || status === "conflicto" || (
+         status === "lista" && moment().isSameOrAfter(moment(`${item.date} ${item.time}`, "DD-MM-YYYY H:mm")))){
+         return "completa"
+      }
+      if (status === "confirmada") 
+         return score[0] > score[1] ? "win" : "lost"
+      return status
+   }
 
 
    return (
       <TouchableOpacity onPress={() => setShowInfo(!showInfo)} 
-                        style={[itemStyles.item, {borderColor: colorSet[item.status] , borderWidth:1.5}]}>
+                        style={[itemStyles.item, {borderColor: colorSet[statusIs(item.status)] , borderWidth:1.5}]}>
          <View style={[itemStyles.head]}>
             <View style={[itemStyles.team, {borderColor: "blue" , borderWidth:0}]}>
                {item[item.team_1.filter(element => element._id === user._id).length === 1 ? "team_1" : "team_2"]
@@ -137,15 +147,15 @@ const ItemRecord = ({ item }) => {
             
             <View style={[itemStyles.info, {borderColor: "red" , borderWidth:0}]}>
                
-                  {item.status === "win" || item.status === "lost"
-                  ?<Text style={[itemStyles.text, { fontSize: 25, color: colorSet[item.status] }]}> 
+                  {item.status === "confirmada"
+                  ?<Text style={[itemStyles.text, { fontSize: 25, color: colorSet[statusIs(item.status)] }]}> 
                      {`${score[0]} - ${score[1]}`}
                   </Text>
                   :<>
-                     <Text style={[itemStyles.text, { textTransform: "uppercase", color: colorSet[item.status] }]}>
-                        {item.status === "completada" ? "completa" : item.status}
+                     <Text style={[itemStyles.text, { textTransform: "uppercase", color: colorSet[statusIs(item.status)] }]}>
+                        {statusIs(item.status)}
                      </Text>
-                     <Text style={[itemStyles.text, { textTransform: "uppercase", color: colorSet[item.status] }]}>
+                     <Text style={[itemStyles.text, { textTransform: "uppercase", color: colorSet[statusIs(item.status)] }]}>
                         {moment(item.date, "DD-MM-YYYY").format("DD-MM")}
                      </Text>
                   </>
@@ -169,15 +179,27 @@ const ItemRecord = ({ item }) => {
          
          { showInfo
          ? <View>
-            <View style={{marginBottom: item.status === "completada" || item.status === "pendiente"? 0 : 16}}>
+            <View style={{marginBottom: item.status === "pendiente" || statusIs(item.status) === "completa" ? 0 : 16}}>
                <Text style={[itemStyles.text]}>
                   El partido se { item.status === "pendiente" || item.status === "lista" ? "disputara" : "disputo"} a las {item.time}
                </Text>
                {item.invitationText === ""
                ? <></>
-               : <Text style={[itemStyles.text]}>
+               : <>
+                  <Text style={[itemStyles.text]}>
                      {item.invitationText}
-               </Text>}
+                  </Text>
+                  {item.status==="conflicto"
+                  ?<>
+                     <Text style={[cardStyles.cancelTxt, {color: colorSet.warning, textAlign: "center"}]}>
+                        Los resultados ingresados anteriormente no coinciden.
+                     </Text>
+                     <Text style={[cardStyles.cancelTxt, {color: colorSet.warning, textAlign: "center"}]}>
+                        Vuelva a intentarlo
+                     </Text>
+                  </>
+                  :<></>}
+               </>}
             </View>
 
                { (item.status === "pendiente") 
@@ -210,7 +232,7 @@ const ItemRecord = ({ item }) => {
                :<></> 
                }
 
-               { (item.status === "lista") 
+               { (statusIs(item.status) === "lista") 
                ?<View>
                   <Text style={[itemStyles.text, {marginTop: 10}]}>
                      Ya has confirmado tu participación
@@ -224,7 +246,7 @@ const ItemRecord = ({ item }) => {
                :<></> 
                }
 
-               { (item.status === "completada") 
+               { (statusIs(item.status) === "completa") 
                ?<View>
                   { !isScored 
                   ? <View style={{ marginTop: 30, flexDirection: "row"}}>
@@ -236,7 +258,7 @@ const ItemRecord = ({ item }) => {
                                     onChangeText={ text => setResult1(parseInt(text))}
                      />
                      
-                     <TouchableOpacity style={[cardStyles.confirmButton, { backgroundColor: colorSet[item.status]}]}
+                     <TouchableOpacity style={[cardStyles.confirmButton, { backgroundColor: colorSet[statusIs(item.status)]}]}
                                        onPress={resultHandler}>
                         <Text style={[cardStyles.buttonTxt]}>{"Enviar"}</Text>
                      </TouchableOpacity>
