@@ -99,10 +99,11 @@ console.log(`req body es`, req.body);
 exports.edit = (req, res, next) => {
   const { _id } = req.params;
   const { name, surname, nickname, age } = req.body;
-
+  console.log('REQ BODY ======>', req.body)
   User.updateOne({ _id }, { name, surname, nickname, age })
     .select("name nickname")
     .then((result) => {
+      console.log('RESULT ====>', result)
       res.send(result);
     })
     .catch((error) => {
