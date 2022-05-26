@@ -39,14 +39,14 @@ import { AntDesign } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-import firebase, { initializeApp } from "firebase/app";
-import "firebase/storage";
-import {
-  getStorage,
-  ref,
-  uploadBytesResumable,
-  getDownloadURL,
-} from "firebase/storage";
+// import firebase, { initializeApp } from "firebase/app";
+// import "firebase/storage";
+// import {
+//   getStorage,
+//   ref,
+//   uploadBytesResumable,
+//   getDownloadURL,
+// } from "firebase/storage";
 
 import * as Updates from "expo-updates";
 
@@ -296,286 +296,286 @@ const User = ({ navigation }) => {
   );
 };
 
-function Add({ setEditImage, navigation }) {
-  const user = useSelector((state) => state.user);
-  const dispatch = useDispatch();
+// function Add({ setEditImage, navigation }) {
+//   const user = useSelector((state) => state.user);
+//   const dispatch = useDispatch();
 
-  const { manifest } = Constants;
-  const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
+//   const { manifest } = Constants;
+//   const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyAGu-jYfZcOJ9YdaaSbaFMmxXlf5owk72o",
-    authDomain: "match-maker2022.firebaseapp.com",
-    projectId: "match-maker2022",
-    storageBucket: "match-maker2022.appspot.com",
-    messagingSenderId: "557226986706",
-    appId: "1:557226986706:web:b108737cb61fe4fe04b10b",
-    measurementId: "G-TCYVKY24CZ",
-  };
+//   const firebaseConfig = {
+//     apiKey: "AIzaSyAGu-jYfZcOJ9YdaaSbaFMmxXlf5owk72o",
+//     authDomain: "match-maker2022.firebaseapp.com",
+//     projectId: "match-maker2022",
+//     storageBucket: "match-maker2022.appspot.com",
+//     messagingSenderId: "557226986706",
+//     appId: "1:557226986706:web:b108737cb61fe4fe04b10b",
+//     measurementId: "G-TCYVKY24CZ",
+//   };
 
-  const firebaseApp = initializeApp(firebaseConfig);
-  const storage = getStorage(firebaseApp);
+//   const firebaseApp = initializeApp(firebaseConfig);
+//   const storage = getStorage(firebaseApp);
 
-  const [cameraPermission, setCameraPermission] = useState(null);
-  const [galleryPermission, setGalleryPermission] = useState(null);
-  const [showCamera, setShowCamera] = useState(false);
-  const [uploading, setUploading] = useState(false);
+//   const [cameraPermission, setCameraPermission] = useState(null);
+//   const [galleryPermission, setGalleryPermission] = useState(null);
+//   const [showCamera, setShowCamera] = useState(false);
+//   const [uploading, setUploading] = useState(false);
 
-  const [camera, setCamera] = useState(null);
-  const [imageUri, setImageUri] = useState([]);
-  const [type, setType] = useState(Camera.Constants.Type.back);
-  const [imageArray, setImageArray] = useState([]);
-  const [dataImage, setDataImage] = useState({});
+//   const [camera, setCamera] = useState(null);
+//   const [imageUri, setImageUri] = useState([]);
+//   const [type, setType] = useState(Camera.Constants.Type.back);
+//   const [imageArray, setImageArray] = useState([]);
+//   const [dataImage, setDataImage] = useState({});
 
-  const permisionFunction = async () => {
-    // here is how you can get the camera permission
-    const cameraPermission = await Camera.requestCameraPermissionsAsync();
+//   const permisionFunction = async () => {
+//     // here is how you can get the camera permission
+//     const cameraPermission = await Camera.requestCameraPermissionsAsync();
 
-    setCameraPermission(cameraPermission.status === "granted");
+//     setCameraPermission(cameraPermission.status === "granted");
 
-    const imagePermission = await ImagePicker.getMediaLibraryPermissionsAsync();
+//     const imagePermission = await ImagePicker.getMediaLibraryPermissionsAsync();
 
-    setGalleryPermission(imagePermission.status === "granted");
+//     setGalleryPermission(imagePermission.status === "granted");
 
-    if (
-      imagePermission.status !== "granted" &&
-      cameraPermission.status !== "granted"
-    ) {
-      alert("Permission for media access needed.");
-    }
-  };
+//     if (
+//       imagePermission.status !== "granted" &&
+//       cameraPermission.status !== "granted"
+//     ) {
+//       alert("Permission for media access needed.");
+//     }
+//   };
 
-  useEffect(() => {
-    permisionFunction();
-  }, []);
+//   useEffect(() => {
+//     permisionFunction();
+//   }, []);
 
-  const takePicture = async () => {
-    if (camera) {
-      const prevData = await camera.takePictureAsync(null);
-      const data = await ImageManipulator.manipulateAsync(prevData.uri, [], {
-        compress: 0.5,
-        format: ImageManipulator.SaveFormat.PNG,
-      });
-      setDataImage(data);
-      setImageUri(data.uri);
-      setImageArray([data.uri]);
-      setShowCamera(false);
-    }
-  };
+//   const takePicture = async () => {
+//     if (camera) {
+//       const prevData = await camera.takePictureAsync(null);
+//       const data = await ImageManipulator.manipulateAsync(prevData.uri, [], {
+//         compress: 0.5,
+//         format: ImageManipulator.SaveFormat.PNG,
+//       });
+//       setDataImage(data);
+//       setImageUri(data.uri);
+//       setImageArray([data.uri]);
+//       setShowCamera(false);
+//     }
+//   };
 
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      //mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 1,
-      aspect: [1, 1],
-      allowsEditing: true,
-      //base64: true,
-    });
+//   const pickImage = async () => {
+//     let result = await ImagePicker.launchImageLibraryAsync({
+//       //mediaTypes: ImagePicker.MediaTypeOptions.Images,
+//       quality: 1,
+//       aspect: [1, 1],
+//       allowsEditing: true,
+//       //base64: true,
+//     });
 
-    if (!result.cancelled) {
-      //handleUpload(result)
-      setDataImage(result);
-      setImageArray([result.uri]);
-    }
-  };
+//     if (!result.cancelled) {
+//       //handleUpload(result)
+//       setDataImage(result);
+//       setImageArray([result.uri]);
+//     }
+//   };
 
-  const handleUploadImage = async (file) => {
-    const userString = await AsyncStorage.getItem("userInfo");
-    const blob = await new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      xhr.onload = function () {
-        resolve(xhr.response);
-      };
-      xhr.onerror = function () {
-        reject(new TypeError("Network request failed"));
-      };
-      xhr.responseType = "blob";
-      xhr.open("GET", file.uri, true);
-      xhr.send(null);
-    });
+//   const handleUploadImage = async (file) => {
+//     const userString = await AsyncStorage.getItem("userInfo");
+//     const blob = await new Promise((resolve, reject) => {
+//       const xhr = new XMLHttpRequest();
+//       xhr.onload = function () {
+//         resolve(xhr.response);
+//       };
+//       xhr.onerror = function () {
+//         reject(new TypeError("Network request failed"));
+//       };
+//       xhr.responseType = "blob";
+//       xhr.open("GET", file.uri, true);
+//       xhr.send(null);
+//     });
 
-    const storage = getStorage();
+//     const storage = getStorage();
 
-    // Create the file metadata
-    const metadata = {
-      contentType: "image/jpg",
-    };
+//     // Create the file metadata
+//     const metadata = {
+//       contentType: "image/jpg",
+//     };
 
-    // Upload file and metadata to the object 'images/mountains.jpg'
-    const storageRef = ref(
-      storage,
-      "images/" + file.uri.split("/").reverse()[0]
-    );
-    const uploadTask = uploadBytesResumable(storageRef, blob, metadata);
+//     // Upload file and metadata to the object 'images/mountains.jpg'
+//     const storageRef = ref(
+//       storage,
+//       "images/" + file.uri.split("/").reverse()[0]
+//     );
+//     const uploadTask = uploadBytesResumable(storageRef, blob, metadata);
 
-    // Listen for state changes, errors, and completion of the upload.
-    uploadTask.on(
-      "state_changed",
-      (snapshot) => {
-        setUploading(true);
-        // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-        const progress =
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        console.log("Upload is " + progress + "% done");
-        switch (snapshot.state) {
-          case "paused":
-            console.log("Upload is paused");
-            break;
-          case "running":
-            console.log("Upload is running");
-            break;
-        }
-      },
-      (error) => {
-        // A full list of error codes is available at
-        // https://firebase.google.com/docs/storage/web/handle-errors
-        switch (error.code) {
-          case "storage/unauthorized":
-            // User doesn't have permission to access the object
-            break;
-          case "storage/canceled":
-            // User canceled the upload
-            break;
+//     // Listen for state changes, errors, and completion of the upload.
+//     uploadTask.on(
+//       "state_changed",
+//       (snapshot) => {
+//         setUploading(true);
+//         // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+//         const progress =
+//           (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+//         console.log("Upload is " + progress + "% done");
+//         switch (snapshot.state) {
+//           case "paused":
+//             console.log("Upload is paused");
+//             break;
+//           case "running":
+//             console.log("Upload is running");
+//             break;
+//         }
+//       },
+//       (error) => {
+//         // A full list of error codes is available at
+//         // https://firebase.google.com/docs/storage/web/handle-errors
+//         switch (error.code) {
+//           case "storage/unauthorized":
+//             // User doesn't have permission to access the object
+//             break;
+//           case "storage/canceled":
+//             // User canceled the upload
+//             break;
 
-          // ...
+//           // ...
 
-          case "storage/unknown":
-            // Unknown error occurred, inspect error.serverResponse
-            break;
-        }
-      },
-      () => {
-        // Upload completed successfully, now we can get the download URL
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          dispatch(
-            updateUser({
-              values: { img: downloadURL },
-              id: user._id,
-              userString: userString,
-            })
-          );
-          setUploading(false);
-          // console.log("File available at", downloadURL);
-          // console.log("USER IMAGE", user.img);
-          navigation.navigate("User");
-        });
-      }
-    );
-  };
+//           case "storage/unknown":
+//             // Unknown error occurred, inspect error.serverResponse
+//             break;
+//         }
+//       },
+//       () => {
+//         // Upload completed successfully, now we can get the download URL
+//         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+//           dispatch(
+//             updateUser({
+//               values: { img: downloadURL },
+//               id: user._id,
+//               userString: userString,
+//             })
+//           );
+//           setUploading(false);
+//           // console.log("File available at", downloadURL);
+//           // console.log("USER IMAGE", user.img);
+//           navigation.navigate("User");
+//         });
+//       }
+//     );
+//   };
 
-  return (
-    <View
-      style={{ flex: 4, justifyContent: "center", backgroundColor: "#0e0b29" }}
-    >
-      {imageArray.length > 0 && (
-        <View style={{ height: 250 }}>
-          <FlatList
-            horizontal
-            data={imageArray}
-            renderItem={({ item }) => (
-              <Image
-                key={1}
-                source={{ uri: item }}
-                style={{
-                  flex: 0.1,
-                  width: 175,
-                  height: 175,
-                  borderRadius: 85,
-                  alignSelf: "center",
-                  marginLeft: 120,
-                }}
-              />
-            )}
-          />
-        </View>
-      )}
-      {showCamera && (
-        <View style={styles.container}>
-          <Camera
-            style={styles.camera}
-            type={type}
-            ref={(ref) => setCamera(ref)}
-          >
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                style={styles.buttonBack}
-                onPress={() => setShowCamera(false)}
-              >
-                <Entypo name="cross" size={36} color="white" />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.buttonReverse}
-                onPress={() => {
-                  setType(
-                    type === Camera.Constants.Type.back
-                      ? Camera.Constants.Type.front
-                      : Camera.Constants.Type.back
-                  );
-                }}
-              >
-                <Ionicons
-                  name="camera-reverse-outline"
-                  size={36}
-                  color="white"
-                />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.buttonPicture}
-                onPress={takePicture}
-              >
-                <Entypo name="circle" size={48} color="white" />
-              </TouchableOpacity>
-            </View>
-          </Camera>
-        </View>
-      )}
-      {!showCamera && (
-        <View style={{ justifyContent: "center" }}>
-          <View style={{ width: "30%", alignSelf: "center" }}>
-            {!uploading ? (
-              <>
-                <Button
-                  title={"Camera"}
-                  type="outline"
-                  color="#841584"
-                  onPress={() => {
-                    setShowCamera(true);
-                  }}
-                />
-                <Button
-                  title={"Gallery"}
-                  onPress={pickImage}
-                  color="#841584"
-                  type="outline"
-                />
-                <Button
-                  title={"Cancelar"}
-                  type="outline"
-                  color="#841584"
-                  onPress={() => navigation.navigate("User")}
-                />
-                {imageArray.length > 0 && (
-                  <Button
-                    title={"Aceptar"}
-                    type="outline"
-                    color="#841584"
-                    onPress={() => handleUploadImage(dataImage)}
-                  />
-                )}
-                {}
-              </>
-            ) : (
-              <ActivityIndicator
-                size={"large"}
-                color={"green"}
-              ></ActivityIndicator>
-            )}
-          </View>
-        </View>
-      )}
-    </View>
-  );
-}
+//   return (
+//     <View
+//       style={{ flex: 4, justifyContent: "center", backgroundColor: "#0e0b29" }}
+//     >
+//       {imageArray.length > 0 && (
+//         <View style={{ height: 250 }}>
+//           <FlatList
+//             horizontal
+//             data={imageArray}
+//             renderItem={({ item }) => (
+//               <Image
+//                 key={1}
+//                 source={{ uri: item }}
+//                 style={{
+//                   flex: 0.1,
+//                   width: 175,
+//                   height: 175,
+//                   borderRadius: 85,
+//                   alignSelf: "center",
+//                   marginLeft: 120,
+//                 }}
+//               />
+//             )}
+//           />
+//         </View>
+//       )}
+//       {showCamera && (
+//         <View style={styles.container}>
+//           <Camera
+//             style={styles.camera}
+//             type={type}
+//             ref={(ref) => setCamera(ref)}
+//           >
+//             <View style={styles.buttonContainer}>
+//               <TouchableOpacity
+//                 style={styles.buttonBack}
+//                 onPress={() => setShowCamera(false)}
+//               >
+//                 <Entypo name="cross" size={36} color="white" />
+//               </TouchableOpacity>
+//               <TouchableOpacity
+//                 style={styles.buttonReverse}
+//                 onPress={() => {
+//                   setType(
+//                     type === Camera.Constants.Type.back
+//                       ? Camera.Constants.Type.front
+//                       : Camera.Constants.Type.back
+//                   );
+//                 }}
+//               >
+//                 <Ionicons
+//                   name="camera-reverse-outline"
+//                   size={36}
+//                   color="white"
+//                 />
+//               </TouchableOpacity>
+//               <TouchableOpacity
+//                 style={styles.buttonPicture}
+//                 onPress={takePicture}
+//               >
+//                 <Entypo name="circle" size={48} color="white" />
+//               </TouchableOpacity>
+//             </View>
+//           </Camera>
+//         </View>
+//       )}
+//       {!showCamera && (
+//         <View style={{ justifyContent: "center" }}>
+//           <View style={{ width: "30%", alignSelf: "center" }}>
+//             {!uploading ? (
+//               <>
+//                 <Button
+//                   title={"Camera"}
+//                   type="outline"
+//                   color="#841584"
+//                   onPress={() => {
+//                     setShowCamera(true);
+//                   }}
+//                 />
+//                 <Button
+//                   title={"Gallery"}
+//                   onPress={pickImage}
+//                   color="#841584"
+//                   type="outline"
+//                 />
+//                 <Button
+//                   title={"Cancelar"}
+//                   type="outline"
+//                   color="#841584"
+//                   onPress={() => navigation.navigate("User")}
+//                 />
+//                 {imageArray.length > 0 && (
+//                   <Button
+//                     title={"Aceptar"}
+//                     type="outline"
+//                     color="#841584"
+//                     onPress={() => handleUploadImage(dataImage)}
+//                   />
+//                 )}
+//                 {}
+//               </>
+//             ) : (
+//               <ActivityIndicator
+//                 size={"large"}
+//                 color={"green"}
+//               ></ActivityIndicator>
+//             )}
+//           </View>
+//         </View>
+//       )}
+//     </View>
+//   );
+// }
 
 function EditUser({ setEditImage, navigation }) {
   const dispatch = useDispatch();
@@ -763,7 +763,7 @@ function MyStack() {
       screenOptions={{ headerShown: false, animationEnabled: false }}
     >
       <Stack.Screen name="User" component={User} />
-      <Stack.Screen name="Change image user" component={Add} />
+      {/* <Stack.Screen name="Change image user" component={Add} /> */}
       <Stack.Screen name="Edit user" component={EditUser} />
     </Stack.Navigator>
   );

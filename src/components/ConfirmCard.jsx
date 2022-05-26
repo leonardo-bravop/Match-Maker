@@ -42,7 +42,7 @@ const ConfirmCard = () => {
         }}
       >
         <Text style={{ fontSize: 25, marginBottom: 8, color: "white" }}>
-          Detalles del match
+          Match Details
         </Text>
       </View>
       <View style={{ flex: 1 /*backgroundColor: "yellow"*/ }}>
@@ -55,7 +55,7 @@ const ConfirmCard = () => {
               /*backgroundColor: "grey",*/ alignItems: "center",
             }}
           >
-            <Text style={{ marginVertical: 8, color: "white" }}>Equipo A</Text>
+            <Text style={{ marginVertical: 8, color: "white" }}>Team A</Text>
             <View style={{ flex: 1, alignItems: "center" }}>
               {match &&
                 match.team_1.map((user) => {
@@ -71,7 +71,7 @@ const ConfirmCard = () => {
               /*backgroundColor: "red",*/ alignItems: "center",
             }}
           >
-            <Text style={{ marginVertical: 8, color: "white" }}>Equipo B</Text>
+            <Text style={{ marginVertical: 8, color: "white" }}>Team B</Text>
             <View style={{ flex: 1, alignItems: "center" }}>
               {match &&
                 match.team_2.map((user, i) => {
@@ -84,12 +84,11 @@ const ConfirmCard = () => {
         </View>
 
         <Text style={{ paddingHorizontal: 8, marginTop: 12, color: "white" }}>
-          El partido se disputara el{" "}
-          {moment(match.date, "DD-MM-YYYY").format("DD [de] MMMM [de] YYYY")} a
-          las {match.time}
+          The match will be played on {" "}
+          {moment(match.date, "DD-MM-YYYY").format("MMMM DD YYYY")} at {match.time}
         </Text>
         <View style={{ height: "auto", marginTop: 16, borderRadius: 10 }}>
-          <Text>Descripcion</Text>
+          <Text>Description</Text>
         </View>
       </View>
       <View style={{ height: 115 }}>
@@ -98,11 +97,11 @@ const ConfirmCard = () => {
             style={[leagueStyles.join, { backgroundColor: "#16a085" }]}
             onPress={acceptHandler}
           >
-            <Text style={leagueStyles.joinTxt}>Confirmar participación</Text>
+            <Text style={leagueStyles.joinTxt}>Confirm participation</Text>
           </TouchableOpacity>
         ) : (
           <Text style={leagueStyles.joinTxt}>
-            Ya has confirmado tu participación
+            You have already confirmed your participation
           </Text>
         )}
       </View>

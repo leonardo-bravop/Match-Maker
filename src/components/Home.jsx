@@ -263,7 +263,7 @@ function Home({ navigation: { navigate } }) {
                   alignSelf: "center",
                 }}
               >
-                Aun no tienes matches registradas
+                You don't have matches yet
               </Text>
             )}
           </>
@@ -272,7 +272,7 @@ function Home({ navigation: { navigate } }) {
           <>
             <View style={{ marginTop: 10 }}>
               <SearchBar
-                placeholder="Escribe aca..."
+                placeholder="Search a league"
                 onChangeText={updateSearch}
                 value={search}
                 lightTheme={true}
@@ -295,7 +295,7 @@ function Home({ navigation: { navigate } }) {
             <>
               <View style={[home.ligaContainer, { marginTop: 80 }]}>
                 <Text style={[home.ligaTittle, { width: "100%" }]}>
-                  RESULTADO
+                  RESULT
                 </Text>
               </View>
               <Text style={{ color: "white", textAlign: "center" }}>
@@ -314,7 +314,7 @@ function Home({ navigation: { navigate } }) {
                       dispatch(setLeagueId(item._id));
                       dispatch(setLeague(item));
                       dispatch(setMembers(item._id));
-                      navigate("Liga", item);
+                      navigate("League", item);
                     }}
                     style={[
                       home.itemContainer,
@@ -349,7 +349,7 @@ function Home({ navigation: { navigate } }) {
                     setMeLeagues(false);
                   }}
                 >
-                  LIGAS
+                  LEAGUES
                 </Text>
                 <Text
                   style={[home.ligaTittle, selectMeLeagues]}
@@ -359,7 +359,7 @@ function Home({ navigation: { navigate } }) {
                     setMeLeagues(true);
                   }}
                 >
-                  TUS LIGAS
+                  MY LEAGUES
                 </Text>
               </View>
               <Text style={{ color: "white", textAlign: "center" }}>
@@ -377,7 +377,7 @@ function Home({ navigation: { navigate } }) {
                         dispatch(setLeagueId(item.league._id));
                         dispatch(setLeague(item));
                         dispatch(setMembers(item.league._id));
-                        navigate("Liga");
+                        navigate("League");
                       }}
                       style={[
                         home.itemContainer,
@@ -412,7 +412,7 @@ function Home({ navigation: { navigate } }) {
                         dispatch(setLeagueId(item._id));
                         dispatch(setLeague(item));
                         dispatch(setMembers(item._id));
-                        navigate("Liga", item);
+                        navigate("League", item);
                       }}
                       style={[
                         home.itemContainer,

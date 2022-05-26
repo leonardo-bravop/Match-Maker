@@ -189,7 +189,8 @@ export const leagueStyles = StyleSheet.create({
       flex: 1,
       width: "auto",
       justifyContent: "center",
-      alignItems: "center"
+      alignItems: "center",
+      marginLeft: 10
    },
    elo:{
       width: 100,

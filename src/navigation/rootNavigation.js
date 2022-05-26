@@ -6,9 +6,7 @@ import { Icon } from "react-native-elements";
 
 import Welcome from "../components/Welcome";
 import Register from "../components/Register";
-import Login from "../components/Login";
 import Home from "../components/Home";
-import Users from "../components/Users";
 import Profile from "../components/Profile";
 import League from "../components/League";
 import Match from "../components/Match";
@@ -24,13 +22,13 @@ const AppNavigator = createBottomTabNavigator(
         tabBarIcon: <Icon name="ios-home" type="ionicon" color="white" />,
       },
     },
-    Liga: {
+    League: {
       screen: League,
       navigationOptions: {
         tabBarIcon: <Icon name="ios-people" type="ionicon" color="white" />,
       },
     },
-    Jugar: {
+    Match: {
       screen: Match,
       navigationOptions: {
         tabBarIcon: (
@@ -38,19 +36,18 @@ const AppNavigator = createBottomTabNavigator(
         ),
       },
     },
-    Historial: {
+    History: {
       screen: Record,
       navigationOptions: {
         tabBarIcon: <Icon name="history" color="white" />,
       },
     },
-    Perfil: {
+    Profile: {
       screen: Profile,
       navigationOptions: {
         tabBarIcon: <Icon name="ios-person" type="ionicon" color="white" />,
       },
     },
-    
   },
   {
     tabBarOptions: {
@@ -74,12 +71,6 @@ const AuthNavigator = createStackNavigator({
       headerShown: false,
     }),
   },
-  Login: {
-    screen: Login,
-    navigationOptions: () => ({
-      headerShown: false,
-    }),
-  },
   Register: {
     screen: Register,
     navigationOptions: () => ({
@@ -98,7 +89,7 @@ export default createAppContainer(
     {
       initialRouteName: "AuthLoading",
       /* initialRouteName: 'Auth', */
-/*        initialRouteName: 'App', */
+      /*        initialRouteName: 'App', */
     },
     {
       defaultNavigationOptions: {

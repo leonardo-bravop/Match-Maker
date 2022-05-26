@@ -9,7 +9,7 @@ const ItemLeague = ({ item, colorLeague }) => {
     <View style={[newLeagueStyles.item, {borderColor: colorLeague , borderWidth:1.5}]}>
          
             <View style={[newLeagueStyles.team, {borderColor: "blue" , borderWidth:0}]}>
-               <Text style={[newLeagueStyles.text, {marginBottom: 3}]}>
+               <Text style={[newLeagueStyles.text, {marginBottom: 3, paddingLeft: 15}]}>
                {item.rank}  
               </Text>
             </View>
@@ -19,13 +19,13 @@ const ItemLeague = ({ item, colorLeague }) => {
 
               <Image style={newLeagueStyles.img} source={{ uri: item.img }}/>
             
-              <Text style={newLeagueStyles.text}>
+              <Text style={[newLeagueStyles.text, {marginLeft: 10}]}>
                 {item.nickname}
               </Text>
           </View>
 
             <View style={[newLeagueStyles.team, {borderColor: "blue" , borderWidth:0}]}>
-               <Text style={[newLeagueStyles.text, {marginBottom: 3}]}>
+               <Text style={[newLeagueStyles.text, {marginBottom: 3, marginRight: 8}]}>
                {item.elo[0].value}
               </Text>
             </View>

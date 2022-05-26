@@ -219,7 +219,7 @@ const Match = ({navigation}) => {
                </TouchableOpacity>
             </View>
             
-            <ListHead labels={["Aliados", "Usuario", "Rivales"]} styling={matchStyles.listHead}/>
+            <ListHead labels={["Allies", "User", "Rivals"]} styling={matchStyles.listHead}/>
          </View>
 
          <View style={matchStyles.body}>
@@ -240,9 +240,16 @@ const Match = ({navigation}) => {
                      highlightDateNameStyle={{fontSize: 0}}
                      highlightDateNumberStyle={{color: colorSet.content , fontSize: 18}}
                      highlightDateContainerStyle={{backgroundColor: colorSet.text}}
-                     locale={ {name: "es", config: {
-                        months: 'Enero_Febrero_Marzo_Abril_Mayo_Junio_Julio_Agosto_Septiembre_Octubre_Noviembre_Diciembre'.split('_'),
-                        weekdaysShort: 'DOM_LUN_MAR_MIE_JUE_VIE_SAB'.split('_'),}}}
+                     locale={{
+                        name: "en",
+                        config: {
+                          months:
+                            "January_February_March_April_May_June_July_August_September_October_November_December".split(
+                              "_"
+                            ),
+                          weekdaysShort: "SUN_MON_TUE_WED_THU_FRI_SAT".split("_"),
+                        },
+                      }}
                      minDate={moment("01-01-2022", "MM-DD-YYYY")}
                      maxDate={moment().add(6, "M")}
                      startingDate={moment().subtract(3, 'd')}
@@ -286,7 +293,7 @@ const Match = ({navigation}) => {
                <TouchableOpacity 
                   disabled={noPress} onPress={createHandler}
                      style={[matchStyles.createButton, {backgroundColor: noPress ? "grey" : actualleague.color/*"#16a085"*/}]}>
-                  <Text style={matchStyles.buttonTxt}>Crear</Text>
+                  <Text style={matchStyles.buttonTxt}>NEW MATCH</Text>
                </TouchableOpacity>
                
                { noPress 
@@ -319,7 +326,7 @@ const Match = ({navigation}) => {
                                  <TextInput style={cardStyles.input}
                                     name="text" keyboardType="default"
                                     multiline={true} numberOfLines={3}
-                                    placeholder="Texto de invitacion"
+                                    placeholder="Invitation text"
                                     value={description} 
                                     onChangeText={ text => setDescription(text)}
                                  />
@@ -328,7 +335,7 @@ const Match = ({navigation}) => {
 
                            <View style={{ height: 115}} >
                               <TouchableOpacity onPress={confirmHandler} style={[cardStyles.confirmButton,{backgroundColor: actualleague.color}]} >
-                                 <Text style={cardStyles.buttonTxt}>Confirmar</Text>
+                                 <Text style={cardStyles.buttonTxt}>CONFIRM</Text>
                               </TouchableOpacity>
                            </View>
                         </View>

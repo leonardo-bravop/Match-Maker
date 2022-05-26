@@ -7,7 +7,7 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
-  ActivityIndicator
+  ActivityIndicator,
 } from "react-native";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -22,21 +22,19 @@ const { manifest } = Constants;
 const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 
 function Login({ navigation }) {
-
-  const [isLoading, setIsLoading] = useState(false)
-  const [errorMessage, setErrorMessage] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(false);
 
   const handleLogin = async (values) => {
     try {
-      setIsLoading(true)
+      setIsLoading(true);
       const result = await axios.post(`${uri}/api/user/login`, values);
       const userStored = result.data.token;
       await AsyncStorage.setItem("userInfo", userStored);
       result.status == 200 ? navigation.navigate("Home") : null;
-
     } catch (err) {
-      setIsLoading(false)
-      setErrorMessage(true)
+      setIsLoading(false);
+      setErrorMessage(true);
       console.log(err);
     }
   };
@@ -58,8 +56,9 @@ function Login({ navigation }) {
         validateOnMount={true}
         validationSchema={validationSchema}
         initialValues={{ email: "", password: "" }}
-        onSubmit={(values, {resetForm}) => {
-          handleLogin(values, resetForm)}}
+        onSubmit={(values, { resetForm }) => {
+          handleLogin(values, resetForm);
+        }}
       >
         {({
           handleChange,
@@ -71,48 +70,65 @@ function Login({ navigation }) {
           isValid,
         }) => (
           <>
-            <Text style={form.formTittle}>Inicia Sesión</Text>
-            
             <View style={form.inputContainer}>
-            <TextInput
-              style={form.inputs}
-              placeholder="Email o Nickname"
-              name="email"
-              onChangeText={handleChange("email")}
-              onBlur={handleBlur("email")}
-              value={values.email}
-              keyboardType="email-address"
-            />
+              <TextInput
+                style={form.inputs}
+                placeholder="Email o Nickname"
+                name="email"
+                onChangeText={handleChange("email")}
+                onBlur={handleBlur("email")}
+                value={values.email}
+                keyboardType="email-address"
+              />
 
-            {errors.email && touched.email && <Text>{errors.email}</Text>}
+              {errors.email && touched.email && <Text>{errors.email}</Text>}
 
-            <TextInput
-              style={form.inputs}
-              onChangeText={handleChange("password")}
-              onBlur={handleBlur("password")}
-              value={values.password}
-              secureTextEntry={true}
-              placeholder="Password"
-              name="password"
-            />
-            {errors.password && touched.password && (
-              <Text>{errors.password}</Text>
-            )}
+              <TextInput
+                style={form.inputs}
+                onChangeText={handleChange("password")}
+                onBlur={handleBlur("password")}
+                value={values.password}
+                secureTextEntry={true}
+                placeholder="Password"
+                name="password"
+              />
+              {errors.password && touched.password && (
+                <Text>{errors.password}</Text>
+              )}
             </View>
 
-            <TouchableOpacity disable style={form.colorBtn} onPress={handleSubmit}>
-              <Text style={form.colorTxtBtn}>ACEPTAR</Text>
+            <TouchableOpacity
+              disable
+              style={form.colorBtn}
+              onPress={handleSubmit}
+            >
+              <Text style={form.colorTxtBtn}>LOGIN</Text>
             </TouchableOpacity>
           </>
         )}
       </Formik>
-      {errorMessage ? <Text style={{color : "white", fontSize : 18, textAlign : "center", backgroundColor: "red", marginTop: 20, borderRadius: 20}}>El email o la contraseña ingresado no coinceden con ningun usuario registrado</Text> : null}
+      {errorMessage ? (
+        <Text
+          style={{
+            color: "white",
+            fontSize: 18,
+            textAlign: "center",
+            backgroundColor: "red",
+            marginTop: 20,
+            borderRadius: 20,
+          }}
+        >
+          E-mail or password don't match with any registered user
+        </Text>
+      ) : null}
       <Text
-        style={form.colorTxtBtn}
-        onPress={() => {setErrorMessage(false)
-          navigation.navigate("Register")}}
+        style={[form.colorTxtBtn, {marginTop: "10"}]}
+        onPress={() => {
+          setErrorMessage(false);
+          navigation.navigate("Register");
+        }}
       >
-        No tenes usuario? Registrate!
+        Don't have an account? Register!
       </Text>
       {isLoading ? <ActivityIndicator size="large" color="#00ff00" /> : null}
     </SafeAreaView>

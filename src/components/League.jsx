@@ -347,7 +347,7 @@ const LeagueHome = ({ navigation }) => {
 
       <View style={newLeagueStyles.body}>
         <ListHead
-          labels={["Rank", "Usuario", "ELO"]}
+          labels={["Rank", "User", "ELO"]}
           styling={newLeagueStyles.listHead}
         />
 
@@ -374,9 +374,9 @@ const LeagueHome = ({ navigation }) => {
                   textAlign: "center",
                 }}
               >
-                Acá aparecerán los miembros cuando selecciones una liga. {"\n"}
+                Team members will be displayed here when you join a league{"\n"}
                 {"\n"}
-                Prueba seleccionando una desde Home
+                Try selecting one in Home
               </Text>
             </View>
           )}
@@ -399,7 +399,7 @@ const LeagueHome = ({ navigation }) => {
           }}
           onPress={() => navigation.navigate("Create a league")}
         >
-          <Text style={{ fontSize: 18, color: "white" }}>CREAR LIGA</Text>
+          <Text style={{ fontSize: 18, color: "white" }}>NEW LEAGUE</Text>
         </TouchableOpacity>
 
         {userData.leagues.includes(leagueId) ? (
@@ -413,7 +413,7 @@ const LeagueHome = ({ navigation }) => {
                   style={[leagueStyles.img, { backgroundColor: user.color }]}
                 ></View>
                 <View style={leagueStyles.nick}>
-                  <Text style={{ color: "#FFFFFF" }}>{userData.nickname}</Text>
+                  <Text style={{ color: "#FFFFFF", marginLeft: 5 }}>{userData.nickname}</Text>
                 </View>
                 <View style={leagueStyles.elo}>
                   <Text style={{ color: "#FFFFFF" }}>{"user.elo"}</Text>

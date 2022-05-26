@@ -1,144 +1,181 @@
 import React, { useEffect, useState } from "react";
-import { Button, View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  TextInput,
+  SafeAreaView,
+  ActivityIndicator,
+} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
-/* import { styles } from "../styles/Styles"; */
-
-import Register from "./Register";
-import Login from "./Login";
-import { useDispatch, useSelector } from "react-redux";
+import { Formik } from "formik";
+import * as yup from "yup";
+import { form } from "../styles/form";
+import { welcome } from "../styles/welcome";
+import { useDispatch } from "react-redux";
 import { setUserMe } from "../state/user";
-export const form = StyleSheet.create({
-  container: {
-    backgroundColor: "#0e0b29",
-    flex: 1,
-    paddingTop: 100,
-    justifyContent: "flex-start",
-    color: "white",
-  },
-  formTittle: {
-    fontSize: 35,
-    fontWeight: "bold",
-    color: "white",
-    textAlign: "center",
-  },
-  inputContainer: {
-    marginTop: 20,
-    backgroundColor: "rgba(255, 255, 255, 0.3)",
-    borderRadius: 7,
-    width: "80%",
-    alignSelf: "center",
-  },
-  inputs: {
-    width: "80%",
-    alignSelf: "center",
-    fontSize: 18,
-    fontWeight: "600",
-    paddingLeft: 20,
-    borderWidth: 2,
-    borderRadius: 7,
-    borderColor: "white",
-    paddingRight: 12,
-    marginTop: 30,
-    marginBottom: 30,
-    backgroundColor: "white",
-  },
-  colorBtn: {
-    alignSelf: "center",
-    width: "50%",
-    borderWidth: 1,
-    borderColor: "#f27e18",
-    backgroundColor: "#e69249",
-    padding: 15,
-    marginTop: 20,
-    marginLeft: 20,
-    marginRight: 20,
-    borderRadius: 7,
-  },
-  colorTxtBtn: {
-    color: "#FFFFFF",
-    fontSize: 20,
-    textAlign: "center",
-  },
-});
-const welcome = StyleSheet.create({
-  container: {
-    backgroundColor: "#0e0b29",
-    flex: 1,
-    justifyContent: "space-evenly",
-  },
-  info: {
-    marginTop: 50,
-    color: "white",
-    fontSize: 48,
-    textAlign: "center",
-  },
-  colorBtn: {
-    borderWidth: 1,
-    borderColor: "#f27e18",
-    backgroundColor: "#e69249",
-    padding: 15,
-    marginTop: 20,
-    marginRight: 20,
-    borderRadius: 7,
-  },
-  colorTxtBtn: {
-    color: "#FFFFFF",
-    fontSize: 18,
-    textAlign: "center",
-    textTransform: "uppercase",
-    fontWeight: "900",
-    fontFamily: "Roboto",
-  },
-  btnContainer: {
-    backgroundColor: "#0e0b29",
-    alignSelf: "center",
-    marginBottom: "20%",
-    width: "50%",
-  },
-});
+import axios from "axios";
+import Constants from "expo-constants";
 
 function Welcome({ navigation }) {
-  const userData = useSelector((state) => state.user);
   const dispatch = useDispatch();
-  const [userString, setUserString] = useState("")
+  const [userString, setUserString] = useState("");
+  const [errorMessage, setErrorMessage] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const { manifest } = Constants;
+  const uri = `http://${manifest.debuggerHost.split(":").shift()}:3000`;
 
   useEffect(() => {
     const asyncUser = async () => {
       const result = await AsyncStorage.getItem("userInfo");
-      setUserString(result)
+      setUserString(result);
       if (result) {
         await dispatch(setUserMe(userString));
-        navigation.navigate("Home")
-        return
-      };
-      const { payload } = await dispatch(setUserMe(userString));
+        navigation.navigate("Home");
+        return;
+      }
+      await dispatch(setUserMe(userString));
     };
     asyncUser();
   }, []);
 
+  //Login Form utils
+  const handleLogin = async (values) => {
+    try {
+      setIsLoading(true);
+      const result = await axios.post(`${uri}/api/user/login`, values);
+      const userStored = result.data.token;
+      await AsyncStorage.setItem("userInfo", userStored);
+      result.status == 200 ? navigation.navigate("Home") : null;
+    } catch (err) {
+      setIsLoading(false);
+      setErrorMessage(true);
+      console.log(err);
+    }
+  };
+
+  const validationSchema = yup.object().shape({
+    email: yup
+      .string("Ingresa tu email o nombre de usuario")
+      .required("*Campo requerido"),
+
+    password: yup
+      .string("Ingresa tu Contraseña")
+      // .min(8, "La contraseña debe tener al menos 8 caracteres")
+      .required("*Campo requerido"),
+  });
+
   return (
     <>
-      {userString===null ? (
+      {userString === null ? (
         <View style={welcome.container}>
-          <Text style={welcome.info}>Bienvenido a Match Maker</Text>
+          <View style={welcome.titleContainer}>
+            <Text style={welcome.info}>Welcome to Match Maker</Text>
+          </View>
+          {
+            //LOGIN FORMIK
+          }
+          <View style={welcome.loginContainer}>
+            <Formik
+              validateOnMount={true}
+              validationSchema={validationSchema}
+              initialValues={{ email: "", password: "" }}
+              onSubmit={(values, { resetForm }) => {
+                handleLogin(values, resetForm);
+              }}
+            >
+              {({
+                handleChange,
+                handleBlur,
+                handleSubmit,
+                values,
+                errors,
+                touched,
+                isValid,
+              }) => (
+                <>
+                  <View style={form.inputContainer}>
+                    <TextInput
+                      style={form.inputs}
+                      placeholder="Email or Nickname"
+                      name="email"
+                      onChangeText={handleChange("email")}
+                      onBlur={handleBlur("email")}
+                      value={values.email}
+                      keyboardType="email-address"
+                    />
+                    {/* <View style={form.errorContainer}>
+                      {errors.email && touched.email && (
+                        <Text style={form.errorText}>{errors.email}</Text>
+                      )}
+                    </View> */}
 
-          <View style={welcome.btnContainer}>
-            <TouchableOpacity
-              style={welcome.colorBtn}
-              onPress={() => navigation.navigate("Login")}
-            >
-              <Text style={welcome.colorTxtBtn}>Iniciar Sesion</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={welcome.colorBtn}
-              onPress={() => navigation.navigate("Register")}
-            >
-              <Text style={welcome.colorTxtBtn}>Registrarse</Text>
-            </TouchableOpacity>
+                    <TextInput
+                      style={form.inputs}
+                      onChangeText={handleChange("password")}
+                      onBlur={handleBlur("password")}
+                      value={values.password}
+                      secureTextEntry={true}
+                      placeholder="Password"
+                      name="password"
+                    />
+                    {/* <View style={form.errorContainer}>
+                      {errors.password && touched.password && (
+                        <Text style={form.errorText}>{errors.password}</Text>
+                      )}
+                    </View> */}
+
+                    <TouchableOpacity
+                      disable
+                      style={form.colorBtn}
+                      onPress={handleSubmit}
+                    >
+                      <Text style={form.colorTxtBtn}>LOGIN</Text>
+                    </TouchableOpacity>
+                  </View>
+                </>
+              )}
+            </Formik>
+
+            {errorMessage ? (
+              <Text
+                style={{
+                  color: "white",
+                  fontSize: 18,
+                  textAlign: "center",
+                  backgroundColor: "red",
+                  marginTop: 20,
+                  borderRadius: 20,
+                  width: "72%",
+                  paddingVertical: 10,
+                  alignSelf: "center",
+                }}
+              >
+                E-mail or password invalid
+              </Text>
+            ) : null}
+            <View style={form.registerOptContainer}>
+              <Text style={form.colorTxtBtn}>Don't have an account yet?</Text>
+              <Text
+                style={form.registerTxtBtn}
+                onPress={() => {
+                  setErrorMessage(false);
+                  navigation.navigate("Register");
+                }}
+              >
+                Register!
+              </Text>
+            </View>
+            {isLoading ? (
+              <ActivityIndicator size="large" color="#00ff00" />
+            ) : null}
           </View>
         </View>
-      ) : <View style={welcome.container}></View> }
+      ) : (
+        <View style={welcome.container}></View>
+      )}
     </>
   );
 }

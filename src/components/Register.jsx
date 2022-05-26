@@ -27,7 +27,7 @@ function Register({ navigation }) {
     setIsLoading(true);
     axios.post(`${uri}/api/user/register`, values).then((res) => {
       setIsLoading(false)
-      res.status == 201 ? navigation.navigate("Login") : null;
+      res.status == 201 ? navigation.navigate("Welcome") : null;
     });
   };
 
@@ -80,7 +80,7 @@ function Register({ navigation }) {
           isValid,
         }) => (
           <>
-            <Text style={formR.formTittle}>Inicia Sesión</Text>
+            <Text style={formR.formTittle}>Create your account!</Text>
 
             <View style={formR.inputContainer}>
               <TextInput
@@ -89,7 +89,7 @@ function Register({ navigation }) {
                 onBlur={handleBlur("name")}
                 value={values.name}
                 keyboardType="default"
-                placeholder="Nombre"
+                placeholder="Name"
                 name="name"
               />
 
@@ -101,7 +101,7 @@ function Register({ navigation }) {
                 onBlur={handleBlur("surname")}
                 value={values.surname}
                 keyboardType="default"
-                placeholder="Apellido"
+                placeholder="Lastname"
                 name="surname"
               />
 
@@ -148,14 +148,14 @@ function Register({ navigation }) {
             </View>
 
             <TouchableOpacity style={formR.colorBtn} onPress={handleSubmit}>
-              <Text style={formR.colorTxtBtn}>REGISTRARSE</Text>
+              <Text style={formR.colorTxtBtn}>REGISTER</Text>
             </TouchableOpacity>
           </>
         )}
       </Formik>
       <Text
         style={formR.colorTxtBtn}
-        onPress={() => navigation.navigate("Login")}
+        onPress={() => navigation.navigate("Welcome")}
       >
         LOGIN
       </Text>
