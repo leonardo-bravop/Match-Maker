@@ -185,7 +185,7 @@ const ItemRecord = ({ item, setOpenedMatch, openedMatch }) => {
          ? <View>
             <View style={{marginBottom: item.status === "pendiente" || statusIs(item.status) === "completa" ? 0 : 16}}>
                <Text style={[itemStyles.text]}>
-                  El partido se { item.status === "pendiente" || item.status === "lista" ? "disputara" : "disputo"} a las {item.time}
+                  The match { item.status === "pendiente" || item.status === "lista" ? "will be played" : "was played"} at {item.time}
                </Text>
                {item.invitationText === ""
                ? <></>
@@ -196,10 +196,10 @@ const ItemRecord = ({ item, setOpenedMatch, openedMatch }) => {
                   {item.status==="conflicto"
                   ?<>
                      <Text style={[cardStyles.cancelTxt, {color: colorSet.warning, textAlign: "center"}]}>
-                        Los resultados ingresados anteriormente no coinciden.
+                        Entered results are not the same.
                      </Text>
                      <Text style={[cardStyles.cancelTxt, {color: colorSet.warning, textAlign: "center"}]}>
-                        Vuelva a intentarlo
+                        Please try again.
                      </Text>
                   </>
                   :<></>}
@@ -223,7 +223,7 @@ const ItemRecord = ({ item, setOpenedMatch, openedMatch }) => {
                   </View>
                   : <View>
                         <Text style={[itemStyles.text, {marginTop: 10}]}>
-                           Ya has confirmado tu participación
+                           You've already confirmed your participation
                         </Text>
                         <View style={{ marginVertical: 10, flexDirection: "row"}}>
                            <TouchableOpacity style={[cardStyles.cancelButton]} onPress={cancelHandler}>
@@ -239,7 +239,7 @@ const ItemRecord = ({ item, setOpenedMatch, openedMatch }) => {
                { (statusIs(item.status) === "lista") 
                ?<View>
                   <Text style={[itemStyles.text, {marginTop: 10}]}>
-                     Ya has confirmado tu participación
+                  You've already confirmed your participation
                   </Text>
                   <View style={{ marginVertical: 10, flexDirection: "row"}}>
                   <TouchableOpacity style={[cardStyles.cancelButton]} onPress={cancelHandler}>

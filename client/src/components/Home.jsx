@@ -203,8 +203,7 @@ function Home({ navigation: { navigate } }) {
             {matches.reverse()[0] ? (
               <View
                 onPress={() => console.log(`esto es magia`)}
-                
-                style={{ marginTop: openedMatch? 100 : 20 }}
+                style={{ marginTop: openedMatch ? 100 : 20 }}
               >
                 <ItemRecord
                   item={matches.reverse()[0]}
@@ -213,49 +212,6 @@ function Home({ navigation: { navigate } }) {
                 />
               </View>
             ) : (
-              // <TouchableOpacity
-              //   style={home.lastContainer}
-              //   onPress={() => {
-              //     navigate("Historial");
-              //   }}
-              // >
-              //   <View style={home.lastItem}>
-              //     {match.team_1.map((item, i) => {
-              //       if (i == 2)
-              //         return (
-              //           <Text key={i} style={home.lastText}>{`y ${
-              //             match.team_1.length - 2
-              //           } más`}</Text>
-              //         );
-              //       if (i > 1) return;
-              //       return (
-              //         <Text key={i} style={home.lastText}>
-              //           {item.nickname}
-              //         </Text>
-              //       );
-              //     })}
-              //   </View>
-              //   <View style={home.lastResultItem}>
-              //   <Text style={home.lastResult}>{match.date}</Text>
-              //     <Text style={home.lastResult}>{match.status}</Text>
-              //   </View>
-              //   <View style={home.lastItem}>
-              //     {match.team_2.map((item, i) => {
-              //       if (i == 2)
-              //         return (
-              //           <Text key={i} style={home.lastText}>{`y ${
-              //             match.team_2.length - 2
-              //           } más`}</Text>
-              //         );
-              //       if (i > 1) return;
-              //       return (
-              //         <Text key={i} style={home.lastText}>
-              //           {item.nickname}
-              //         </Text>
-              //       );
-              //     })}
-              //   </View>
-              // </TouchableOpacity>
               <Text
                 style={{
                   color: "white",
@@ -294,9 +250,7 @@ function Home({ navigation: { navigate } }) {
           {results[0] ? (
             <>
               <View style={[home.ligaContainer, { marginTop: 80 }]}>
-                <Text style={[home.ligaTittle, { width: "100%" }]}>
-                  RESULT
-                </Text>
+                <Text style={[home.ligaTittle, { width: "100%" }]}>RESULT</Text>
               </View>
               <Text style={{ color: "white", textAlign: "center" }}>
                 ──────────────────────────────────────

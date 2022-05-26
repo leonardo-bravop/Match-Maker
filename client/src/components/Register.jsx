@@ -1,19 +1,16 @@
 import React from "react";
 import {
-  Button,
   View,
   Text,
   SafeAreaView,
   TextInput,
-  StyleSheet,
-  TouchableHighlight,
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
 import { Formik } from "formik";
 import * as yup from "yup";
 import { formR } from "../styles/form";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import Constants from "expo-constants";
 
@@ -26,7 +23,7 @@ function Register({ navigation }) {
   const handleRegister = (values) => {
     setIsLoading(true);
     axios.post(`${uri}/api/user/register`, values).then((res) => {
-      setIsLoading(false)
+      setIsLoading(false);
       res.status == 201 ? navigation.navigate("Welcome") : null;
     });
   };
@@ -89,7 +86,7 @@ function Register({ navigation }) {
                 onBlur={handleBlur("name")}
                 value={values.name}
                 keyboardType="default"
-                placeholder="Name"
+                placeholder="Name*"
                 name="name"
               />
 
@@ -111,7 +108,7 @@ function Register({ navigation }) {
                 onBlur={handleBlur("nickname")}
                 value={values.nickname}
                 keyboardType="default"
-                placeholder="Nickname"
+                placeholder="Nickname*"
                 name="nickname"
               />
 
@@ -138,7 +135,7 @@ function Register({ navigation }) {
                 value={values.password}
                 keyboardType="default"
                 secureTextEntry={true}
-                placeholder="Password"
+                placeholder="Password*"
                 name="password"
               />
 
@@ -154,10 +151,10 @@ function Register({ navigation }) {
         )}
       </Formik>
       <Text
-        style={formR.colorTxtBtn}
+        style={[formR.colorTxtBtn, { marginTop: 15, color: "#e69249" }]}
         onPress={() => navigation.navigate("Welcome")}
       >
-        LOGIN
+        {"< "} Go back to Login
       </Text>
       {isLoading ? <ActivityIndicator size="large" color="#00ff00" /> : null}
     </SafeAreaView>

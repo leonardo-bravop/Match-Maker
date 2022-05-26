@@ -8,7 +8,6 @@ import {
   ScrollView,
   Pressable,
   Modal,
-  Button,
   TextInput,
   ActivityIndicator,
   Image,
@@ -27,7 +26,6 @@ import { leagueStyles, newLeagueStyles } from "../styles/league";
 import List from "../commons/List";
 import { useDispatch, useSelector } from "react-redux";
 import ItemLeague from "./ItemLeague";
-import FootLigue from "./FootLeague";
 import { setLeagueId } from "../state/idLeague";
 import { setMembers } from "../state/memberList";
 import { setUserLeagues } from "../state/userLeague";
@@ -45,7 +43,6 @@ import { CheckBox } from "react-native-elements";
 import { setUserMe } from "../state/user";
 import { colorSet } from "../styles/colorSet";
 import ListHead from "./MatchListHead";
-import autoMergeLevel1 from "redux-persist/es/stateReconciler/autoMergeLevel1";
 
 const LeagueHome = ({ navigation }) => {
   const { manifest } = Constants;
@@ -128,7 +125,7 @@ const LeagueHome = ({ navigation }) => {
         setActualLeague(data);
       } catch (error) {
         console.error(`Error: ${error.message}`);
-        setSecretError("Hubo un problema, por favor intenta de nuevo");
+        setSecretError("There was a problem, please try again");
       }
     };
 
@@ -144,15 +141,12 @@ const LeagueHome = ({ navigation }) => {
         setSecretError("");
 
         if (result && result.request.status === 200) {
-          Alert.alert(
-            "Bienvenido!",
-            `Te uniste a la liga ${actualleague.name}`
-          );
+          Alert.alert("Welcome!", `You've joined ${actualleague.name}`);
           setSecretKey = "";
           setShowSecretkeyCard(false);
-        } else setSecretError("Clave secreta inválida");
+        } else setSecretError("Invalid secret key");
       } catch (error) {
-        setSecretError("Clave secreta inválida");
+        setSecretError("Invalid secret key");
         console.error(`Error: ${error.message}`);
       }
     };
@@ -217,7 +211,8 @@ const LeagueHome = ({ navigation }) => {
                             padding: 10,
                           }}
                         >
-                          Acá aparecerán tus ligas. Únete a una desde Home
+                          Here will be displayed your leagues. Join one from
+                          Home
                         </Text>
                       )}
                     </View>
@@ -262,7 +257,7 @@ const LeagueHome = ({ navigation }) => {
                   <Text
                     style={{ color: "white", paddingBottom: 15, fontSize: 18 }}
                   >
-                    Ingrese clave secreta de 5 caracteres:
+                    Enter 5 character secret key:
                   </Text>
                   <TextInput
                     style={{
@@ -302,7 +297,7 @@ const LeagueHome = ({ navigation }) => {
                       }
                     }}
                   >
-                    <Text style={leagueStyles.joinTxt}>Aceptar</Text>
+                    <Text style={leagueStyles.joinTxt}>Accept</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -413,7 +408,9 @@ const LeagueHome = ({ navigation }) => {
                   style={[leagueStyles.img, { backgroundColor: user.color }]}
                 ></View>
                 <View style={leagueStyles.nick}>
-                  <Text style={{ color: "#FFFFFF", marginLeft: 5 }}>{userData.nickname}</Text>
+                  <Text style={{ color: "#FFFFFF", marginLeft: 5 }}>
+                    {userData.nickname}
+                  </Text>
                 </View>
                 <View style={leagueStyles.elo}>
                   <Text style={{ color: "#FFFFFF" }}>{"user.elo"}</Text>
@@ -485,33 +482,30 @@ const HomeScreen = ({ navigation }) => {
       })
       .then(() => {
         navigation.navigate("Leagues");
-        Alert.alert("Liga creada!", `Se ha creado la liga ${values.name}`);
+        Alert.alert(
+          "League created!",
+          `League ${values.name} has been created`
+        );
       })
       .catch((error) => {
         setIsLoading(false);
-        console.log("error es", error);
+        console.log("error is", error);
       });
   };
 
   const validationSchema = yup.object().shape({
-    name: yup.string("Ingresa tu nombre").required("*Campo requerido"),
-    // surname: yup.string("Ingresa tu apellido").required("*Campo requerido"),
-
-    // nickname: yup
-    //   .string("Ingresa tu nickname")
-    //   .required("*Campo requerido")
-    //   .max(10, "El nickname debe tener un maximo de 10 caracteres"),
+    name: yup.string("Enter your name").required("*Required field"),
 
     secretKey: yup
       .string("Ingrese una clave")
-      .min(5, "La clave debe tener 5 caracteres")
+      .min(5, "Password must have 5 characters")
       .matches(
         /^(?=(.*[A-Z]){1,}).*$/,
-        "La contraseña debe tener al menos una mayúscula"
+        "Password must contain at least one uppercase letter"
       )
       .matches(
         /^(?=(.*[0-9]){1,}).*$/,
-        "La contraseña debe tener al menos un número"
+        "Password must contain at least one number"
       ),
   });
 
@@ -544,7 +538,7 @@ const HomeScreen = ({ navigation }) => {
             handleRegister({ ...values, select });
           else if (!select && !values.secretKey) {
             handleRegister({ ...values, select });
-          } 
+          }
         }}
       >
         {({
@@ -557,7 +551,7 @@ const HomeScreen = ({ navigation }) => {
           isValid,
         }) => (
           <>
-            <Text style={formR.formTittle}>Nueva Liga</Text>
+            <Text style={formR.formTittle}>New League</Text>
 
             <View style={formR.inputContainer}>
               <TextInput
@@ -566,7 +560,7 @@ const HomeScreen = ({ navigation }) => {
                 onBlur={handleBlur("name")}
                 value={values.name}
                 keyboardType="default"
-                placeholder="Nombre de la liga"
+                placeholder="League Name"
                 name="name"
               />
 
@@ -578,7 +572,7 @@ const HomeScreen = ({ navigation }) => {
                 onBlur={handleBlur("sport")}
                 value={values.sport}
                 keyboardType="default"
-                placeholder="Deporte"
+                placeholder="Sport"
                 name="sport"
               />
 
@@ -588,12 +582,12 @@ const HomeScreen = ({ navigation }) => {
                 onBlur={handleBlur("description")}
                 value={values.description}
                 keyboardType="default"
-                placeholder="Descripción"
+                placeholder="Description"
                 name="description"
               />
 
               <View style={formR.customInput}>
-                <Text style={formR.textCustomInput}>¿Es privada?</Text>
+                <Text style={formR.textCustomInput}>Private?</Text>
                 <View
                   style={[formR.customInput, { width: "auto", marginLeft: 5 }]}
                 >
@@ -630,14 +624,14 @@ const HomeScreen = ({ navigation }) => {
                   value={values.secretKey}
                   keyboardType="default"
                   secureTextEntry={true}
-                  placeholder="Clave Secreta (5)"
+                  placeholder="Secret key (5)"
                   name="secretKey"
                   maxLength={5}
                 />
               ) : null}
 
               {select && values.secretKey === "" ? (
-                <Text style={formR.error}>Por favor, ingrese una clave</Text>
+                <Text style={formR.error}>Please, enter a password</Text>
               ) : null}
               {errors.secretKey && touched.secretKey && (
                 <Text style={formR.error}>{errors.secretKey}</Text>
@@ -659,7 +653,7 @@ const HomeScreen = ({ navigation }) => {
                 onBlur={handleBlur("img")}
                 value={values.img}
                 keyboardType="default"
-                placeholder="Imagen (opcional)"
+                placeholder="Image (optional)"
                 name="img"
               />
               {
@@ -683,13 +677,13 @@ const HomeScreen = ({ navigation }) => {
                 style={formR.leagueFormBtn}
                 onPress={() => navigation.goBack()}
               >
-                <Text style={formR.colorTxtBtn}>CANCELAR</Text>
+                <Text style={formR.colorTxtBtn}>CANCEL</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[formR.leagueFormBtn, { backgroundColor: "#e69249" }]}
                 onPress={handleSubmit}
               >
-                <Text style={formR.colorTxtBtn}>CREAR</Text>
+                <Text style={formR.colorTxtBtn}>CREATE</Text>
               </TouchableOpacity>
             </View>
           </>

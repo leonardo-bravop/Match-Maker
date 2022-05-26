@@ -4,9 +4,6 @@ import { ligaStyles } from "../styles/league";
 import { profile } from "../styles/profile";
 
 const UserLeagues = ({ item, i }) => {
-  // const onPress = () => {
-  //   navigation.navigate("Ligas");
-  // };
 
   return (
     <TouchableOpacity>
